@@ -1,0 +1,72 @@
+@baseUrl = http://localhost:8000
+
+### Créer un genre → 201
+# @name createGenre
+POST {{baseUrl}}/genres
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "Action" }
+
+### Créer un deuxième genre → 201
+POST {{baseUrl}}/genres
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "Drame" }
+
+### Créer un genre dont le nom existe déjà, aux majuscules près → 422
+POST {{baseUrl}}/genres
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "action" }
+
+### Créer un genre au nom trop court → 422
+POST {{baseUrl}}/genres
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "A" }
+
+### Liste des genres, triés par nom, 5 par page → 200
+GET {{baseUrl}}/genres
+Accept: application/json
+
+### Liste des genres, page 2 de 1 élément → 200
+GET {{baseUrl}}/genres?page=2&limit=1
+Accept: application/json
+
+### Pagination invalide → 422
+GET {{baseUrl}}/genres?limit=0
+Accept: application/json
+
+### Détail du genre créé → 200
+GET {{baseUrl}}/genres/{{createGenre.response.body.id}}
+Accept: application/json
+
+### Détail d'un genre inexistant → 404
+GET {{baseUrl}}/genres/999999
+Accept: application/json
+
+### Renommer le genre créé (changer seulement la casse est autorisé) → 200
+PUT {{baseUrl}}/genres/{{createGenre.response.body.id}}
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "ACTION" }
+
+### Renommer vers le nom d'un autre genre → 422
+PUT {{baseUrl}}/genres/{{createGenre.response.body.id}}
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "drame" }
+
+### Supprimer le genre créé (les films qui l'utilisent sont conservés) → 204
+DELETE {{baseUrl}}/genres/{{createGenre.response.body.id}}
+Accept: application/json
+
+### Supprimer un genre inexistant → 404
+DELETE {{baseUrl}}/genres/999999
+Accept: application/json

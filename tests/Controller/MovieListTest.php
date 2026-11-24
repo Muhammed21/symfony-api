@@ -73,7 +73,7 @@ final class MovieListTest extends ApiTestCase
 
         $body = $this->requestJson('GET', '/movies');
 
-        self::assertSame(['id', 'title', 'releaseYear', 'duration', 'ageRating'], array_keys($body['items'][0]));
+        self::assertSame(['id', 'title', 'releaseYear', 'duration', 'ageRating', 'genres'], array_keys($body['items'][0]));
     }
 
     public function testFiltersByPartOfTitleIgnoringCase(): void

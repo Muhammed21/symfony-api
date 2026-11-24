@@ -46,8 +46,30 @@ abstract class ApiTestCase extends WebTestCase
             'releaseYear' => 1972,
             'duration' => 175,
             'ageRating' => '16+',
+            'genres' => [],
             ...$overrides,
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function createGenre(string $name): array
+    {
+        $genre = $this->requestJson('POST', '/genres', ['name' => $name]);
+        self::assertResponseStatusCodeSame(201);
+
+        return $genre ?? [];
+    }
+
+    /**
+     * @param array<string, mixed> $error
+     *
+     * @return list<string>
+     */
+    protected static function violatedPaths(array $error): array
+    {
+        return array_column($error['violations'] ?? [], 'propertyPath');
     }
 
     /**

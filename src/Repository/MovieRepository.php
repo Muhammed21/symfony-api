@@ -21,6 +21,8 @@ class MovieRepository extends ServiceEntityRepository
     public function createFilteredQuery(MovieFilters $filters): QueryBuilder
     {
         $query = $this->createQueryBuilder('movie')
+            ->leftJoin('movie.genres', 'genre')
+            ->addSelect('genre')
             ->orderBy('movie.title', 'ASC')
             ->addOrderBy('movie.id', 'ASC');
 
@@ -32,6 +34,11 @@ class MovieRepository extends ServiceEntityRepository
         if (null !== $filters->year) {
             $query->andWhere('movie.releaseYear = :year')
                 ->setParameter('year', $filters->year);
+        }
+
+        if (null !== $filters->genre) {
+            $query->andWhere(':genre MEMBER OF movie.genres')
+                ->setParameter('genre', $filters->genre);
         }
 
         return $query;

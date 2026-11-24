@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Dto\MovieInput;
 use App\Enum\AgeRating;
 use App\Repository\MovieRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -38,18 +40,45 @@ class Movie
     #[Groups(['movie:list', 'movie:read'])]
     private AgeRating $ageRating;
 
-    public function __construct(MovieInput $input)
+    /**
+     * @var Collection<int, Genre>
+     */
+    #[ORM\ManyToMany(targetEntity: Genre::class, inversedBy: 'movies')]
+    private Collection $genres;
+
+    /**
+     * @param list<Genre> $genres
+     */
+    public function __construct(MovieInput $input, array $genres)
     {
-        $this->replaceWith($input);
+        $this->genres = new ArrayCollection();
+        $this->replaceWith($input, $genres);
     }
 
-    public function replaceWith(MovieInput $input): void
+    /**
+     * @param list<Genre> $genres
+     */
+    public function replaceWith(MovieInput $input, array $genres): void
     {
         $this->title = $input->title;
         $this->synopsis = $input->synopsis;
         $this->releaseYear = $input->releaseYear;
         $this->duration = $input->duration;
         $this->ageRating = $input->ageRating;
+        $this->genres->clear();
+        array_walk($genres, fn (Genre $genre) => $this->genres->add($genre));
+    }
+
+    /**
+     * @return list<Genre>
+     */
+    #[Groups(['movie:list', 'movie:read'])]
+    public function getGenres(): array
+    {
+        $genres = $this->genres->getValues();
+        usort($genres, static fn (Genre $a, Genre $b): int => strcmp($a->getName(), $b->getName()));
+
+        return $genres;
     }
 
     public function getId(): ?int

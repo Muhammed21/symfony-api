@@ -1,6 +1,14 @@
 @baseUrl = http://localhost:8000
 
-### Créer un film → 201
+### Préparer un genre pour les films → 201
+# @name createGenreForMovies
+POST {{baseUrl}}/genres
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "Policier" }
+
+### Créer un film avec ses genres → 201
 # @name createMovie
 POST {{baseUrl}}/movies
 Content-Type: application/json
@@ -11,10 +19,11 @@ Accept: application/json
   "synopsis": "Le patriarche vieillissant d'une dynastie mafieuse transmet le contrôle à son fils.",
   "releaseYear": 1972,
   "duration": 175,
-  "ageRating": "16+"
+  "ageRating": "16+",
+  "genres": [{{createGenreForMovies.response.body.id}}]
 }
 
-### Créer un deuxième film, sans synopsis → 201
+### Créer un deuxième film, sans synopsis ni genre → 201
 POST {{baseUrl}}/movies
 Content-Type: application/json
 Accept: application/json
@@ -58,6 +67,35 @@ Accept: application/json
 GET {{baseUrl}}/movies?title=parrain&year=1974
 Accept: application/json
 
+### Filtrer par genre → 200
+GET {{baseUrl}}/movies?genre={{createGenreForMovies.response.body.id}}
+Accept: application/json
+
+### Cumuler genre et année → 200
+GET {{baseUrl}}/movies?genre={{createGenreForMovies.response.body.id}}&year=1972
+Accept: application/json
+
+### Genre inexistant : liste vide → 200
+GET {{baseUrl}}/movies?genre=999999
+Accept: application/json
+
+### Genre invalide → 422
+GET {{baseUrl}}/movies?genre=0
+Accept: application/json
+
+### Créer un film avec un genre inexistant → 422
+POST {{baseUrl}}/movies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Heat",
+  "releaseYear": 1995,
+  "duration": 170,
+  "ageRating": "16+",
+  "genres": [999999]
+}
+
 ### Page invalide → 422
 GET {{baseUrl}}/movies?page=0
 Accept: application/json
@@ -88,7 +126,8 @@ Accept: application/json
   "synopsis": "Le patriarche vieillissant d'une dynastie mafieuse transmet le contrôle à son fils.",
   "releaseYear": 1972,
   "duration": 177,
-  "ageRating": "16+"
+  "ageRating": "16+",
+  "genres": []
 }
 
 ### Remplacer sans champ obligatoire (duration manquante) → 422

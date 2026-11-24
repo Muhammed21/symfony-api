@@ -7,6 +7,7 @@ use App\Dto\MovieInput;
 use App\Entity\Movie;
 use App\Model\PaginationDTO;
 use App\Model\Paginator;
+use App\Repository\GenreRepository;
 use App\Repository\MovieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,8 +19,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/movies')]
 final class MovieController extends AbstractController
 {
-    public function __construct(private readonly MovieRepository $movies)
-    {
+    public function __construct(
+        private readonly MovieRepository $movies,
+        private readonly GenreRepository $genres,
+    ) {
     }
 
     #[Route('', name: 'movie_list', methods: ['GET'])]
@@ -43,7 +46,7 @@ final class MovieController extends AbstractController
     #[Route('', name: 'movie_create', methods: ['POST'])]
     public function create(#[MapRequestPayload] MovieInput $input): JsonResponse
     {
-        $movie = new Movie($input);
+        $movie = new Movie($input, $this->genres->findByIds($input->genres));
         $this->movies->save($movie);
 
         return $this->json($movie, Response::HTTP_CREATED, context: ['groups' => ['movie:read']]);
@@ -52,7 +55,7 @@ final class MovieController extends AbstractController
     #[Route('/{id}', name: 'movie_replace', requirements: ['id' => '\d+'], methods: ['PUT'])]
     public function replace(Movie $movie, #[MapRequestPayload] MovieInput $input): JsonResponse
     {
-        $movie->replaceWith($input);
+        $movie->replaceWith($input, $this->genres->findByIds($input->genres));
         $this->movies->save($movie);
 
         return $this->json($movie, context: ['groups' => ['movie:read']]);

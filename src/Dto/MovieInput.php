@@ -3,6 +3,7 @@
 namespace App\Dto;
 
 use App\Enum\AgeRating;
+use App\Validator\ExistingGenres;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -29,6 +30,10 @@ final readonly class MovieInput
 
         #[Assert\Length(max: 2000, maxMessage: 'Le synopsis ne peut pas dépasser {{ limit }} caractères.')]
         public ?string $synopsis = null,
+
+        /** @var list<int> */
+        #[ExistingGenres]
+        public array $genres = [],
     ) {
     }
 
