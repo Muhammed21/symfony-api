@@ -2,16 +2,61 @@
 
 namespace App\Tests\Support;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class ApiTestCase extends WebTestCase
 {
+    protected const PASSWORD = 'password';
+
     protected KernelBrowser $client;
+
+    private ?string $token = null;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        $this->actAs($this->createUser('admin@prime.local', ['ROLE_ADMIN']));
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    protected function createUser(string $email, array $roles = []): User
+    {
+        $container = static::getContainer();
+        $user = new User($email, $roles);
+        $user->changePassword($container->get(UserPasswordHasherInterface::class)->hashPassword($user, self::PASSWORD));
+
+        $entityManager = $container->get(EntityManagerInterface::class);
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return $user;
+    }
+
+    protected function actAs(User $user): void
+    {
+        $this->token = static::getContainer()->get(JWTTokenManagerInterface::class)->create($user);
+    }
+
+    protected function actAsRegularUser(): void
+    {
+        $this->actAs($this->createUser('user@prime.local'));
+    }
+
+    protected function actAsAnonymous(): void
+    {
+        $this->token = null;
+    }
+
+    protected function useToken(string $token): void
+    {
+        $this->token = $token;
     }
 
     /**
@@ -24,7 +69,11 @@ abstract class ApiTestCase extends WebTestCase
         $this->client->request(
             $method,
             $uri,
-            server: ['HTTP_ACCEPT' => 'application/json', 'CONTENT_TYPE' => 'application/json'],
+            server: [
+                'HTTP_ACCEPT' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
+                ...(null === $this->token ? [] : ['HTTP_AUTHORIZATION' => 'Bearer '.$this->token]),
+            ],
             content: null === $payload ? null : json_encode($payload, JSON_THROW_ON_ERROR),
         );
 

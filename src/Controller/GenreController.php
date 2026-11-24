@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Dto\GenreInput;
 use App\Entity\Genre;
+use App\Entity\User;
 use App\Model\PaginationDTO;
 use App\Model\Paginator;
 use App\Repository\GenreRepository;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -44,6 +46,7 @@ final class GenreController extends AbstractController
     }
 
     #[Route('', name: 'genre_create', methods: ['POST'])]
+    #[IsGranted(User::ROLE_ADMIN)]
     public function create(#[MapRequestPayload] GenreInput $input): JsonResponse
     {
         $this->assertNameIsAvailable($input);
@@ -55,6 +58,7 @@ final class GenreController extends AbstractController
     }
 
     #[Route('/{id}', name: 'genre_rename', requirements: ['id' => '\d+'], methods: ['PUT'])]
+    #[IsGranted(User::ROLE_ADMIN)]
     public function rename(Genre $genre, #[MapRequestPayload] GenreInput $input): JsonResponse
     {
         $this->assertNameIsAvailable($input, $genre);
@@ -66,6 +70,7 @@ final class GenreController extends AbstractController
     }
 
     #[Route('/{id}', name: 'genre_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[IsGranted(User::ROLE_ADMIN)]
     public function delete(Genre $genre): Response
     {
         $this->genres->remove($genre);

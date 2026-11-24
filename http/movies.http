@@ -1,8 +1,19 @@
 @baseUrl = http://localhost:8000
+@adminEmail = admin@prime.local
+@password = password
+
+### Connexion administrateur (voir http/auth.http pour créer ce compte) → 200
+# @name loginAdmin
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "{{adminEmail}}", "password": "{{password}}" }
 
 ### Préparer un genre pour les films → 201
 # @name createGenreForMovies
 POST {{baseUrl}}/genres
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -11,6 +22,7 @@ Accept: application/json
 ### Créer un film avec ses genres → 201
 # @name createMovie
 POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -25,6 +37,7 @@ Accept: application/json
 
 ### Créer un deuxième film, sans synopsis ni genre → 201
 POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -37,6 +50,7 @@ Accept: application/json
 
 ### Créer un film invalide (titre vide, année trop ancienne, durée nulle, classification inconnue) → 422
 POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -85,6 +99,7 @@ Accept: application/json
 
 ### Créer un film avec un genre inexistant → 422
 POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -118,6 +133,7 @@ Accept: application/json
 
 ### Remplacer entièrement le film créé → 200
 PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -132,6 +148,7 @@ Accept: application/json
 
 ### Remplacer sans champ obligatoire (duration manquante) → 422
 PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -143,8 +160,10 @@ Accept: application/json
 
 ### Supprimer le film créé → 204
 DELETE {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Accept: application/json
 
 ### Supprimer un film inexistant → 404
 DELETE {{baseUrl}}/movies/999999
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Accept: application/json

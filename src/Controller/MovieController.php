@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Dto\MovieFilters;
 use App\Dto\MovieInput;
 use App\Entity\Movie;
+use App\Entity\User;
 use App\Model\PaginationDTO;
 use App\Model\Paginator;
 use App\Repository\GenreRepository;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/movies')]
 final class MovieController extends AbstractController
@@ -44,6 +46,7 @@ final class MovieController extends AbstractController
     }
 
     #[Route('', name: 'movie_create', methods: ['POST'])]
+    #[IsGranted(User::ROLE_ADMIN)]
     public function create(#[MapRequestPayload] MovieInput $input): JsonResponse
     {
         $movie = new Movie($input, $this->genres->findByIds($input->genres));
@@ -53,6 +56,7 @@ final class MovieController extends AbstractController
     }
 
     #[Route('/{id}', name: 'movie_replace', requirements: ['id' => '\d+'], methods: ['PUT'])]
+    #[IsGranted(User::ROLE_ADMIN)]
     public function replace(Movie $movie, #[MapRequestPayload] MovieInput $input): JsonResponse
     {
         $movie->replaceWith($input, $this->genres->findByIds($input->genres));
@@ -62,6 +66,7 @@ final class MovieController extends AbstractController
     }
 
     #[Route('/{id}', name: 'movie_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[IsGranted(User::ROLE_ADMIN)]
     public function delete(Movie $movie): Response
     {
         $this->movies->remove($movie);

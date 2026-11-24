@@ -1,0 +1,93 @@
+@baseUrl = http://localhost:8000
+@password = motdepasse
+
+### Inscription → 201 (le mot de passe n'est jamais renvoyé)
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "alice@prime.local", "password": "{{password}}" }
+
+### Inscription en demandant le rôle administrateur : il est ignoré → 201 avec ROLE_USER seulement
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "mallory@prime.local", "password": "{{password}}", "roles": ["ROLE_ADMIN"] }
+
+### Inscription avec un e-mail déjà pris, aux majuscules près → 409
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "ALICE@prime.local", "password": "{{password}}" }
+
+### Inscription avec un e-mail invalide et un mot de passe trop court → 422
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "pas-un-email", "password": "1234567" }
+
+### Connexion → 200 avec un jeton
+# @name loginAlice
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "alice@prime.local", "password": "{{password}}" }
+
+### Connexion avec un mauvais mot de passe → 401
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "alice@prime.local", "password": "mauvais-mot-de-passe" }
+
+### Mon compte, avec le jeton → 200
+GET {{baseUrl}}/me
+Authorization: Bearer {{loginAlice.response.body.token}}
+Accept: application/json
+
+### Mon compte, sans jeton → 401
+GET {{baseUrl}}/me
+Accept: application/json
+
+### Mon compte, avec un jeton invalide → 401
+GET {{baseUrl}}/me
+Authorization: Bearer jeton-invalide
+Accept: application/json
+
+### Lire le catalogue sans être connecté → 200
+GET {{baseUrl}}/movies
+Accept: application/json
+
+### Créer un film sans être connecté → 401
+POST {{baseUrl}}/movies
+Content-Type: application/json
+Accept: application/json
+
+{ "title": "Heat", "releaseYear": 1995, "duration": 170, "ageRating": "16+" }
+
+### Créer un film en tant qu'utilisateur simple → 403
+POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAlice.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "title": "Heat", "releaseYear": 1995, "duration": 170, "ageRating": "16+" }
+
+### Créer un genre en tant qu'utilisateur simple → 403
+POST {{baseUrl}}/genres
+Authorization: Bearer {{loginAlice.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "name": "Western" }
+
+### Préparer le compte administrateur utilisé par movies.http et genres.http (étape 1/2) → 201
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "admin@prime.local", "password": "password" }

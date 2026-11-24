@@ -1,8 +1,19 @@
 @baseUrl = http://localhost:8000
+@adminEmail = admin@prime.local
+@password = password
+
+### Connexion administrateur (voir http/auth.http pour créer ce compte) → 200
+# @name loginAdmin
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "{{adminEmail}}", "password": "{{password}}" }
 
 ### Créer un genre → 201
 # @name createGenre
 POST {{baseUrl}}/genres
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -10,6 +21,7 @@ Accept: application/json
 
 ### Créer un deuxième genre → 201
 POST {{baseUrl}}/genres
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -17,6 +29,7 @@ Accept: application/json
 
 ### Créer un genre dont le nom existe déjà, aux majuscules près → 422
 POST {{baseUrl}}/genres
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -24,6 +37,7 @@ Accept: application/json
 
 ### Créer un genre au nom trop court → 422
 POST {{baseUrl}}/genres
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -51,6 +65,7 @@ Accept: application/json
 
 ### Renommer le genre créé (changer seulement la casse est autorisé) → 200
 PUT {{baseUrl}}/genres/{{createGenre.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -58,6 +73,7 @@ Accept: application/json
 
 ### Renommer vers le nom d'un autre genre → 422
 PUT {{baseUrl}}/genres/{{createGenre.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -65,8 +81,10 @@ Accept: application/json
 
 ### Supprimer le genre créé (les films qui l'utilisent sont conservés) → 204
 DELETE {{baseUrl}}/genres/{{createGenre.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Accept: application/json
 
 ### Supprimer un genre inexistant → 404
 DELETE {{baseUrl}}/genres/999999
+Authorization: Bearer {{loginAdmin.response.body.token}}
 Accept: application/json

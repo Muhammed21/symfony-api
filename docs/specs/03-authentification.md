@@ -8,6 +8,20 @@ Permettre aux **utilisateurs** de créer un compte et de se connecter, puis rés
 
 Specs 01 et 02 terminées. Installer `symfony/security-bundle` et `lexik/jwt-authentication-bundle`, générer la paire de clés (`php bin/console lexik:jwt:generate-keypair`), mettre la phrase secrète dans `.env.local`.
 
+Après un clonage du dépôt, ni la phrase secrète ni les clés ne sont présentes (elles ne sont pas versionnées) :
+
+```bash
+echo "JWT_PASSPHRASE=$(openssl rand -hex 32)" > .env.local
+cp .env.local .env.test.local   # l'environnement de test ne lit pas .env.local
+docker exec symfony-api php bin/console lexik:jwt:generate-keypair
+```
+
+Tant que les données de test (spec 06) n'existent pas, un administrateur se crée en deux temps : inscription via `POST /register`, puis promotion en base :
+
+```bash
+docker exec symfony-api php bin/console dbal:run-sql "UPDATE \"user\" SET roles = '[\"ROLE_ADMIN\"]' WHERE email = 'admin@prime.local'"
+```
+
 ## L'utilisateur
 
 | Champ | Type | Règles |
