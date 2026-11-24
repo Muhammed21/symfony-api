@@ -1,0 +1,111 @@
+@baseUrl = http://localhost:8000
+
+### Créer un film → 201
+# @name createMovie
+POST {{baseUrl}}/movies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Le Parrain",
+  "synopsis": "Le patriarche vieillissant d'une dynastie mafieuse transmet le contrôle à son fils.",
+  "releaseYear": 1972,
+  "duration": 175,
+  "ageRating": "16+"
+}
+
+### Créer un deuxième film, sans synopsis → 201
+POST {{baseUrl}}/movies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Le Parrain 2",
+  "releaseYear": 1974,
+  "duration": 202,
+  "ageRating": "16+"
+}
+
+### Créer un film invalide (titre vide, année trop ancienne, durée nulle, classification inconnue) → 422
+POST {{baseUrl}}/movies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "",
+  "releaseYear": 1800,
+  "duration": 0,
+  "ageRating": "12+"
+}
+
+### Liste par défaut : page 1, 5 films, triés par titre → 200
+GET {{baseUrl}}/movies
+Accept: application/json
+
+### Page 2, 3 films par page → 200
+GET {{baseUrl}}/movies?page=2&limit=3
+Accept: application/json
+
+### Filtrer par morceau de titre, sans tenir compte des majuscules → 200
+GET {{baseUrl}}/movies?title=PARR
+Accept: application/json
+
+### Filtrer par année exacte → 200
+GET {{baseUrl}}/movies?year=1974
+Accept: application/json
+
+### Cumuler les filtres → 200
+GET {{baseUrl}}/movies?title=parrain&year=1974
+Accept: application/json
+
+### Page invalide → 422
+GET {{baseUrl}}/movies?page=0
+Accept: application/json
+
+### Limite trop grande → 422
+GET {{baseUrl}}/movies?limit=101
+Accept: application/json
+
+### Année qui n'est pas un nombre → 422
+GET {{baseUrl}}/movies?year=abc
+Accept: application/json
+
+### Détail du film créé, avec son synopsis → 200
+GET {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Accept: application/json
+
+### Détail d'un film inexistant → 404
+GET {{baseUrl}}/movies/999999
+Accept: application/json
+
+### Remplacer entièrement le film créé → 200
+PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Le Parrain (version restaurée)",
+  "synopsis": "Le patriarche vieillissant d'une dynastie mafieuse transmet le contrôle à son fils.",
+  "releaseYear": 1972,
+  "duration": 177,
+  "ageRating": "16+"
+}
+
+### Remplacer sans champ obligatoire (duration manquante) → 422
+PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Le Parrain",
+  "releaseYear": 1972,
+  "ageRating": "16+"
+}
+
+### Supprimer le film créé → 204
+DELETE {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Accept: application/json
+
+### Supprimer un film inexistant → 404
+DELETE {{baseUrl}}/movies/999999
+Accept: application/json
