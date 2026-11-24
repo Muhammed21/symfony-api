@@ -15,12 +15,15 @@ abstract class ApiTestCase extends WebTestCase
 
     protected KernelBrowser $client;
 
+    protected User $admin;
+
     private ?string $token = null;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->actAs($this->createUser('admin@prime.local', ['ROLE_ADMIN']));
+        $this->admin = $this->createUser('admin@prime.local', ['ROLE_ADMIN']);
+        $this->actAs($this->admin);
     }
 
     /**

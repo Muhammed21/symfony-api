@@ -10,6 +10,7 @@ use App\Model\PaginationDTO;
 use App\Model\Paginator;
 use App\Repository\GenreRepository;
 use App\Repository\MovieRepository;
+use App\Repository\ReviewRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[Route('/movies')]
 final class MovieController extends AbstractController
@@ -24,6 +26,8 @@ final class MovieController extends AbstractController
     public function __construct(
         private readonly MovieRepository $movies,
         private readonly GenreRepository $genres,
+        private readonly ReviewRepository $reviews,
+        private readonly NormalizerInterface $normalizer,
     ) {
     }
 
@@ -42,7 +46,7 @@ final class MovieController extends AbstractController
     #[Route('/{id}', name: 'movie_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(Movie $movie): JsonResponse
     {
-        return $this->json($movie, context: ['groups' => ['movie:read']]);
+        return $this->detail($movie);
     }
 
     #[Route('', name: 'movie_create', methods: ['POST'])]
@@ -52,7 +56,7 @@ final class MovieController extends AbstractController
         $movie = new Movie($input, $this->genres->findByIds($input->genres));
         $this->movies->save($movie);
 
-        return $this->json($movie, Response::HTTP_CREATED, context: ['groups' => ['movie:read']]);
+        return $this->detail($movie, Response::HTTP_CREATED);
     }
 
     #[Route('/{id}', name: 'movie_replace', requirements: ['id' => '\d+'], methods: ['PUT'])]
@@ -62,7 +66,7 @@ final class MovieController extends AbstractController
         $movie->replaceWith($input, $this->genres->findByIds($input->genres));
         $this->movies->save($movie);
 
-        return $this->json($movie, context: ['groups' => ['movie:read']]);
+        return $this->detail($movie);
     }
 
     #[Route('/{id}', name: 'movie_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
@@ -72,5 +76,16 @@ final class MovieController extends AbstractController
         $this->movies->remove($movie);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    private function detail(Movie $movie, int $status = Response::HTTP_OK): JsonResponse
+    {
+        $ratings = $this->reviews->summarizeRatings($movie);
+
+        return $this->json([
+            ...$this->normalizer->normalize($movie, 'json', ['groups' => ['movie:read']]),
+            'averageRating' => $ratings->averageRating,
+            'reviewCount' => $ratings->reviewCount,
+        ], $status);
     }
 }

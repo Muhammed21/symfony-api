@@ -53,7 +53,7 @@ L'auteur n'est exposé que par son `id` : l'e-mail est une donnée personnelle e
 - `averageRating` : moyenne des notes, arrondie à une décimale, `null` si le film n'a aucun avis ;
 - `reviewCount` : nombre d'avis.
 
-Ces valeurs sont **calculées à la lecture** (requête d'agrégat dans `ReviewRepository`) et jamais stockées. Elles ne figurent pas dans la liste `GET /movies`.
+Ces valeurs sont **calculées à la lecture** (requête d'agrégat dans `ReviewRepository`) et jamais stockées. Elles ne figurent pas dans la liste `GET /movies`. Les réponses de `POST /movies` et `PUT /movies/{id}` renvoient la même représentation que `GET /movies/{id}`, notes comprises.
 
 ## Critères d'acceptation
 

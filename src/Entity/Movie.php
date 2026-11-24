@@ -17,7 +17,7 @@ class Movie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['movie:list', 'movie:read'])]
+    #[Groups(['movie:list', 'movie:read', 'review:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -47,11 +47,18 @@ class Movie
     private Collection $genres;
 
     /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'movie', cascade: ['remove'])]
+    private Collection $reviews;
+
+    /**
      * @param list<Genre> $genres
      */
     public function __construct(MovieInput $input, array $genres)
     {
         $this->genres = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
         $this->replaceWith($input, $genres);
     }
 

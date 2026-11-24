@@ -1,0 +1,145 @@
+@baseUrl = http://localhost:8000
+
+### Connexion administrateur (compte préparé via http/auth.http) → 200
+# @name loginAdmin
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "admin@prime.local", "password": "password" }
+
+### Connexion d'Alice (inscrite via http/auth.http) → 200
+# @name loginAlice
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "alice@prime.local", "password": "motdepasse" }
+
+### Inscription de Bob → 201 (409 s'il existe déjà, sans conséquence)
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "bob@prime.local", "password": "motdepasse" }
+
+### Connexion de Bob → 200
+# @name loginBob
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+Accept: application/json
+
+{ "email": "bob@prime.local", "password": "motdepasse" }
+
+### Préparer un film à noter (administrateur) → 201
+# @name createMovie
+POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "title": "Les Évadés", "releaseYear": 1994, "duration": 142, "ageRating": "13+" }
+
+### Alice donne son avis → 201
+# @name aliceReview
+POST {{baseUrl}}/movies/{{createMovie.response.body.id}}/reviews
+Authorization: Bearer {{loginAlice.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 5, "comment": "Un chef-d'œuvre." }
+
+### Alice donne un deuxième avis sur le même film → 409
+POST {{baseUrl}}/movies/{{createMovie.response.body.id}}/reviews
+Authorization: Bearer {{loginAlice.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 4 }
+
+### Bob donne son avis, sans commentaire → 201
+POST {{baseUrl}}/movies/{{createMovie.response.body.id}}/reviews
+Authorization: Bearer {{loginBob.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 4 }
+
+### Avis avec une note de 6 → 422
+POST {{baseUrl}}/movies/{{createMovie.response.body.id}}/reviews
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 6 }
+
+### Avis sans être connecté → 401
+POST {{baseUrl}}/movies/{{createMovie.response.body.id}}/reviews
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 3 }
+
+### Avis sur un film inexistant → 404
+POST {{baseUrl}}/movies/999999/reviews
+Authorization: Bearer {{loginBob.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 3 }
+
+### Avis du film, du plus récent au plus ancien, sans être connecté → 200
+GET {{baseUrl}}/movies/{{createMovie.response.body.id}}/reviews
+Accept: application/json
+
+### Avis du film, 1 par page → 200
+GET {{baseUrl}}/movies/{{createMovie.response.body.id}}/reviews?page=2&limit=1
+Accept: application/json
+
+### Détail du film avec sa note moyenne (4.5) et son nombre d'avis (2) → 200
+GET {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Accept: application/json
+
+### Alice modifie son avis → 200
+PUT {{baseUrl}}/reviews/{{aliceReview.response.body.id}}
+Authorization: Bearer {{loginAlice.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 4, "comment": "Toujours excellent, un peu long." }
+
+### Bob modifie l'avis d'Alice → 403
+PUT {{baseUrl}}/reviews/{{aliceReview.response.body.id}}
+Authorization: Bearer {{loginBob.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 1 }
+
+### L'administrateur modifie l'avis d'Alice → 403 (il peut seulement le supprimer)
+PUT {{baseUrl}}/reviews/{{aliceReview.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "rating": 1 }
+
+### Bob supprime l'avis d'Alice → 403
+DELETE {{baseUrl}}/reviews/{{aliceReview.response.body.id}}
+Authorization: Bearer {{loginBob.response.body.token}}
+Accept: application/json
+
+### L'administrateur supprime l'avis d'Alice (modération) → 204
+DELETE {{baseUrl}}/reviews/{{aliceReview.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
+
+### Supprimer un avis inexistant → 404
+DELETE {{baseUrl}}/reviews/999999
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
+
+### Supprimer le film supprime aussi ses avis → 204
+DELETE {{baseUrl}}/movies/{{createMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
