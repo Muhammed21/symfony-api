@@ -47,6 +47,14 @@ class Movie
     private Collection $genres;
 
     /**
+     * @var Collection<int, Movie>
+     */
+    #[ORM\ManyToMany(targetEntity: Movie::class)]
+    #[ORM\JoinTable(name: 'movie_similar')]
+    #[ORM\InverseJoinColumn(name: 'similar_movie_id', onDelete: 'CASCADE')]
+    private Collection $similarMovies;
+
+    /**
      * @var Collection<int, Review>
      */
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'movie', cascade: ['remove'])]
@@ -59,6 +67,7 @@ class Movie
     {
         $this->genres = new ArrayCollection();
         $this->reviews = new ArrayCollection();
+        $this->similarMovies = new ArrayCollection();
         $this->replaceWith($input, $genres);
     }
 
@@ -86,6 +95,41 @@ class Movie
         usort($genres, static fn (Genre $a, Genre $b): int => strcmp($a->getName(), $b->getName()));
 
         return $genres;
+    }
+
+    public function addSimilarMovie(Movie $other): void
+    {
+        if ($other === $this) {
+            throw new \DomainException('Un film ne peut pas être similaire à lui-même.');
+        }
+
+        if ($this->similarMovies->contains($other)) {
+            return;
+        }
+
+        $this->similarMovies->add($other);
+        $other->addSimilarMovie($this);
+    }
+
+    public function removeSimilarMovie(Movie $other): void
+    {
+        if (!$this->similarMovies->removeElement($other)) {
+            return;
+        }
+
+        $other->removeSimilarMovie($this);
+    }
+
+    /**
+     * @return list<array{id: ?int, title: string}>
+     */
+    #[Groups(['movie:read'])]
+    public function getSimilarMovies(): array
+    {
+        $movies = $this->similarMovies->getValues();
+        usort($movies, static fn (Movie $a, Movie $b): int => strcmp($a->getTitle(), $b->getTitle()));
+
+        return array_map(static fn (Movie $movie): array => ['id' => $movie->getId(), 'title' => $movie->getTitle()], $movies);
     }
 
     public function getId(): ?int

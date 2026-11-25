@@ -11,11 +11,13 @@ use App\Model\Paginator;
 use App\Repository\GenreRepository;
 use App\Repository\MovieRepository;
 use App\Repository\ReviewRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -74,6 +76,31 @@ final class MovieController extends AbstractController
     public function delete(Movie $movie): Response
     {
         $this->movies->remove($movie);
+
+        return new Response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/{id}/similar/{otherId}', name: 'movie_link_similar', requirements: ['id' => '\d+', 'otherId' => '\d+'], methods: ['PUT'])]
+    #[IsGranted(User::ROLE_ADMIN)]
+    public function linkSimilar(Movie $movie, #[MapEntity(id: 'otherId')] Movie $other): Response
+    {
+        try {
+            $movie->addSimilarMovie($other);
+        } catch (\DomainException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        }
+
+        $this->movies->save($movie);
+
+        return new Response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/{id}/similar/{otherId}', name: 'movie_unlink_similar', requirements: ['id' => '\d+', 'otherId' => '\d+'], methods: ['DELETE'])]
+    #[IsGranted(User::ROLE_ADMIN)]
+    public function unlinkSimilar(Movie $movie, #[MapEntity(id: 'otherId')] Movie $other): Response
+    {
+        $movie->removeSimilarMovie($other);
+        $this->movies->save($movie);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }

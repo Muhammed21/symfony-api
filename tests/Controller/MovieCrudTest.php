@@ -122,7 +122,7 @@ final class MovieCrudTest extends ApiTestCase
         $movie = $this->requestJson('PUT', '/movies/'.$created['id'], $replacement);
 
         self::assertResponseIsSuccessful();
-        self::assertSame(['id' => $created['id'], ...$replacement, 'averageRating' => null, 'reviewCount' => 0], $movie);
+        self::assertSame(['id' => $created['id'], ...$replacement, 'similarMovies' => [], 'averageRating' => null, 'reviewCount' => 0], $movie);
         self::assertSame($movie, $this->requestJson('GET', '/movies/'.$created['id']));
     }
 

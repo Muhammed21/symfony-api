@@ -158,6 +158,48 @@ Accept: application/json
   "ageRating": "16+"
 }
 
+### Préparer un film à relier (administrateur) → 201
+# @name createSimilarMovie
+POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "title": "Les Affranchis", "releaseYear": 1990, "duration": 146, "ageRating": "16+" }
+
+### Relier deux films comme titres similaires (administrateur) → 204
+PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}/similar/{{createSimilarMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
+
+### Les deux films se voient mutuellement dans similarMovies → 200
+GET {{baseUrl}}/movies/{{createSimilarMovie.response.body.id}}
+Accept: application/json
+
+### Relier à nouveau, dans l'autre sens : aucun doublon → 204
+PUT {{baseUrl}}/movies/{{createSimilarMovie.response.body.id}}/similar/{{createMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
+
+### Relier un film à lui-même → 422
+PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}/similar/{{createMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
+
+### Relier à un film inexistant → 404
+PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}/similar/999999
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
+
+### Relier sans être connecté → 401
+PUT {{baseUrl}}/movies/{{createMovie.response.body.id}}/similar/{{createSimilarMovie.response.body.id}}
+Accept: application/json
+
+### Délier depuis l'autre film : les deux côtés sont déliés → 204
+DELETE {{baseUrl}}/movies/{{createSimilarMovie.response.body.id}}/similar/{{createMovie.response.body.id}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Accept: application/json
+
 ### Supprimer le film créé → 204
 DELETE {{baseUrl}}/movies/{{createMovie.response.body.id}}
 Authorization: Bearer {{loginAdmin.response.body.token}}
