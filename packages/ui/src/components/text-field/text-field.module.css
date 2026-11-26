@@ -1,0 +1,45 @@
+.frame {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  column-gap: var(--prime-space-s);
+  block-size: var(--prime-size-control-regular);
+  padding-inline: var(--prime-space-xl);
+  border-radius: var(--prime-radius-pill);
+  background-color: var(--prime-color-view-recessed);
+  box-shadow: var(--prime-shadow-recessed);
+}
+
+.frame[data-symbol="true"] {
+  padding-inline-start: var(--prime-space-m);
+}
+
+.frame:focus-within {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: 2px;
+}
+
+.symbol {
+  --symbol-size: var(--prime-size-symbol-regular);
+  composes: symbol from "../control/symbol.module.css";
+  color: var(--prime-color-text-secondary);
+}
+
+.input {
+  flex: 1;
+  min-inline-size: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--prime-color-text-primary);
+  font: var(--prime-text-body);
+}
+
+.input::placeholder {
+  color: var(--prime-color-text-tertiary);
+}
+
+.input::-webkit-search-cancel-button {
+  appearance: none;
+}

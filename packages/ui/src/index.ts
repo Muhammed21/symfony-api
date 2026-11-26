@@ -27,9 +27,16 @@ export {
   type MovieThumbProps,
 } from "./components/movie-thumb/movie-thumb.tsx";
 export { PageControl, type PageControlProps } from "./components/page-control/page-control.tsx";
+export { SearchToken, type SearchTokenProps } from "./components/search-token/search-token.tsx";
 export {
   type HeadingLevel,
   SectionHeader,
   type SectionHeaderProps,
 } from "./components/section-header/section-header.tsx";
+export {
+  TextField,
+  type TextFieldInputMode,
+  type TextFieldProps,
+  type TextFieldType,
+} from "./components/text-field/text-field.tsx";
 export { type DesignTokens, type Shadow, type TextStyle, tokens } from "./tokens/index.ts";

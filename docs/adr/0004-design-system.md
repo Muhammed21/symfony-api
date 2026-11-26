@@ -29,9 +29,9 @@ jetons  ←  thème CSS  ←  composants React  ←  apps/web, apps/storybook
 - **Verre approximé** : chaque couleur Figma composée de couches à modes de fusion (`color-dodge`, `color-burn`…) devient une seule couleur `rgba`, avec `backdrop-filter: blur()` pour les surfaces en verre. Un flou Figma de rayon 100 vaut `blur(50px)` en CSS.
 - Les états visionOS deviennent des états web : Hover → `:hover`, Pinch → `:active`, Disabled → `disabled`, Selected → apparence « prominent » (fond blanc, symbole noir). Le « Dwell » (regard prolongé) n'a pas d'équivalent.
 
-Premier lot : jetons, thème, `ButtonSymbol`, `ButtonTextAndSymbol`, `SectionHeader`, `MovieThumb`, `PageControl`, `ActivityIndicator` ; puis `Link`.
+Premier lot : jetons, thème, `ButtonSymbol`, `ButtonTextAndSymbol`, `SectionHeader`, `MovieThumb`, `PageControl`, `ActivityIndicator` ; puis `Link` ; puis `TextField` et `SearchToken` (filtres du catalogue, spec 09).
 
-Valeurs non relevées dans Figma (quota de l'offre Starter atteint) et donc estimées, à vérifier dès que possible : taille des symboles hors bouton Large, couleurs de l'état Disabled, taille des points du `PageControl`, dessin de l'`ActivityIndicator`, style de texte des boutons texte, texte et marges de `Link` (marge de 4px au lieu des 3px relevés, pour rester sur l'échelle d'espacement).
+Valeurs non relevées dans Figma (quota de l'offre Starter atteint) et donc estimées, à vérifier dès que possible : taille des symboles hors bouton Large, couleurs de l'état Disabled, taille des points du `PageControl`, dessin de l'`ActivityIndicator`, style de texte des boutons texte, texte et marges de `Link` (marge de 4px au lieu des 3px relevés, pour rester sur l'échelle d'espacement), marges et ombre en creux du `TextField`, hauteur (32px), marges et texte du `SearchToken`.
 
 Tests :
 

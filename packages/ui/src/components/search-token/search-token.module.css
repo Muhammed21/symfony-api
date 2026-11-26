@@ -1,0 +1,8 @@
+.token {
+  composes: control from "../control/control.module.css";
+  box-sizing: border-box;
+  block-size: var(--prime-size-control-small);
+  padding-inline: var(--prime-space-m);
+  font: var(--prime-text-callout);
+  white-space: nowrap;
+}
