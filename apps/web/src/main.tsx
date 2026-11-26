@@ -16,7 +16,13 @@ const appRouter = ({ apiUrl }: { readonly apiUrl: string }) => {
 
   const root = createRootRoute();
   return createRouter({
-    routeTree: root.addChildren([moviesRoute({ parent: root, listMovies: catalogue.listMovies })]),
+    routeTree: root.addChildren([
+      moviesRoute({
+        parent: root,
+        listMovies: catalogue.listMovies,
+        listGenres: catalogue.listGenres,
+      }),
+    ]),
   });
 };
 

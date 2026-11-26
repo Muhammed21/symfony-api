@@ -18,18 +18,38 @@ import {
   SectionHeader,
 } from "@prime/ui";
 
-import type { AgeRating, CatalogueFailure, Movie, MoviePage } from "../domain/movie.ts";
+import type {
+  AgeRating,
+  CatalogueFailure,
+  Genre,
+  Movie,
+  MovieFilters,
+  MoviePage,
+} from "../domain/movie.ts";
 import { formatDuration } from "./duration.ts";
+import { MovieFilterBar } from "./movie-filters.tsx";
 
 import styles from "./movies-route.module.css";
 
 type ListMovies = (query: {
   readonly page: number;
+  readonly filters: MovieFilters;
 }) => Promise<Result<MoviePage, CatalogueFailure>>;
+
+type ListGenres = () => Promise<Result<readonly Genre[], CatalogueFailure>>;
 
 const FIRST_PAGE = 1;
 
 const Page = z.coerce.number().int().min(FIRST_PAGE).catch(FIRST_PAGE);
+
+const Title = z.string().trim().min(1).optional().catch(undefined);
+
+const Identifier = z.number().int().positive().optional().catch(undefined);
+
+type CatalogueSearch = { readonly page: number } & MovieFilters;
+
+const hasFilters = ({ title, year, genre }: MovieFilters) =>
+  [title, year, genre].some((value) => value !== undefined);
 
 const ageRatingLabel = (ageRating: AgeRating) => (ageRating === "ALL" ? "Tous publics" : ageRating);
 
@@ -60,14 +80,25 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
               size="regular"
               label="Précédent"
               symbol={<ChevronLeft />}
-              render={(anchor) => <RouterLink {...anchor} to="/" search={{ page: page - 1 }} />}
+              render={(anchor) => (
+                <RouterLink
+                  {...anchor}
+                  to="/"
+                  search={(search: CatalogueSearch) => ({ ...search, page: page - 1 })}
+                />
+              )}
             />
           )}
           <PageControl
             label="Pagination"
             count={lastPage}
             current={page}
-            onSelect={(selected) => void navigate({ to: "/", search: { page: selected } })}
+            onSelect={(selected) =>
+              void navigate({
+                to: "/",
+                search: (search: CatalogueSearch) => ({ ...search, page: selected }),
+              })
+            }
           />
           {page < lastPage && (
             <Link
@@ -75,7 +106,13 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
               label="Suivant"
               symbol={<ChevronRight />}
               symbolPlacement="trailing"
-              render={(anchor) => <RouterLink {...anchor} to="/" search={{ page: page + 1 }} />}
+              render={(anchor) => (
+                <RouterLink
+                  {...anchor}
+                  to="/"
+                  search={(search: CatalogueSearch) => ({ ...search, page: page + 1 })}
+                />
+              )}
             />
           )}
         </div>
@@ -87,16 +124,28 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
   );
 };
 
+const NoMatch = () => (
+  <div className={styles.status}>
+    <p>Aucun film ne correspond à ces filtres.</p>
+    <Link
+      label="Effacer les filtres"
+      render={(anchor) => <RouterLink {...anchor} to="/" search={{ page: FIRST_PAGE }} />}
+    />
+  </div>
+);
+
 const Movies = ({
   page,
+  filters,
   listMovies,
 }: {
   readonly page: number;
+  readonly filters: MovieFilters;
   readonly listMovies: ListMovies;
 }) => {
   const { data, refetch } = useQuery({
-    queryKey: ["movies", page],
-    queryFn: () => listMovies({ page }),
+    queryKey: ["movies", page, filters],
+    queryFn: () => listMovies({ page, filters }),
   });
   if (data === undefined) {
     return (
@@ -120,7 +169,11 @@ const Movies = ({
   }
   const { movies, lastPage } = data.value;
   if (movies.length === 0) {
-    return <p className={styles.status}>Aucun film pour le moment.</p>;
+    return hasFilters(filters) ? (
+      <NoMatch />
+    ) : (
+      <p className={styles.status}>Aucun film pour le moment.</p>
+    );
   }
   return (
     <>
@@ -139,24 +192,43 @@ const Movies = ({
 export const moviesRoute = ({
   parent,
   listMovies,
+  listGenres,
 }: {
   readonly parent: AnyRootRoute;
   readonly listMovies: ListMovies;
+  readonly listGenres: ListGenres;
 }) => {
   const route = createRoute({
     getParentRoute: () => parent,
     path: "/",
-    validateSearch: (search: Readonly<Record<string, unknown>>) => ({
+    validateSearch: (search: Readonly<Record<string, unknown>>): CatalogueSearch => ({
       page: Page.parse(search["page"]),
+      title: Title.parse(search["title"]),
+      year: Identifier.parse(search["year"]),
+      genre: Identifier.parse(search["genre"]),
     }),
     component: function MoviesPage() {
-      const { page } = route.useSearch();
+      const { page, title, year, genre } = route.useSearch();
+      const navigate = useNavigate();
+      const genres = useQuery({ queryKey: ["genres"], queryFn: listGenres });
+      const filters = { title, year, genre };
       return (
         <main className={styles.page}>
           <h1 className={styles.brand}>Prime Video</h1>
           <section className={styles.catalogue}>
             <SectionHeader title="Catalogue" />
-            <Movies page={page} listMovies={listMovies} />
+            <MovieFilterBar
+              filters={filters}
+              genres={genres.data?.ok === true ? genres.data.value : []}
+              onChange={(change, { replace }) =>
+                void navigate({
+                  to: "/",
+                  search: (search: CatalogueSearch) => ({ ...search, ...change, page: FIRST_PAGE }),
+                  replace,
+                })
+              }
+            />
+            <Movies page={page} filters={filters} listMovies={listMovies} />
           </section>
         </main>
       );

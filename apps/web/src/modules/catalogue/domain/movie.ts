@@ -18,3 +18,14 @@ export type MoviePage = {
 };
 
 export type CatalogueFailure = "unavailable" | "invalid_response";
+
+export type MovieFilters = {
+  readonly title?: string | undefined;
+  readonly year?: number | undefined;
+  readonly genre?: number | undefined;
+};
+
+export type Genre = {
+  readonly id: number;
+  readonly name: string;
+};

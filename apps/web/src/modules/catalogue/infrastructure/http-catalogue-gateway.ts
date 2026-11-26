@@ -1,10 +1,19 @@
 import { z } from "zod";
 
-import { err, ok } from "@prime/result";
+import { err, ok, type Result } from "@prime/result";
 
-import { failureOf, type Fetch, OK, parseJson, send } from "../../../platform/http.ts";
+import {
+  failureOf,
+  type Fetch,
+  type HttpFailure,
+  OK,
+  parseJson,
+  send,
+} from "../../../platform/http.ts";
 import type { CatalogueGateway } from "../application/catalogue-gateway.ts";
-import { AGE_RATINGS, type Movie } from "../domain/movie.ts";
+import { AGE_RATINGS, type Movie, type MovieFilters } from "../domain/movie.ts";
+
+const GenreOutput = z.object({ id: z.number().int(), name: z.string() });
 
 const MovieOutput = z.object({
   id: z.number().int(),
@@ -12,19 +21,31 @@ const MovieOutput = z.object({
   releaseYear: z.number().int(),
   duration: z.number().int(),
   ageRating: z.enum(AGE_RATINGS),
-  genres: z.array(z.object({ id: z.number().int(), name: z.string() })),
+  genres: z.array(GenreOutput),
 });
 
-const MoviePageOutput = z.object({
-  total: z.number().int(),
-  lastPage: z.number().int(),
-  items: z.array(MovieOutput),
-});
+const pageOutputOf = <Item extends z.ZodType>(item: Item) =>
+  z.object({
+    total: z.number().int(),
+    lastPage: z.number().int(),
+    items: z.array(item),
+  });
+
+const MoviePageOutput = pageOutputOf(MovieOutput);
+
+const GenrePageOutput = pageOutputOf(GenreOutput);
+
+const ALL_GENRES = 100;
 
 const movieOf = ({ genres, ...movie }: z.infer<typeof MovieOutput>): Movie => ({
   ...movie,
   genres: genres.map((genre) => genre.name),
 });
+
+const filterParameters = ({ title, year, genre }: MovieFilters) =>
+  Object.entries({ title, year, genre }).flatMap(([name, value]): [string, string][] =>
+    value === undefined ? [] : [[name, String(value)]],
+  );
 
 export const createHttpCatalogueGateway = ({
   apiUrl,
@@ -32,10 +53,12 @@ export const createHttpCatalogueGateway = ({
 }: {
   readonly apiUrl: string;
   readonly fetch: Fetch;
-}): CatalogueGateway => ({
-  listMovies: async ({ page, limit }) => {
-    const query = new URLSearchParams({ page: String(page), limit: String(limit) });
-    const sent = await send(fetch, `${apiUrl}/movies?${query}`, { method: "GET" });
+}): CatalogueGateway => {
+  const getJson = async <T>(
+    path: string,
+    output: z.ZodType<T>,
+  ): Promise<Result<T, HttpFailure>> => {
+    const sent = await send(fetch, `${apiUrl}${path}`, { method: "GET" });
     if (!sent.ok) {
       return sent;
     }
@@ -43,11 +66,26 @@ export const createHttpCatalogueGateway = ({
     if (response.status !== OK) {
       return err(failureOf(response));
     }
-    const body = await parseJson(response, MoviePageOutput);
-    if (!body.ok) {
-      return body;
-    }
-    const { total, lastPage, items } = body.value;
-    return ok({ total, lastPage, movies: items.map(movieOf) });
-  },
-});
+    return parseJson(response, output);
+  };
+
+  return {
+    listMovies: async ({ page, limit, filters }) => {
+      const query = new URLSearchParams([
+        ["page", String(page)],
+        ["limit", String(limit)],
+        ...filterParameters(filters),
+      ]);
+      const body = await getJson(`/movies?${query}`, MoviePageOutput);
+      if (!body.ok) {
+        return body;
+      }
+      const { total, lastPage, items } = body.value;
+      return ok({ total, lastPage, movies: items.map(movieOf) });
+    },
+    listGenres: async () => {
+      const body = await getJson(`/genres?limit=${ALL_GENRES}`, GenrePageOutput);
+      return body.ok ? ok(body.value.items) : body;
+    },
+  };
+};

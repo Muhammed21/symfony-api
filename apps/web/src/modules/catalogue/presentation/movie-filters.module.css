@@ -1,0 +1,25 @@
+.filters {
+  display: grid;
+  gap: var(--prime-space-l);
+}
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-m);
+}
+
+.title {
+  flex: 1 1 280px;
+  max-inline-size: 420px;
+}
+
+.year {
+  flex: 0 0 140px;
+}
+
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-s);
+}
