@@ -4,6 +4,8 @@
     "packageManager": "pnpm@11.25.0",
     "scripts": {
         "dev": "turbo run dev",
+        "build": "turbo run build",
+        "typecheck": "turbo run typecheck",
         "test": "turbo run test",
         "lint": "turbo run lint",
         "container:up": "pnpm --filter @prime/api container:up",
