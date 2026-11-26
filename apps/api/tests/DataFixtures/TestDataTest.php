@@ -49,6 +49,20 @@ final class TestDataTest extends ApiTestCase
         self::assertSame(80, $entityManager->getRepository(Review::class)->count());
     }
 
+    public function testGivesEachMovieAPosterAndABackdropFromTheSamePhoto(): void
+    {
+        $this->loadTestData();
+
+        foreach ($this->allMovies() as $movie) {
+            self::assertMatchesRegularExpression('#^https://picsum\.photos/seed/prime-video-(\d+)/448/250$#', $movie['posterUrl']);
+            self::assertSame(
+                str_replace('/448/250', '/1280/720', $movie['posterUrl']),
+                $movie['backdropUrl'],
+            );
+        }
+        self::assertCount(40, array_unique(array_column($this->allMovies(), 'posterUrl')));
+    }
+
     public function testLoadsTheTenRealGenres(): void
     {
         $this->loadTestData();

@@ -23,6 +23,11 @@ final class MovieFixtures extends Fixture implements DependentFixtureInterface
         return 'movie-'.$number;
     }
 
+    private static function photo(int $number, string $size): string
+    {
+        return sprintf('https://picsum.photos/seed/prime-video-%d/%s', $number, $size);
+    }
+
     public function getDependencies(): array
     {
         return [GenreFixtures::class];
@@ -62,6 +67,8 @@ final class MovieFixtures extends Fixture implements DependentFixtureInterface
                 duration: $faker->numberBetween(75, 200),
                 ageRating: $faker->randomElement(AgeRating::cases()),
                 synopsis: $faker->realText($faker->numberBetween(150, 600)),
+                posterUrl: self::photo($number, '448/250'),
+                backdropUrl: self::photo($number, '1280/720'),
             ),
             'genreNames' => array_values($faker->randomElements(GenreFixtures::NAMES, $faker->numberBetween(1, 3))),
         ];

@@ -40,6 +40,14 @@ class Movie
     #[Groups(['movie:list', 'movie:read'])]
     private AgeRating $ageRating;
 
+    #[ORM\Column(length: MovieInput::MAX_URL_LENGTH, nullable: true)]
+    #[Groups(['movie:list', 'movie:read'])]
+    private ?string $posterUrl;
+
+    #[ORM\Column(length: MovieInput::MAX_URL_LENGTH, nullable: true)]
+    #[Groups(['movie:list', 'movie:read'])]
+    private ?string $backdropUrl;
+
     /**
      * @var Collection<int, Genre>
      */
@@ -81,6 +89,8 @@ class Movie
         $this->releaseYear = $input->releaseYear;
         $this->duration = $input->duration;
         $this->ageRating = $input->ageRating;
+        $this->posterUrl = $input->posterUrl;
+        $this->backdropUrl = $input->backdropUrl;
         $this->genres->clear();
         array_walk($genres, fn (Genre $genre) => $this->genres->add($genre));
     }
@@ -160,5 +170,15 @@ class Movie
     public function getAgeRating(): AgeRating
     {
         return $this->ageRating;
+    }
+
+    public function getPosterUrl(): ?string
+    {
+        return $this->posterUrl;
+    }
+
+    public function getBackdropUrl(): ?string
+    {
+        return $this->backdropUrl;
     }
 }

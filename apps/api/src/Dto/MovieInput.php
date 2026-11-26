@@ -11,6 +11,7 @@ final readonly class MovieInput
 {
     public const FIRST_FILM_YEAR = 1888;
     public const MAX_YEARS_AHEAD = 5;
+    public const MAX_URL_LENGTH = 2048;
 
     public function __construct(
         #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
@@ -34,6 +35,14 @@ final readonly class MovieInput
         /** @var list<int> */
         #[ExistingGenres]
         public array $genres = [],
+
+        #[Assert\Url(message: "L'affiche doit être une adresse http ou https.", protocols: ['http', 'https'], requireTld: true)]
+        #[Assert\Length(max: self::MAX_URL_LENGTH, maxMessage: "L'adresse de l'affiche ne peut pas dépasser {{ limit }} caractères.")]
+        public ?string $posterUrl = null,
+
+        #[Assert\Url(message: 'La bannière doit être une adresse http ou https.', protocols: ['http', 'https'], requireTld: true)]
+        #[Assert\Length(max: self::MAX_URL_LENGTH, maxMessage: "L'adresse de la bannière ne peut pas dépasser {{ limit }} caractères.")]
+        public ?string $backdropUrl = null,
     ) {
     }
 

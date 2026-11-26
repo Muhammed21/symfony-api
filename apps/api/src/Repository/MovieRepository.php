@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Dto\MovieFilters;
+use App\Dto\MovieSorting;
 use App\Entity\Movie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -18,12 +19,17 @@ class MovieRepository extends ServiceEntityRepository
         parent::__construct($registry, Movie::class);
     }
 
-    public function createFilteredQuery(MovieFilters $filters): QueryBuilder
+    public function createFilteredQuery(MovieFilters $filters, MovieSorting $sorting = new MovieSorting()): QueryBuilder
     {
         $query = $this->createQueryBuilder('movie')
             ->leftJoin('movie.genres', 'genre')
-            ->addSelect('genre')
-            ->orderBy('movie.title', 'ASC')
+            ->addSelect('genre');
+
+        if (MovieSorting::MOST_RECENT === $sorting->sort) {
+            $query->addOrderBy('movie.releaseYear', 'DESC');
+        }
+
+        $query->addOrderBy('movie.title', 'ASC')
             ->addOrderBy('movie.id', 'ASC');
 
         if (null !== $filters->title) {

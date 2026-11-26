@@ -32,7 +32,9 @@ Accept: application/json
   "releaseYear": 1972,
   "duration": 175,
   "ageRating": "16+",
-  "genres": [{{createGenreForMovies.response.body.id}}]
+  "genres": [{{createGenreForMovies.response.body.id}}],
+  "posterUrl": "https://picsum.photos/seed/le-parrain/448/250",
+  "backdropUrl": "https://picsum.photos/seed/le-parrain/1280/720"
 }
 
 ### Créer un deuxième film, sans synopsis ni genre → 201
@@ -96,6 +98,26 @@ Accept: application/json
 ### Genre invalide → 422
 GET {{baseUrl}}/movies?genre=0
 Accept: application/json
+
+### Les plus récents d'abord (spec 10) → 200
+GET {{baseUrl}}/movies?sort=recent
+Accept: application/json
+
+### Les plus récents d'un genre → 200
+GET {{baseUrl}}/movies?sort=recent&genre={{createGenreForMovies.response.body.id}}
+Accept: application/json
+
+### Tri inconnu → 422
+GET {{baseUrl}}/movies?sort=popular
+Accept: application/json
+
+### Affiche qui n'est pas une adresse http(s) → 422
+POST {{baseUrl}}/movies
+Authorization: Bearer {{loginAdmin.response.body.token}}
+Content-Type: application/json
+Accept: application/json
+
+{ "title": "Sans affiche valide", "releaseYear": 2000, "duration": 90, "ageRating": "ALL", "posterUrl": "ftp://exemple.fr/a.jpg" }
 
 ### Créer un film avec un genre inexistant → 422
 POST {{baseUrl}}/movies

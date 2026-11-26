@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Dto\MovieFilters;
 use App\Dto\MovieInput;
+use App\Dto\MovieSorting;
 use App\Entity\Movie;
 use App\Entity\User;
 use App\Model\PaginationDTO;
@@ -39,8 +40,10 @@ final class MovieController extends AbstractController
         PaginationDTO $pagination = new PaginationDTO(),
         #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)]
         MovieFilters $filters = new MovieFilters(),
+        #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)]
+        MovieSorting $sorting = new MovieSorting(),
     ): JsonResponse {
-        $page = (new Paginator())->paginate($this->movies->createFilteredQuery($filters), $pagination);
+        $page = (new Paginator())->paginate($this->movies->createFilteredQuery($filters, $sorting), $pagination);
 
         return $this->json($page, context: ['groups' => ['paginate', 'movie:list']]);
     }

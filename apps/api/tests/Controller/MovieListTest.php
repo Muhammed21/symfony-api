@@ -73,7 +73,7 @@ final class MovieListTest extends ApiTestCase
 
         $body = $this->requestJson('GET', '/movies');
 
-        self::assertSame(['id', 'title', 'releaseYear', 'duration', 'ageRating', 'genres'], array_keys($body['items'][0]));
+        self::assertSame(['id', 'title', 'releaseYear', 'duration', 'ageRating', 'posterUrl', 'backdropUrl', 'genres'], array_keys($body['items'][0]));
     }
 
     public function testFiltersByPartOfTitleIgnoringCase(): void
@@ -148,5 +148,48 @@ final class MovieListTest extends ApiTestCase
         $this->requestJson('GET', $uri);
 
         self::assertResponseStatusCodeSame(422);
+    }
+
+    public function testSortsMostRecentFirstThenByTitle(): void
+    {
+        $this->createMovie(['title' => 'Ancien', 'releaseYear' => 1950]);
+        $this->createMovie(['title' => 'Récent B', 'releaseYear' => 2020]);
+        $this->createMovie(['title' => 'Récent A', 'releaseYear' => 2020]);
+        $this->createMovie(['title' => 'Moyen', 'releaseYear' => 1990]);
+
+        $body = $this->requestJson('GET', '/movies?sort=recent');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['Récent A', 'Récent B', 'Moyen', 'Ancien'], self::titles($body));
+    }
+
+    public function testSortsByTitleWhenAskedExplicitly(): void
+    {
+        $this->createMovie(['title' => 'Bravo', 'releaseYear' => 2020]);
+        $this->createMovie(['title' => 'Alpha', 'releaseYear' => 1950]);
+
+        $body = $this->requestJson('GET', '/movies?sort=title');
+
+        self::assertSame(['Alpha', 'Bravo'], self::titles($body));
+    }
+
+    public function testCombinesRecentSortWithGenreFilter(): void
+    {
+        $drame = $this->createGenre('Drame');
+        $this->createMovie(['title' => 'Drame ancien', 'releaseYear' => 1960, 'genres' => [$drame['id']]]);
+        $this->createMovie(['title' => 'Comédie récente', 'releaseYear' => 2022]);
+        $this->createMovie(['title' => 'Drame récent', 'releaseYear' => 2010, 'genres' => [$drame['id']]]);
+
+        $body = $this->requestJson('GET', '/movies?sort=recent&genre='.$drame['id']);
+
+        self::assertSame(['Drame récent', 'Drame ancien'], self::titles($body));
+    }
+
+    public function testRejectsUnknownSort(): void
+    {
+        $error = $this->requestJson('GET', '/movies?sort=popular');
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertContains('sort', self::violatedPaths($error));
     }
 }

@@ -30,6 +30,40 @@ final class MovieCrudTest extends ApiTestCase
         self::assertNull($movie['synopsis']);
     }
 
+    public function testCreatesMovieWithPosterAndBackdrop(): void
+    {
+        $created = $this->createMovie([
+            'posterUrl' => 'https://images.exemple.fr/parrain-affiche.jpg',
+            'backdropUrl' => 'http://images.exemple.fr/parrain-banniere.jpg',
+        ]);
+
+        $movie = $this->requestJson('GET', '/movies/'.$created['id']);
+
+        self::assertSame('https://images.exemple.fr/parrain-affiche.jpg', $movie['posterUrl']);
+        self::assertSame('http://images.exemple.fr/parrain-banniere.jpg', $movie['backdropUrl']);
+    }
+
+    public function testMovieWithoutImagesHasNullImages(): void
+    {
+        $movie = $this->createMovie();
+
+        self::assertNull($movie['posterUrl']);
+        self::assertNull($movie['backdropUrl']);
+    }
+
+    public function testReplacesImages(): void
+    {
+        $created = $this->createMovie(['posterUrl' => 'https://images.exemple.fr/ancienne.jpg']);
+
+        $movie = $this->requestJson('PUT', '/movies/'.$created['id'], self::aMovie([
+            'backdropUrl' => 'https://images.exemple.fr/nouvelle.jpg',
+        ]));
+
+        self::assertResponseIsSuccessful();
+        self::assertNull($movie['posterUrl']);
+        self::assertSame('https://images.exemple.fr/nouvelle.jpg', $movie['backdropUrl']);
+    }
+
     /**
      * @return iterable<string, array{array<string, mixed>, string}>
      */
@@ -42,6 +76,9 @@ final class MovieCrudTest extends ApiTestCase
         yield 'year too far in future' => [['releaseYear' => (int) date('Y') + 6], 'releaseYear'];
         yield 'zero duration' => [['duration' => 0], 'duration'];
         yield 'unknown age rating' => [['ageRating' => '12+'], 'ageRating'];
+        yield 'poster not an url' => [['posterUrl' => 'pas-une-url'], 'posterUrl'];
+        yield 'backdrop not http' => [['backdropUrl' => 'ftp://exemple.fr/a.jpg'], 'backdropUrl'];
+        yield 'poster too long' => [['posterUrl' => 'https://exemple.fr/'.str_repeat('a', 2030)], 'posterUrl'];
     }
 
     /**
@@ -122,7 +159,20 @@ final class MovieCrudTest extends ApiTestCase
         $movie = $this->requestJson('PUT', '/movies/'.$created['id'], $replacement);
 
         self::assertResponseIsSuccessful();
-        self::assertSame(['id' => $created['id'], ...$replacement, 'similarMovies' => [], 'averageRating' => null, 'reviewCount' => 0], $movie);
+        self::assertSame([
+            'id' => $created['id'],
+            'title' => 'Le Parrain 2',
+            'synopsis' => null,
+            'releaseYear' => 1974,
+            'duration' => 202,
+            'ageRating' => '18+',
+            'posterUrl' => null,
+            'backdropUrl' => null,
+            'genres' => [],
+            'similarMovies' => [],
+            'averageRating' => null,
+            'reviewCount' => 0,
+        ], $movie);
         self::assertSame($movie, $this->requestJson('GET', '/movies/'.$created['id']));
     }
 
