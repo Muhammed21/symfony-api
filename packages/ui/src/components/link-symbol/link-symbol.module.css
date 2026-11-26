@@ -1,0 +1,8 @@
+.link {
+  composes: button from "../button-symbol/button-symbol.module.css";
+  box-sizing: border-box;
+}
+
+.symbol {
+  composes: symbol from "../control/symbol.module.css";
+}

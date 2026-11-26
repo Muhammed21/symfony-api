@@ -22,6 +22,8 @@ export const size = {
   control: { mini: 28, small: 32, regular: 44, large: 52, extraLarge: 64 },
   symbol: { mini: 14, small: 16, regular: 20, large: 24, extraLarge: 28 },
   link: { small: 26 },
+  navigation: { bar: 92 },
+  hero: { height: 560, scrim: 320 },
   avatar: { small: 44, medium: 52, large: 88, extraLarge: 128 },
   activityIndicator: { small: 20, medium: 28, large: 44 },
   pageControl: { dot: 8, height: 28 },

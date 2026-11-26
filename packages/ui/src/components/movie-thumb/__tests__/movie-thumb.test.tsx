@@ -26,6 +26,36 @@ describe("MovieThumb", () => {
     expect(screen.container.querySelector("img")).toBeNull();
   });
 
+  it("avec légende, écrit le titre sur l'image, qui devient décorative", async () => {
+    const screen = await renderMovieThumb({ image: POSTER, captioned: true });
+
+    await expect.element(screen.getByText("Le Grand Voyage")).toBeVisible();
+    await expect.element(screen.getByRole("img")).not.toBeInTheDocument();
+    expect(screen.container.querySelector("img")?.getAttribute("alt")).toBe("");
+  });
+
+  it("place la légende en bas, sur un dégradé sombre", async () => {
+    const screen = await renderMovieThumb({ image: POSTER, captioned: true });
+
+    const caption = screen.getByText("Le Grand Voyage");
+    const thumb = screen.getByTestId("movie-thumb").element().getBoundingClientRect();
+    const box = caption.element().getBoundingClientRect();
+
+    expect(thumb.bottom - box.bottom).toBe(12);
+    expect(box.left - thumb.left).toBe(12);
+    await expect.element(caption).toHaveStyle({ fontSize: "15px", fontWeight: "510" });
+    expect(
+      getComputedStyle(caption.element().parentElement ?? document.body).backgroundImage,
+    ).toMatch(/^linear-gradient/);
+  });
+
+  it("revient au titre quand l'image ne se charge pas", async () => {
+    const screen = await renderMovieThumb({ image: "data:image/png;base64,AAAA" });
+
+    await expect.element(screen.getByText("Le Grand Voyage")).toBeVisible();
+    expect(screen.container.querySelector("img")).toBeNull();
+  });
+
   it("en paysage par défaut : 224 × 125, coins arrondis de 12", async () => {
     const screen = await renderMovieThumb();
 

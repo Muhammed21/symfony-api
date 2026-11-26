@@ -28,6 +28,7 @@
   --prime-color-view-regular: rgba(40, 40, 40, 0.5);
   --prime-color-view-thicker: rgba(20, 20, 20, 0.8);
   --prime-color-view-recessed: rgba(0, 0, 0, 0.2);
+  --prime-color-view-scrim: rgba(0, 0, 0, 0.8);
   --prime-color-window-glass: rgba(128, 128, 128, 0.3);
   --prime-color-separator-default: rgba(255, 255, 255, 0.12);
   --prime-font-family: "SF Pro", "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -69,6 +70,9 @@
   --prime-size-symbol-large: 24px;
   --prime-size-symbol-extra-large: 28px;
   --prime-size-link-small: 26px;
+  --prime-size-navigation-bar: 92px;
+  --prime-size-hero-height: 560px;
+  --prime-size-hero-scrim: 320px;
   --prime-size-avatar-small: 44px;
   --prime-size-avatar-medium: 52px;
   --prime-size-avatar-large: 88px;

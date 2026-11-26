@@ -34,6 +34,7 @@ export const color = {
     regular: "rgba(40, 40, 40, 0.5)",
     thicker: "rgba(20, 20, 20, 0.8)",
     recessed: "rgba(0, 0, 0, 0.2)",
+    scrim: "rgba(0, 0, 0, 0.8)",
   },
   window: {
     glass: "rgba(128, 128, 128, 0.3)",

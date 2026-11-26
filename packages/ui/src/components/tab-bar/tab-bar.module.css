@@ -1,0 +1,84 @@
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-s);
+  margin: 0;
+  padding: var(--prime-space-m);
+  border-radius: var(--prime-radius-pill);
+  background-color: var(--prime-color-window-glass);
+  backdrop-filter: blur(var(--prime-blur-glass));
+  list-style: none;
+}
+
+.tab {
+  composes: control from "../control/control.module.css";
+  --symbol-size: var(--prime-size-symbol-large);
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  inline-size: var(--prime-size-control-regular);
+  block-size: var(--prime-size-control-regular);
+  background-color: transparent;
+  backdrop-filter: none;
+}
+
+.tab[aria-current="page"] {
+  background-color: var(--prime-color-control-pressed);
+}
+
+.symbol {
+  composes: symbol from "../control/symbol.module.css";
+}
+
+.label {
+  position: absolute;
+  inset-inline-start: calc(100% + var(--prime-space-l));
+  padding: var(--prime-space-xs) var(--prime-space-m);
+  border-radius: var(--prime-radius-pill);
+  background-color: var(--prime-color-view-thicker);
+  font: var(--prime-text-callout);
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.tab:hover > .label,
+.tab:focus-visible > .label {
+  visibility: visible;
+}
+
+.bar[data-orientation="horizontal"] {
+  flex-direction: row;
+  padding: var(--prime-space-s);
+}
+
+.bar[data-orientation="horizontal"] .tab {
+  display: inline-flex;
+  align-items: center;
+  column-gap: var(--prime-space-s);
+  inline-size: auto;
+  padding-inline: var(--prime-space-l) var(--prime-space-xl);
+  font: var(--prime-text-body);
+  text-decoration: none;
+}
+
+.bar[data-orientation="horizontal"] .label {
+  position: static;
+  padding: 0;
+  background-color: transparent;
+  font: inherit;
+  visibility: visible;
+}
+
+@media (width < 600px) {
+  .bar[data-orientation="horizontal"] .tab {
+    inline-size: var(--prime-size-control-regular);
+    padding-inline: 0;
+    justify-content: center;
+  }
+
+  .bar[data-orientation="horizontal"] .label {
+    display: none;
+  }
+}

@@ -22,6 +22,11 @@ export {
   type LinkSymbolPlacement,
 } from "./components/link/link.tsx";
 export {
+  LinkSymbol,
+  type LinkSymbolAnchor,
+  type LinkSymbolProps,
+} from "./components/link-symbol/link-symbol.tsx";
+export {
   MovieThumb,
   type MovieThumbOrientation,
   type MovieThumbProps,
@@ -33,6 +38,13 @@ export {
   SectionHeader,
   type SectionHeaderProps,
 } from "./components/section-header/section-header.tsx";
+export {
+  type Tab,
+  type TabAnchor,
+  TabBar,
+  type TabBarOrientation,
+  type TabBarProps,
+} from "./components/tab-bar/tab-bar.tsx";
 export {
   TextField,
   type TextFieldInputMode,

@@ -29,6 +29,16 @@ export const AvecImage: Story = {
   args: { image: gradientPoster("#0a84ff", "#bf5af2") },
 };
 
+export const AvecLegende: Story = {
+  name: "Avec légende",
+  args: { image: gradientPoster("#0a84ff", "#bf5af2"), captioned: true },
+};
+
+export const ImageIntrouvable: Story = {
+  name: "Image introuvable",
+  args: { image: "data:image/png;base64,AAAA" },
+};
+
 export const Portrait: Story = {
   args: { orientation: "portrait", image: gradientPoster("#ff9f0a", "#ff375f") },
 };
