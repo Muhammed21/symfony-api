@@ -34,7 +34,7 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 
 - **Nouveautés** en premier (`sort=recent`, 12 films), puis **une rangée par genre**, dans l'ordre alphabétique des genres (12 films du genre, triés par titre).
 - Chaque rangée : un `SectionHeader` avec chevron qui ouvre le catalogue (`/catalogue` pour Nouveautés, `/catalogue?genre=<id>` pour un genre), puis les vignettes paysage (224 × 125, écart 16, marge 40) qui défilent à l'horizontale.
-- Vignette : l'affiche (`posterUrl`) en fond, le titre du film en bas sur un léger dégradé (les photos ne portent pas le titre, contrairement aux affiches de la maquette). Au survol, elle s'agrandit (264 × 147) avec l'ombre flottante. Sans affiche, le rendu actuel (titre sur fond gris).
+- Vignette : la bannière (`backdropUrl`, paysage comme la vignette) en fond, sinon l'affiche (`posterUrl`), le titre du film en bas sur un léger dégradé (les photos ne portent pas le titre, contrairement aux affiches de la maquette). Au survol, elle s'agrandit (264 × 147) avec l'ombre flottante. Sans affiche, le rendu actuel (titre sur fond gris).
 - Une rangée de genre vide n'apparaît pas, ni pendant son chargement ; en cas d'échec, elle disparaît sans gêner les autres.
 - Tant que les nouveautés n'ont pas répondu : un indicateur d'activité « Chargement de l'accueil ». Si elles échouent : `Impossible de charger les nouveautés.` et un bouton Réessayer.
 

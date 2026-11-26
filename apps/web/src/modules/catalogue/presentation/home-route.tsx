@@ -13,7 +13,7 @@ import {
   SectionHeader,
 } from "@prime/ui";
 
-import type { Genre, Movie } from "../domain/movie.ts";
+import { type Genre, type Movie, thumbnailOf } from "../domain/movie.ts";
 import { riseInOrder } from "./motion.ts";
 import type { ListGenres, ListMovies } from "./use-cases.ts";
 
@@ -105,15 +105,18 @@ const MovieRow = ({
       />
     </div>
     <ul className={styles.thumbs}>
-      {movies.map((movie, index) => (
-        <li key={movie.id} {...riseInOrder(index)}>
-          <MovieThumb
-            title={movie.title}
-            captioned
-            {...(movie.posterUrl === undefined ? {} : { image: movie.posterUrl })}
-          />
-        </li>
-      ))}
+      {movies.map((movie, index) => {
+        const thumbnail = thumbnailOf(movie);
+        return (
+          <li key={movie.id} {...riseInOrder(index)}>
+            <MovieThumb
+              title={movie.title}
+              captioned
+              {...(thumbnail === undefined ? {} : { image: thumbnail })}
+            />
+          </li>
+        );
+      })}
     </ul>
   </section>
 );

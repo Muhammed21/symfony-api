@@ -13,6 +13,9 @@ export type Movie = {
   readonly genres: readonly string[];
 };
 
+export const thumbnailOf = (movie: Movie): string | undefined =>
+  movie.backdropUrl ?? movie.posterUrl;
+
 export type MoviePage = {
   readonly movies: readonly Movie[];
   readonly total: number;

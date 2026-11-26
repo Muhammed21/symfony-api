@@ -10,7 +10,7 @@ import { z } from "zod";
 
 import { ActivityIndicator, ButtonTextAndSymbol, Link, MovieThumb, PageControl } from "@prime/ui";
 
-import type { AgeRating, Movie, MovieFilters } from "../domain/movie.ts";
+import { type AgeRating, type Movie, type MovieFilters, thumbnailOf } from "../domain/movie.ts";
 import { formatDuration } from "./duration.ts";
 import { riseInOrder } from "./motion.ts";
 import { MovieFilterBar } from "./movie-filters.tsx";
@@ -35,12 +35,10 @@ const ageRatingLabel = (ageRating: AgeRating) => (ageRating === "ALL" ? "Tous pu
 
 const MovieCard = ({ movie }: { readonly movie: Movie }) => {
   const titleId = `movie-${movie.id}`;
+  const thumbnail = thumbnailOf(movie);
   return (
     <article className={styles.card} aria-labelledby={titleId}>
-      <MovieThumb
-        title={movie.title}
-        {...(movie.posterUrl === undefined ? {} : { image: movie.posterUrl })}
-      />
+      <MovieThumb title={movie.title} {...(thumbnail === undefined ? {} : { image: thumbnail })} />
       <h3 id={titleId} className={styles.cardTitle}>
         {movie.title}
       </h3>

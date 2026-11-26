@@ -138,16 +138,28 @@ describe("page du catalogue (spec 08)", () => {
     await expect.element(roiLion).toMatchTextContent("Animation, Aventure");
   });
 
-  it("montre l'affiche de chaque film, avec son titre en légende", async () => {
+  it("montre la bannière paysage de chaque film, sinon son affiche, avec son titre en légende", async () => {
     const screen = await renderMovies(
-      listing({ movies: [makeMovie({ posterUrl: "https://images.exemple.fr/evades.jpg" })] }),
+      listing({
+        movies: [
+          makeMovie({
+            posterUrl: "https://images.exemple.fr/evades.jpg",
+            backdropUrl: "https://images.exemple.fr/evades-banniere.jpg",
+          }),
+          makeMovie({ id: 2, title: "Heat", posterUrl: "https://images.exemple.fr/heat.jpg" }),
+        ],
+      }),
     );
 
-    const card = screen.getByRole("article", { name: "Les Évadés" });
+    const evades = screen.getByRole("article", { name: "Les Évadés" });
+    const heat = screen.getByRole("article", { name: "Heat" });
 
-    await expect.element(card).toBeVisible();
-    expect(card.element().querySelector("img")?.getAttribute("src")).toBe(
-      "https://images.exemple.fr/evades.jpg",
+    await expect.element(evades).toBeVisible();
+    expect(evades.element().querySelector("img")?.getAttribute("src")).toBe(
+      "https://images.exemple.fr/evades-banniere.jpg",
+    );
+    expect(heat.element().querySelector("img")?.getAttribute("src")).toBe(
+      "https://images.exemple.fr/heat.jpg",
     );
   });
 

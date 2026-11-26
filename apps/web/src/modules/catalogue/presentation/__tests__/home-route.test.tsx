@@ -57,7 +57,7 @@ const RECENT: readonly Movie[] = Array.from({ length: 6 }, (_, index) =>
 
 const ACTION: readonly Movie[] = [
   makeMovie({ id: 1, title: "Heat" }),
-  makeMovie({ id: 2, title: "Ronin" }),
+  makeMovie({ id: 2, title: "Ronin", backdropUrl: undefined }),
 ];
 
 const GENRES: readonly Genre[] = [
@@ -251,14 +251,14 @@ describe("accueil (spec 11)", () => {
     expect(router.state.location.search).toMatchObject({ genre: 1 });
   });
 
-  it("montre l'affiche de chaque vignette, avec le titre en légende", async () => {
+  it("montre la bannière paysage de chaque vignette, sinon son affiche, avec le titre en légende", async () => {
     const { screen } = await renderHome();
     const row = screen.getByRole("region", { name: "Action" });
 
     await expect.element(row.getByText("Heat")).toBeVisible();
-    expect(row.element().querySelector("img")?.getAttribute("src")).toBe(
-      "https://images.exemple.fr/affiche.jpg",
-    );
+    expect(
+      [...row.element().querySelectorAll("img")].map((image) => image.getAttribute("src")),
+    ).toEqual(["https://images.exemple.fr/banniere.jpg", "https://images.exemple.fr/affiche.jpg"]);
   });
 
   it("n'affiche pas la rangée d'un genre sans film", async () => {
