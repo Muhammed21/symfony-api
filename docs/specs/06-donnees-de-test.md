@@ -11,10 +11,10 @@ Specs 01 à 05 terminées. Installer en dépendances de développement `doctrine
 ## Commande
 
 ```bash
-docker exec symfony-api php bin/console doctrine:fixtures:load --no-interaction
+docker exec symfony-api composer db:reset
 ```
 
-Elle **vide la base** puis la remplit ; on peut la relancer autant de fois qu'on veut. Elle n'est disponible qu'en environnement `dev` et `test`.
+Le script supprime toutes les tables, rejoue les migrations puis charge les fixtures (`doctrine:fixtures:load`) ; on peut le relancer autant de fois qu'on veut. Recréer les tables plutôt que les vider remet les compteurs d'ids SQLite à zéro : les films ont toujours les ids 1 à 40 et l'administrateur l'id 1, ce dont dépendent les fichiers `.http`. Les fixtures ne sont disponibles qu'en environnement `dev` et `test`.
 
 ## Contenu
 
@@ -23,9 +23,9 @@ Elle **vide la base** puis la remplit ; on peut la relancer autant de fois qu'on
 | Administrateur | 1 | `admin@prime.local` / `password`, rôles `ROLE_USER` + `ROLE_ADMIN` |
 | Utilisateurs | 5 | `user1@prime.local` … `user5@prime.local` / `password` |
 | Genres | 10 | noms réels : Action, Animation, Aventure, Comédie, Documentaire, Drame, Horreur, Romance, Science-fiction, Thriller |
-| Films | 40 | titre, synopsis, année, durée et classification d'âge générés par Faker ; 1 à 3 genres chacun |
-| Avis | ~80 | note et commentaire aléatoires, **jamais deux avis du même utilisateur sur le même film** |
-| Titres similaires | ~20 paires | jamais un film lié à lui-même |
+| Films | 40 | titre (`catchPhrase`), synopsis (`realText`), année, durée et classification d'âge générés par Faker ; 1 à 3 genres chacun |
+| Avis | 80 | note de 1 à 5, commentaire dans 80 % des cas, **jamais deux avis du même utilisateur sur le même film** |
+| Titres similaires | 20 paires | jamais un film lié à lui-même |
 
 - Faker est initialisé avec une **graine fixe** (`$faker->seed(…)`) et en français (`Faker\Factory::create('fr_FR')`) : chaque chargement produit exactement les mêmes données, ce qui rend les requêtes `.http` reproductibles.
 - Les mots de passe passent par `UserPasswordHasherInterface`, comme à l'inscription.

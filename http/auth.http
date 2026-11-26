@@ -84,10 +84,3 @@ Content-Type: application/json
 Accept: application/json
 
 { "name": "Western" }
-
-### Préparer le compte administrateur utilisé par movies.http et genres.http (étape 1/2) → 201
-POST {{baseUrl}}/register
-Content-Type: application/json
-Accept: application/json
-
-{ "email": "admin@prime.local", "password": "password" }

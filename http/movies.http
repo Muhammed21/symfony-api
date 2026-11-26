@@ -2,7 +2,7 @@
 @adminEmail = admin@prime.local
 @password = password
 
-### Connexion administrateur (voir http/auth.http pour créer ce compte) → 200
+### Connexion administrateur (compte des données de test) → 200
 # @name loginAdmin
 POST {{baseUrl}}/api/login
 Content-Type: application/json

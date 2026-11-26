@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:8000
 
-### Connexion administrateur (compte préparé via http/auth.http) → 200
+### Connexion administrateur (compte des données de test) → 200
 # @name loginAdmin
 POST {{baseUrl}}/api/login
 Content-Type: application/json
@@ -8,28 +8,21 @@ Accept: application/json
 
 { "email": "admin@prime.local", "password": "password" }
 
-### Connexion d'Alice (inscrite via http/auth.http) → 200
+### Connexion d'Alice (user1 des données de test) → 200
 # @name loginAlice
 POST {{baseUrl}}/api/login
 Content-Type: application/json
 Accept: application/json
 
-{ "email": "alice@prime.local", "password": "motdepasse" }
+{ "email": "user1@prime.local", "password": "password" }
 
-### Inscription de Bob → 201 (409 s'il existe déjà, sans conséquence)
-POST {{baseUrl}}/register
-Content-Type: application/json
-Accept: application/json
-
-{ "email": "bob@prime.local", "password": "motdepasse" }
-
-### Connexion de Bob → 200
+### Connexion de Bob (user2 des données de test) → 200
 # @name loginBob
 POST {{baseUrl}}/api/login
 Content-Type: application/json
 Accept: application/json
 
-{ "email": "bob@prime.local", "password": "motdepasse" }
+{ "email": "user2@prime.local", "password": "password" }
 
 ### Préparer un film à noter (administrateur) → 201
 # @name createMovie

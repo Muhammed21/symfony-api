@@ -16,11 +16,7 @@ cp .env.local .env.test.local   # l'environnement de test ne lit pas .env.local
 docker exec symfony-api php bin/console lexik:jwt:generate-keypair
 ```
 
-Tant que les données de test (spec 06) n'existent pas, un administrateur se crée en deux temps : inscription via `POST /register`, puis promotion en base :
-
-```bash
-docker exec symfony-api php bin/console dbal:run-sql "UPDATE \"user\" SET roles = '[\"ROLE_ADMIN\"]' WHERE email = 'admin@prime.local'"
-```
+Le compte administrateur (`admin@prime.local` / `password`) est créé par les données de test (spec 06) : `docker exec symfony-api composer db:reset`.
 
 ## L'utilisateur
 
