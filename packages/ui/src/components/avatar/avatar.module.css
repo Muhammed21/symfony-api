@@ -1,0 +1,22 @@
+.avatar {
+  display: grid;
+  place-items: center;
+  inline-size: var(--avatar-size);
+  block-size: var(--avatar-size);
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--prime-color-system-cyan),
+    var(--prime-color-system-blue)
+  );
+  color: var(--prime-color-system-white);
+  font: var(--prime-text-title3);
+}
+
+.avatar[data-size="small"] {
+  --avatar-size: var(--prime-size-avatar-small);
+}
+
+.avatar[data-size="medium"] {
+  --avatar-size: var(--prime-size-avatar-medium);
+}

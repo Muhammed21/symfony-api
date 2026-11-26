@@ -81,4 +81,40 @@ describe("ButtonTextAndSymbol", () => {
       .element(screen.getByRole("button"))
       .toHaveStyle({ backgroundColor: "rgba(0, 0, 0, 0)" });
   });
+
+  it("n'envoie pas le formulaire qui l'entoure par défaut", async () => {
+    const submitted: string[] = [];
+    const screen = await render(
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          submitted.push("envoyé");
+        }}
+      >
+        <ButtonTextAndSymbol label="Réessayer" symbol={<svg />} />
+      </form>,
+    );
+
+    await screen.getByRole("button", { name: "Réessayer" }).click();
+
+    expect(submitted).toEqual([]);
+  });
+
+  it("en bouton d'envoi, envoie le formulaire qui l'entoure", async () => {
+    const submitted: string[] = [];
+    const screen = await render(
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          submitted.push("envoyé");
+        }}
+      >
+        <ButtonTextAndSymbol label="Se connecter" symbol={<svg />} type="submit" />
+      </form>,
+    );
+
+    await screen.getByRole("button", { name: "Se connecter" }).click();
+
+    expect(submitted).toEqual(["envoyé"]);
+  });
 });

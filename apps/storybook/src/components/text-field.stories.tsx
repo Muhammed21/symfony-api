@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Search } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { useState } from "react";
 import { fn } from "storybook/test";
 
-import { TextField, type TextFieldProps } from "@prime/ui";
+import { ButtonSymbol, TextField, type TextFieldProps } from "@prime/ui";
 
 const meta = {
   title: "Composants/TextField",
@@ -11,7 +11,8 @@ const meta = {
   args: { label: "Année", value: "", placeholder: "1994", onChange: fn() },
   argTypes: {
     symbol: { control: false },
-    type: { control: "inline-radio", options: ["text", "search"] },
+    accessory: { control: false },
+    type: { control: "inline-radio", options: ["text", "search", "email", "password"] },
     inputMode: { control: "inline-radio", options: ["text", "numeric"] },
   },
   decorators: [
@@ -63,4 +64,47 @@ export const Annee: Story = {
   name: "Année (clavier numérique, 4 chiffres)",
   args: { inputMode: "numeric", maxLength: 4 },
   render: (args) => <InteractiveTextField {...args} />,
+};
+
+export const EMailAvecLibelle: Story = {
+  name: "E-mail, libellé visible",
+  args: {
+    type: "email",
+    label: "E-mail",
+    placeholder: "vous@exemple.fr",
+    autoComplete: "email",
+    labelVisible: true,
+  },
+  render: (args) => <InteractiveTextField {...args} />,
+};
+
+export const MotDePasseAvecAide: Story = {
+  name: "Mot de passe, aide et bouton œil",
+  args: {
+    type: "password",
+    label: "Mot de passe",
+    autoComplete: "new-password",
+    labelVisible: true,
+    hint: "8 caractères minimum",
+    accessory: (
+      <ButtonSymbol
+        size="mini"
+        appearance="plain"
+        label="Afficher le mot de passe"
+        symbol={<Eye />}
+      />
+    ),
+  },
+  render: (args) => <InteractiveTextField {...args} />,
+};
+
+export const EnErreur: Story = {
+  name: "En erreur",
+  args: {
+    type: "email",
+    label: "E-mail",
+    value: "pas-un-email",
+    labelVisible: true,
+    error: "Cet e-mail n'est pas valide.",
+  },
 };

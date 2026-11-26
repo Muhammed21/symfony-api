@@ -6,12 +6,15 @@ import styles from "./button-text-and-symbol.module.css";
 
 export type ButtonTextAndSymbolSize = "regular" | "large";
 
+export type ButtonTextAndSymbolType = "button" | "submit";
+
 export type ButtonTextAndSymbolProps = {
   readonly label: string;
   readonly symbol: ReactNode;
   readonly size?: ButtonTextAndSymbolSize;
   readonly appearance?: ControlAppearance;
   readonly disabled?: boolean;
+  readonly type?: ButtonTextAndSymbolType;
   readonly onClick?: () => void;
 };
 
@@ -21,10 +24,11 @@ export const ButtonTextAndSymbol = ({
   size = "regular",
   appearance,
   disabled = false,
+  type = "button",
   onClick,
 }: ButtonTextAndSymbolProps) => (
   <button
-    type="button"
+    type={type}
     className={styles.button}
     data-size={size}
     data-appearance={appearance}

@@ -4,7 +4,7 @@ import { render } from "vitest-browser-react";
 import { TextField, type TextFieldProps } from "../text-field.tsx";
 
 const frameOf = (screen: Awaited<ReturnType<typeof render>>) => {
-  const frame = screen.container.firstElementChild;
+  const frame = screen.container.querySelector("input")?.parentElement;
   if (!(frame instanceof HTMLElement)) {
     throw new Error("Le champ n'a pas de cadre");
   }
@@ -91,5 +91,97 @@ describe("TextField", () => {
     await expect
       .element(frameOf(screen))
       .toHaveStyle({ outlineStyle: "solid", outlineColor: "rgba(255, 255, 255, 0.96)" });
+  });
+
+  it("en variante e-mail, est un champ de texte d'e-mail, avec l'autocomplétion voulue", async () => {
+    const screen = await renderTextField({ type: "email", label: "E-mail", autoComplete: "email" });
+
+    const field = screen.getByRole("textbox", { name: "E-mail" });
+
+    await expect.element(field).toHaveAttribute("type", "email");
+    await expect.element(field).toHaveAttribute("autocomplete", "email");
+  });
+
+  it("en variante mot de passe, masque la saisie", async () => {
+    const screen = await renderTextField({ type: "password", label: "Mot de passe" });
+
+    await expect.element(screen.getByLabelText("Mot de passe")).toHaveAttribute("type", "password");
+  });
+
+  it("peut afficher son libellé au-dessus du champ, en Callout secondaire", async () => {
+    const screen = await renderTextField({ label: "E-mail", labelVisible: true });
+
+    const label = screen.getByText("E-mail");
+
+    await expect.element(label).toBeVisible();
+    await expect.element(label).toHaveStyle({
+      fontSize: "15px",
+      color: "rgba(255, 255, 255, 0.56)",
+    });
+    await expect.element(screen.getByRole("textbox", { name: "E-mail" })).toBeVisible();
+    expect(label.element().getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      frameOf(screen).getBoundingClientRect().top,
+    );
+  });
+
+  it("sans libellé visible, aide ni erreur : le cadre seul, sans description", async () => {
+    const screen = await renderTextField();
+    const field = screen.getByRole("textbox", { name: "Année" });
+
+    await expect.element(field).not.toHaveAttribute("aria-describedby");
+    await expect.element(field).not.toHaveAttribute("aria-invalid");
+    expect(screen.container.querySelectorAll("label, p")).toHaveLength(0);
+    await expect
+      .element(frameOf(screen))
+      .not.toHaveStyle({ boxShadow: "rgb(255, 69, 58) 0px 0px 0px 1px inset" });
+  });
+
+  it("avec une erreur seule, n'est décrit que par elle", async () => {
+    const screen = await renderTextField({ error: "Saisissez une année." });
+    const field = screen.getByRole("textbox", { name: "Année" });
+    const describedBy = field.element().getAttribute("aria-describedby") ?? "";
+
+    expect(describedBy.split(" ")).toHaveLength(1);
+    expect(document.getElementById(describedBy)?.textContent).toBe("Saisissez une année.");
+  });
+
+  it("décrit le champ par son aide", async () => {
+    const screen = await renderTextField({ label: "Mot de passe", hint: "8 caractères minimum" });
+
+    await expect.element(screen.getByText("8 caractères minimum")).toBeVisible();
+    await expect
+      .element(screen.getByRole("textbox", { name: "Mot de passe" }))
+      .toHaveAccessibleDescription("8 caractères minimum");
+    await expect.element(screen.getByRole("textbox")).not.toHaveAttribute("aria-invalid");
+  });
+
+  it("signale une erreur, en rouge, et la lie au champ", async () => {
+    const screen = await renderTextField({
+      label: "Mot de passe",
+      hint: "8 caractères minimum",
+      error: "Saisissez votre mot de passe.",
+    });
+
+    const field = screen.getByRole("textbox", { name: "Mot de passe" });
+
+    await expect.element(field).toHaveAttribute("aria-invalid", "true");
+    await expect
+      .element(field)
+      .toHaveAccessibleDescription("Saisissez votre mot de passe. 8 caractères minimum");
+    await expect
+      .element(screen.getByText("Saisissez votre mot de passe."))
+      .toHaveStyle({ color: "rgb(255, 69, 58)" });
+    await expect
+      .element(frameOf(screen))
+      .toHaveStyle({ boxShadow: "rgb(255, 69, 58) 0px 0px 0px 1px inset" });
+  });
+
+  it("place un accessoire en fin de champ", async () => {
+    const screen = await renderTextField({ accessory: <button type="button">Afficher</button> });
+
+    const frame = frameOf(screen);
+
+    expect(frame.lastElementChild?.textContent).toBe("Afficher");
+    await expect.element(screen.getByRole("button", { name: "Afficher" })).toBeVisible();
   });
 });

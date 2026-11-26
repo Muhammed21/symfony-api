@@ -1,3 +1,29 @@
+.field {
+  display: grid;
+  row-gap: var(--prime-space-xs);
+}
+
+.label {
+  padding-inline: var(--prime-space-xl);
+  color: var(--prime-color-text-secondary);
+  font: var(--prime-text-callout);
+}
+
+.hint,
+.error {
+  margin: 0;
+  padding-inline: var(--prime-space-xl);
+  font: var(--prime-text-footnote);
+}
+
+.hint {
+  color: var(--prime-color-text-tertiary);
+}
+
+.error {
+  color: var(--prime-color-system-red);
+}
+
 .frame {
   display: flex;
   align-items: center;
@@ -8,6 +34,10 @@
   border-radius: var(--prime-radius-pill);
   background-color: var(--prime-color-view-recessed);
   box-shadow: var(--prime-shadow-recessed);
+}
+
+.frame[data-invalid="true"] {
+  box-shadow: inset 0 0 0 1px var(--prime-color-system-red);
 }
 
 .frame[data-symbol="true"] {
