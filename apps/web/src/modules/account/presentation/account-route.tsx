@@ -8,7 +8,7 @@ import {
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
-import { ButtonSymbol, ButtonTextAndSymbol, Link, SegmentedControl, TextField } from "@prime/ui";
+import { ButtonSymbol, ButtonTextAndSymbol, Link, TextField } from "@prime/ui";
 
 import type { AccountFailure, Credentials } from "../domain/account.ts";
 import type { AccountUseCases, LoadBackdrop } from "./use-cases.ts";
@@ -49,12 +49,16 @@ const TEXTS = {
     submit: "Se connecter",
     pending: "Connexion…",
     autoComplete: "current-password",
+    otherQuestion: "Pas encore de compte ?",
+    otherMode: "register",
   },
   register: {
     title: "Créer un compte",
     submit: "Créer mon compte",
     pending: "Création…",
     autoComplete: "new-password",
+    otherQuestion: "Déjà un compte ?",
+    otherMode: "log_in",
   },
 } as const;
 
@@ -124,7 +128,7 @@ const AccountForm = ({
   return (
     <form
       ref={form}
-      className={styles.panel}
+      className={styles.form}
       aria-labelledby={titleId}
       noValidate
       onSubmit={(event) => {
@@ -135,35 +139,6 @@ const AccountForm = ({
       <h1 id={titleId} className={styles.title}>
         {texts.title}
       </h1>
-      <SegmentedControl
-        label="Mode du compte"
-        segments={[
-          {
-            label: TEXTS.log_in.title,
-            current: mode === "log_in",
-            render: (anchor) => (
-              <RouterLink
-                {...anchor}
-                to="/compte"
-                search={searchOf({ mode: "log_in", redirect })}
-                activeOptions={EXACT}
-              />
-            ),
-          },
-          {
-            label: TEXTS.register.title,
-            current: mode === "register",
-            render: (anchor) => (
-              <RouterLink
-                {...anchor}
-                to="/compte"
-                search={searchOf({ mode: "register", redirect })}
-                activeOptions={EXACT}
-              />
-            ),
-          },
-        ]}
-      />
       <div className={styles.fields}>
         <TextField
           label="E-mail"
@@ -176,7 +151,7 @@ const AccountForm = ({
           {...(fields.email === undefined ? {} : { error: fields.email })}
         />
         {failure?.kind === "email_taken" && (
-          <div className={styles.switch}>
+          <div className={styles.taken}>
             <Link
               label="Se connecter avec cet e-mail"
               size="small"
@@ -224,9 +199,25 @@ const AccountForm = ({
           appearance="prominent"
           label={submission.isPending ? texts.pending : texts.submit}
           symbol={<ArrowRight />}
+          symbolPlacement="trailing"
           disabled={submission.isPending}
         />
       </div>
+      <p className={styles.switch}>
+        <span>{texts.otherQuestion}</span>
+        <Link
+          label={TEXTS[texts.otherMode].title}
+          appearance="plain"
+          render={(anchor) => (
+            <RouterLink
+              {...anchor}
+              to="/compte"
+              search={searchOf({ mode: texts.otherMode, redirect })}
+              activeOptions={EXACT}
+            />
+          )}
+        />
+      </p>
     </form>
   );
 };
@@ -254,12 +245,16 @@ export const accountRoute = ({
       }
       return (
         <div className={styles.page}>
-          <Backdrop loadBackdrop={loadBackdrop} />
-          <AccountForm
-            mode={mode === REGISTER_MODE ? "register" : "log_in"}
-            redirect={redirect}
-            account={account}
-          />
+          <div className={styles.visual}>
+            <Backdrop loadBackdrop={loadBackdrop} />
+          </div>
+          <div className={styles.side}>
+            <AccountForm
+              mode={mode === REGISTER_MODE ? "register" : "log_in"}
+              redirect={redirect}
+              account={account}
+            />
+          </div>
         </div>
       );
     },

@@ -16,9 +16,9 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 | `/catalogue` | Catalogue | la grille filtrée et paginée des specs 08 et 09, inchangée |
 
 - Les paramètres de la spec 09 (`page`, `title`, `year`, `genre`) passent sur `/catalogue`.
-- **Navigation** horizontale en haut à droite, dans la barre du logo : Accueil (maison) et Catalogue (loupe), avec leur libellé. L'onglet de la page courante est sélectionné (`aria-current="page"`). Sous 600 px de large, seules les icônes restent, le nom de chaque onglet restant lu par les lecteurs d'écran.
+- **Navigation** horizontale et compacte (onglets de 32 px, texte Callout), à gauche dans la barre du logo, 40 px après lui : Accueil (maison) et Catalogue (loupe), avec leur libellé. L'onglet de la page courante est sélectionné (`aria-current="page"`). Sous 600 px de large, seules les icônes restent, le nom de chaque onglet restant lu par les lecteurs d'écran.
 - **Pleine page** : le contenu couvre toute la largeur du navigateur, sans fenêtre ni coins arrondis (la fenêtre visionOS de la maquette n'a pas de sens dans un navigateur).
-- **Barre de navigation** (92 px) posée sur la bannière : le logo « prime video » à gauche, qui ramène à l'accueil, et la navigation à droite (logo Prime Video officiel en SVG, d'une seule couleur, celle du texte). L'avatar de la maquette arrive avec le compte ([spec 12](12-front-connexion-et-compte.md)).
+- **Barre de navigation** (92 px) posée sur la bannière : le logo « prime video » à gauche, qui ramène à l'accueil, suivi de la navigation (logo Prime Video officiel en SVG, d'une seule couleur, celle du texte). L'avatar de la maquette arrive avec le compte ([spec 12](12-front-connexion-et-compte.md)).
 
 ## Accueil
 
@@ -52,7 +52,7 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 - `MovieThumb` affiche le titre en légende sur l'image (`captioned`), fait apparaître l'image en fondu une fois chargée, et revient au titre seul si elle ne se charge pas.
 - Jetons de mouvement : durées `page` (320 ms) et `slow` (600 ms), courbes `standard` et `decelerate`.
 - Nouveau composant `LinkSymbol` : un lien qui a l'allure d'un `ButtonSymbol`, pour le chevron des rangées.
-- Nouveau composant `TabBar` : barre d'onglets verticale (celle de la maquette) ou horizontale (`orientation`), compacte sur écran étroit ; comme pour `Link`, l'application fournit ses propres liens.
+- Nouveau composant `TabBar` : barre d'onglets verticale (celle de la maquette) ou horizontale (`orientation`), en taille `regular` (44 px) ou `small` (32 px), compacte sur écran étroit ; comme pour `Link`, l'application fournit ses propres liens.
 - La bannière n'est pas un composant du kit visionOS : elle reste dans `apps/web`, construite avec `ButtonSymbol`, `PageControl` et les jetons.
 
 ## Critères d'acceptation
@@ -60,7 +60,7 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 - `/` affiche la bannière du film le plus récent, puis « Nouveautés » et une rangée par genre non vide.
 - Le point 3 du `PageControl` affiche le 3ᵉ film le plus récent dans la bannière.
 - Le chevron d'une rangée de genre ouvre `/catalogue?genre=<id>` avec le genre déjà sélectionné.
-- L'onglet Catalogue, en haut à droite, ouvre `/catalogue` ; l'onglet de la page courante est signalé.
+- L'onglet Catalogue, en haut à gauche après le logo, ouvre `/catalogue` ; l'onglet de la page courante est signalé.
 - La page couvre toute la largeur du navigateur, sans coins arrondis ni défilement horizontal, y compris sur téléphone.
 - Les pages, la bannière et les vignettes s'animent à l'entrée, sauf avec `prefers-reduced-motion: reduce`.
 - Les boutons de la bannière sont désactivés et l'expliquent.

@@ -1,18 +1,23 @@
 .page {
-  position: relative;
   display: grid;
-  place-items: center;
-  overflow: hidden;
-  box-sizing: border-box;
+  grid-template-columns: minmax(0, 1fr);
   min-block-size: 100vh;
-  padding: var(--prime-size-navigation-bar) var(--prime-space-l) var(--prime-space-3xl);
+  background-color: var(--prime-color-system-black);
 }
 
-.page::after {
+.visual {
+  position: relative;
+  display: none;
+  overflow: hidden;
+}
+
+.visual::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent, var(--prime-color-view-scrim));
+  background:
+    linear-gradient(to right, transparent 55%, var(--prime-color-system-black)),
+    linear-gradient(to bottom, var(--prime-color-view-scrim), transparent 30%);
 }
 
 .backdrop {
@@ -21,29 +26,27 @@
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
-  filter: blur(40px) brightness(0.55);
-  scale: 1.1;
   animation: fade var(--prime-duration-slow) var(--prime-easing-standard) both;
 }
 
-.panel {
-  position: relative;
-  z-index: 1;
+.side {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: var(--prime-size-navigation-bar) var(--prime-space-l) var(--prime-space-3xl);
+}
+
+.form {
+  --prime-color-view-recessed: var(--prime-color-control-idle);
+
   display: grid;
   row-gap: var(--prime-space-2xl);
-  box-sizing: border-box;
   inline-size: 100%;
   max-inline-size: 400px;
-  padding: var(--prime-space-3xl) var(--prime-space-2xl);
-  border-radius: var(--prime-radius-panel);
-  background-color: var(--prime-color-view-regular);
-  box-shadow: var(--prime-shadow-big);
-  backdrop-filter: blur(var(--prime-blur-glass));
 }
 
 .title {
   margin: 0;
-  text-align: center;
   font: var(--prime-text-large-title);
 }
 
@@ -52,7 +55,7 @@
   row-gap: var(--prime-space-l);
 }
 
-.switch {
+.taken {
   margin-block-start: calc(-1 * var(--prime-space-s));
   padding-inline: var(--prime-space-s);
 }
@@ -64,11 +67,31 @@
   background-color: var(--prime-color-view-recessed);
   color: var(--prime-color-system-red);
   font: var(--prime-text-callout);
-  text-align: center;
 }
 
 .submit {
   display: grid;
+}
+
+.switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: var(--prime-space-2xs);
+  margin: 0;
+  color: var(--prime-color-text-secondary);
+  font: var(--prime-text-callout);
+}
+
+@media (min-width: 900px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) minmax(480px, 40%);
+  }
+
+  .visual {
+    display: block;
+  }
 }
 
 @keyframes fade {

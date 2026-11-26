@@ -20,10 +20,10 @@
     backdrop-filter var(--prime-duration-page) var(--prime-easing-standard);
 }
 
-.actions {
+.start {
   display: flex;
   align-items: center;
-  gap: var(--prime-space-l);
+  gap: var(--prime-space-3xl);
 }
 
 .navigationBar[data-scrolled] {

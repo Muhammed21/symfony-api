@@ -1,9 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link as RouterLink, useRouterState } from "@tanstack/react-router";
-import { CircleUser, LogOut } from "lucide-react";
+import { CircleUserRound, LogOut } from "lucide-react";
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 
-import { Avatar, ButtonTextAndSymbol, Link } from "@prime/ui";
+import { Avatar, ButtonTextAndSymbol, LinkSymbol } from "@prime/ui";
 
 import type { Session } from "../domain/account.ts";
 import type { AccountUseCases } from "./use-cases.ts";
@@ -14,10 +14,10 @@ import styles from "./account-button.module.css";
 const LogInLink = () => {
   const here = useRouterState({ select: (state) => state.location.href });
   return (
-    <Link
+    <LinkSymbol
       label="Se connecter"
-      size="regular"
-      symbol={<CircleUser />}
+      symbol={<CircleUserRound />}
+      appearance="prominent"
       render={(anchor) => <RouterLink {...anchor} to="/compte" search={{ redirect: here }} />}
     />
   );

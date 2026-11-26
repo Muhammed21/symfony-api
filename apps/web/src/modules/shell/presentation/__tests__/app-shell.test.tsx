@@ -76,15 +76,22 @@ describe("coque de l'application (spec 11)", () => {
       .toHaveStyle({ textDecorationLine: "none" });
   });
 
-  it("place la navigation à l'horizontale, en haut à droite, dans la barre du logo", async () => {
+  it("place une navigation compacte à gauche, juste après le logo", async () => {
     await page.viewport(1280, 800);
     const { screen } = await renderShell("/");
     const banner = screen.getByRole("banner");
     const tabs = banner.getByRole("navigation", { name: "Navigation principale" });
+    const logo = banner.getByRole("link", { name: "Prime Video" }).element();
 
     await expect.element(tabs).toBeVisible();
     const bar = tabs.element().firstElementChild;
     expect(bar === null ? "" : getComputedStyle(bar).flexDirection).toBe("row");
+    expect(tabs.element().getBoundingClientRect().left - logo.getBoundingClientRect().right).toBe(
+      40,
+    );
+    await expect
+      .element(tabs.getByRole("link", { name: "Catalogue" }))
+      .toHaveStyle({ height: "32px", fontSize: "15px" });
     expect(
       screen.getByRole("navigation", { name: "Navigation principale" }).elements(),
     ).toHaveLength(1);
@@ -207,17 +214,13 @@ describe("coque de l'application (spec 11)", () => {
     await commands.reduceMotion(false);
   });
 
-  it("place le compte tout à droite de la barre, après la navigation", async () => {
+  it("place le compte seul tout à droite de la barre", async () => {
     await page.viewport(1280, 800);
     const { screen } = await renderShell("/");
     const banner = screen.getByRole("banner");
     const account = banner.getByRole("button", { name: "Compte factice" }).element();
-    const navigation = banner.getByRole("navigation", { name: "Navigation principale" }).element();
     const bar = banner.element().getBoundingClientRect();
 
-    expect(account.getBoundingClientRect().left - navigation.getBoundingClientRect().right).toBe(
-      16,
-    );
     expect(bar.right - account.getBoundingClientRect().right).toBe(40);
     expect(
       Math.abs(

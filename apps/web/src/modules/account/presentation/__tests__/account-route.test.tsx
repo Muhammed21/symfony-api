@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
+import { page } from "vitest/browser";
 
 import { err, ok, type Result } from "@prime/result";
 
@@ -91,14 +92,15 @@ const ADA = { email: "ada@exemple.fr", password: "un-bon-mot-de-passe" };
 describe("page de connexion et de création de compte (spec 12)", () => {
   it("par défaut, propose de se connecter", async () => {
     const { screen } = await renderAccount();
-    const modes = screen.getByRole("navigation", { name: "Mode du compte" });
 
     await expect
       .element(screen.getByRole("heading", { level: 1, name: "Se connecter" }))
       .toBeVisible();
+    await expect.element(screen.getByText("Pas encore de compte ?")).toBeVisible();
+    await expect.element(screen.getByRole("link", { name: "Créer un compte" })).toBeVisible();
     await expect
-      .element(modes.getByRole("link", { name: "Se connecter" }))
-      .toHaveAttribute("aria-current", "page");
+      .element(screen.getByRole("link", { name: "Se connecter" }))
+      .not.toBeInTheDocument();
     await expect.element(emailField(screen)).toHaveAttribute("autocomplete", "email");
     await expect.element(passwordField(screen)).toHaveAttribute("type", "password");
     await expect.element(passwordField(screen)).toHaveAttribute("autocomplete", "current-password");
@@ -117,12 +119,11 @@ describe("page de connexion et de création de compte (spec 12)", () => {
     await expect
       .element(screen.getByRole("heading", { level: 1, name: "Créer un compte" }))
       .toBeVisible();
+    await expect.element(screen.getByText("Déjà un compte ?")).toBeVisible();
+    await expect.element(screen.getByRole("link", { name: "Se connecter" })).toBeVisible();
     await expect
       .element(screen.getByRole("link", { name: "Créer un compte" }))
-      .toHaveAttribute("aria-current", "page");
-    await expect
-      .element(screen.getByRole("link", { name: "Se connecter" }))
-      .not.toHaveAttribute("aria-current");
+      .not.toBeInTheDocument();
     await expect.element(passwordField(screen)).toHaveAttribute("autocomplete", "new-password");
     await expect.element(passwordField(screen)).toHaveAccessibleDescription("8 caractères minimum");
     await expect.element(screen.getByRole("button", { name: "Créer mon compte" })).toBeVisible();
@@ -333,25 +334,59 @@ describe("page de connexion et de création de compte (spec 12)", () => {
     await expect.element(screen.getByText("Page d'accueil")).toBeVisible();
   });
 
-  it("pose le formulaire sur un panneau de verre, devant la bannière floutée", async () => {
+  it("occupe toute la page : la bannière nette à gauche, le formulaire à droite, sans panneau", async () => {
+    await page.viewport(1280, 800);
     const { screen } = await renderAccount({
       loadBackdrop: () => Promise.resolve("https://images.exemple.fr/banniere.jpg"),
     });
     const form = screen.getByRole("form", { name: "Se connecter" });
     await expect.element(form).toBeVisible();
+    await expect
+      .poll(() => screen.container.querySelector("img")?.getAttribute("src"))
+      .toBe("https://images.exemple.fr/banniere.jpg");
     const backdrop = screen.container.querySelector("img");
 
-    await expect.element(form).toHaveStyle({
-      backdropFilter: "blur(50px)",
-      borderTopLeftRadius: "32px",
-      maxWidth: "400px",
-    });
-    await expect
-      .poll(() => backdrop?.getAttribute("src"))
-      .toBe("https://images.exemple.fr/banniere.jpg");
     expect(backdrop?.getAttribute("alt")).toBe("");
-    expect(
-      backdrop === null || backdrop === undefined ? "" : getComputedStyle(backdrop).filter,
-    ).toMatch(/blur/);
+    expect(backdrop === null ? "" : getComputedStyle(backdrop).filter).toBe("none");
+    expect(backdrop?.getBoundingClientRect().left).toBe(0);
+    expect(backdrop?.getBoundingClientRect().height).toBe(800);
+    expect(form.element().getBoundingClientRect().left).toBeGreaterThan(640);
+    await expect.element(form).toHaveStyle({
+      backgroundColor: "rgba(0, 0, 0, 0)",
+      backdropFilter: "none",
+      borderTopLeftRadius: "0px",
+    });
+  });
+
+  it("détache les champs du fond noir", async () => {
+    const { screen } = await renderAccount();
+    const field = emailField(screen).element().parentElement;
+
+    expect(field === null ? "" : getComputedStyle(field).backgroundColor).toBe(
+      "rgba(255, 255, 255, 0.12)",
+    );
+  });
+
+  it("sur téléphone, ne garde que le formulaire, sans défilement horizontal", async () => {
+    await page.viewport(390, 844);
+    const { screen } = await renderAccount({
+      loadBackdrop: () => Promise.resolve("https://images.exemple.fr/banniere.jpg"),
+    });
+    await expect.element(screen.getByRole("form", { name: "Se connecter" })).toBeVisible();
+    await expect.poll(() => screen.container.querySelector("img")).not.toBeNull();
+
+    expect(screen.container.querySelector("img")?.checkVisibility()).toBe(false);
+    expect(document.documentElement.scrollWidth).toBe(390);
+  });
+
+  it("étire le bouton d'envoi sur toute la largeur des champs, flèche après le texte", async () => {
+    const { screen } = await renderAccount();
+    const submit = screen.getByRole("button", { name: "Se connecter" }).element();
+
+    expect(submit.getBoundingClientRect().width).toBe(
+      emailField(screen).element().closest("label, div")?.getBoundingClientRect().width,
+    );
+    expect(submit.firstChild?.textContent).toBe("Se connecter");
+    expect(getComputedStyle(submit).backgroundColor).toBe("rgba(255, 255, 255, 0.96)");
   });
 });

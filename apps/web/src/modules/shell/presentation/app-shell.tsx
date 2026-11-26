@@ -26,13 +26,14 @@ export const AppShell = ({ account }: { readonly account: ReactNode }) => {
   return (
     <div className={styles.page}>
       <header className={styles.navigationBar} data-scrolled={scrolled ? true : undefined}>
-        <RouterLink to="/" aria-label="Prime Video" className={styles.logo}>
-          <PrimeVideoLogo />
-        </RouterLink>
-        <div className={styles.actions}>
+        <div className={styles.start}>
+          <RouterLink to="/" aria-label="Prime Video" className={styles.logo}>
+            <PrimeVideoLogo />
+          </RouterLink>
           <TabBar
             label="Navigation principale"
             orientation="horizontal"
+            size="small"
             tabs={[
               {
                 label: "Accueil",
@@ -48,8 +49,8 @@ export const AppShell = ({ account }: { readonly account: ReactNode }) => {
               },
             ]}
           />
-          {account}
         </div>
+        {account}
       </header>
       <main>
         <div key={pathname} className={styles.content}>
