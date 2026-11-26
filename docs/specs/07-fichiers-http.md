@@ -40,7 +40,7 @@ Ces identifiants sont ceux des données de test (spec 06), donc sans secret rée
   ```http
   ### Connexion administrateur → 200
   # @name loginAdmin
-  POST {{baseUrl}}/api/login
+  POST {{baseUrl}}/login
   Content-Type: application/json
   Accept: application/json
 

@@ -37,7 +37,7 @@ final class AccountController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, context: ['groups' => ['user:read']]);
     }
 
-    #[Route('/api/login', name: 'account_login', methods: ['POST'])]
+    #[Route('/login', name: 'account_login', methods: ['POST'])]
     public function login(): never
     {
         throw new \LogicException('Cette route est interceptée par le pare-feu json_login.');

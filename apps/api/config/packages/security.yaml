@@ -16,7 +16,7 @@ security:
             pattern: ^/(_profiler(/|$)|(_wdt|assets|build)/)
             security: false
         login:
-            pattern: ^/api/login$
+            pattern: ^/login$
             stateless: true
             provider: app_user_provider
             json_login:

@@ -4,7 +4,7 @@
 
 ### Connexion administrateur (compte des données de test) → 200
 # @name loginAdmin
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
 

@@ -25,7 +25,7 @@ final class TestDataTest extends ApiTestCase
     private function logIn(string $email): void
     {
         $this->actAsAnonymous();
-        $login = $this->requestJson('POST', '/api/login', ['email' => $email, 'password' => 'password']);
+        $login = $this->requestJson('POST', '/login', ['email' => $email, 'password' => 'password']);
         self::assertResponseIsSuccessful();
         $this->useToken($login['token']);
     }

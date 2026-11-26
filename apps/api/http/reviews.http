@@ -2,7 +2,7 @@
 
 ### Connexion administrateur (compte des données de test) → 200
 # @name loginAdmin
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
 
@@ -10,7 +10,7 @@ Accept: application/json
 
 ### Connexion d'Alice (user1 des données de test) → 200
 # @name loginAlice
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
 
@@ -18,7 +18,7 @@ Accept: application/json
 
 ### Connexion de Bob (user2 des données de test) → 200
 # @name loginBob
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
 

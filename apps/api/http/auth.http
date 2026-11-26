@@ -31,14 +31,14 @@ Accept: application/json
 
 ### Connexion → 200 avec un jeton
 # @name loginAlice
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
 
 { "email": "alice@prime.local", "password": "{{password}}" }
 
 ### Connexion avec un mauvais mot de passe → 401
-POST {{baseUrl}}/api/login
+POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
 

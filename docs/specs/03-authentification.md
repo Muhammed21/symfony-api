@@ -36,7 +36,7 @@ Le compte administrateur (`admin@prime.local` / `password`) est créé par les d
 | Méthode | Route | Accès | Rôle | Succès | Erreurs |
 |---|---|---|---|---|---|
 | `POST` | `/register` | public | créer un compte utilisateur | 201 | 409, 422 |
-| `POST` | `/api/login` | public | obtenir un jeton JWT | 200 `{ "token": "…" }` | 401 |
+| `POST` | `/login` | public | obtenir un jeton JWT | 200 `{ "token": "…" }` | 401 |
 | `GET` | `/me` | connecté | voir son propre compte | 200 | 401 |
 
 - `/register` crée **toujours** un utilisateur simple (`ROLE_USER`). Un champ `roles` envoyé dans le corps est ignoré. Les administrateurs n'existent que via les données de test (spec 06).
@@ -63,8 +63,8 @@ Inscription et connexion :
 - `POST /register` avec un e-mail déjà pris (même en majuscules) renvoie 409.
 - `POST /register` avec un e-mail invalide ou un mot de passe de moins de 8 caractères renvoie 422.
 - `POST /register` avec `"roles": ["ROLE_ADMIN"]` crée un utilisateur qui n'a que `ROLE_USER`.
-- `POST /api/login` avec les bons identifiants renvoie 200 et un `token`.
-- `POST /api/login` avec un mauvais mot de passe renvoie 401.
+- `POST /login` avec les bons identifiants renvoie 200 et un `token`.
+- `POST /login` avec un mauvais mot de passe renvoie 401.
 - `GET /me` avec le jeton renvoie l'utilisateur ; sans jeton, 401.
 
 Accès :

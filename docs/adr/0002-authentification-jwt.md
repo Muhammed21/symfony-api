@@ -1,6 +1,6 @@
 # Authentification par JWT (lexik/jwt-authentication-bundle)
 
-L'API s'authentifie avec un jeton JWT obtenu via `POST /api/login` puis envoyé dans l'en-tête `Authorization: Bearer <jeton>`, grâce à `lexik/jwt-authentication-bundle`. C'est l'approche la plus courante pour une API sans état, et elle se teste simplement depuis un fichier `.http` en réutilisant le jeton de la réponse de connexion.
+L'API s'authentifie avec un jeton JWT obtenu via `POST /login` puis envoyé dans l'en-tête `Authorization: Bearer <jeton>`, grâce à `lexik/jwt-authentication-bundle`. C'est l'approche la plus courante pour une API sans état, et elle se teste simplement depuis un fichier `.http` en réutilisant le jeton de la réponse de connexion.
 
 ## Considered Options
 

@@ -72,7 +72,7 @@ final class AuthenticationTest extends ApiTestCase
     {
         $registered = $this->requestJson('POST', '/register', ['email' => 'alice@prime.local', 'password' => 'motdepasse']);
 
-        $login = $this->requestJson('POST', '/api/login', ['email' => 'alice@prime.local', 'password' => 'motdepasse']);
+        $login = $this->requestJson('POST', '/login', ['email' => 'alice@prime.local', 'password' => 'motdepasse']);
         self::assertResponseIsSuccessful();
         self::assertIsString($login['token']);
 
@@ -98,10 +98,17 @@ final class AuthenticationTest extends ApiTestCase
     #[DataProvider('wrongCredentialsProvider')]
     public function testLoginWithWrongCredentialsReturns401(array $credentials): void
     {
-        $response = $this->requestJson('POST', '/api/login', $credentials);
+        $response = $this->requestJson('POST', '/login', $credentials);
 
         self::assertResponseStatusCodeSame(401);
         self::assertArrayNotHasKey('token', $response ?? []);
+    }
+
+    public function testFormerLoginRouteNoLongerExists(): void
+    {
+        $this->requestJson('POST', '/api/login', ['email' => 'admin@prime.local', 'password' => self::PASSWORD]);
+
+        self::assertResponseStatusCodeSame(404);
     }
 
     public function testAccountRequiresAuthentication(): void
