@@ -8,9 +8,12 @@ export type ButtonTextAndSymbolSize = "regular" | "large";
 
 export type ButtonTextAndSymbolType = "button" | "submit";
 
+export type ButtonTextAndSymbolPlacement = "leading" | "trailing";
+
 export type ButtonTextAndSymbolProps = {
   readonly label: string;
   readonly symbol: ReactNode;
+  readonly symbolPlacement?: ButtonTextAndSymbolPlacement;
   readonly size?: ButtonTextAndSymbolSize;
   readonly appearance?: ControlAppearance;
   readonly disabled?: boolean;
@@ -21,6 +24,7 @@ export type ButtonTextAndSymbolProps = {
 export const ButtonTextAndSymbol = ({
   label,
   symbol,
+  symbolPlacement = "leading",
   size = "regular",
   appearance,
   disabled = false,
@@ -35,9 +39,10 @@ export const ButtonTextAndSymbol = ({
     disabled={disabled}
     onClick={onClick}
   >
+    {symbolPlacement === "trailing" && label}
     <span aria-hidden="true" className={styles.symbol}>
       {symbol}
     </span>
-    {label}
+    {symbolPlacement === "leading" && label}
   </button>
 );

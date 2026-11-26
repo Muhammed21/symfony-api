@@ -61,17 +61,21 @@ describe("ButtonTextAndSymbol", () => {
   it("taille regular par défaut, texte en Headline", async () => {
     const screen = await renderButton();
 
-    await expect
-      .element(screen.getByRole("button"))
-      .toHaveStyle({ height: "44px", fontSize: "17px", fontWeight: "700", lineHeight: "22px" });
+    await expect.element(screen.getByRole("button")).toHaveStyle({
+      height: "44px",
+      fontSize: "17px",
+      fontWeight: "700",
+      lineHeight: "22px",
+    });
   });
 
   it("mis en avant : fond blanc et texte noir", async () => {
     const screen = await renderButton({ appearance: "prominent" });
 
-    await expect
-      .element(screen.getByRole("button"))
-      .toHaveStyle({ backgroundColor: "rgba(255, 255, 255, 0.96)", color: "rgb(0, 0, 0)" });
+    await expect.element(screen.getByRole("button")).toHaveStyle({
+      backgroundColor: "rgba(255, 255, 255, 0.96)",
+      color: "rgb(0, 0, 0)",
+    });
   });
 
   it("sans fond hors survol", async () => {
@@ -80,6 +84,36 @@ describe("ButtonTextAndSymbol", () => {
     await expect
       .element(screen.getByRole("button"))
       .toHaveStyle({ backgroundColor: "rgba(0, 0, 0, 0)" });
+  });
+
+  it("place le symbole avant le texte par défaut", async () => {
+    const screen = await renderButton();
+    const button = screen.getByRole("button").element();
+
+    expect(button.firstElementChild?.contains(screen.getByTestId("symbole").element())).toBe(true);
+    expect(button.lastChild?.textContent).toBe("Lecture");
+  });
+
+  it("place le symbole après le texte sur demande", async () => {
+    const screen = await renderButton({ symbolPlacement: "trailing" });
+    const button = screen.getByRole("button").element();
+
+    expect(button.lastElementChild?.contains(screen.getByTestId("symbole").element())).toBe(true);
+    expect(button.textContent).toBe("Lecture");
+    expect(button.firstChild?.textContent).toBe("Lecture");
+  });
+
+  it("étiré sur toute une largeur, centre son contenu", async () => {
+    const screen = await render(
+      <div style={{ display: "grid", width: "400px" }}>
+        <ButtonTextAndSymbol label="Lecture" symbol={<svg data-testid="symbole" />} />
+      </div>,
+    );
+    const button = screen.getByRole("button").element().getBoundingClientRect();
+    const symbol = screen.getByTestId("symbole").element().getBoundingClientRect();
+
+    expect(button.width).toBe(400);
+    expect(symbol.left - button.left).toBeGreaterThan(100);
   });
 
   it("n'envoie pas le formulaire qui l'entoure par défaut", async () => {

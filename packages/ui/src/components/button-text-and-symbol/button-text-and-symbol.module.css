@@ -2,6 +2,7 @@
   composes: control from "../control/control.module.css";
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   column-gap: var(--prime-space-xs);
   block-size: var(--control-size);
   padding-block: 0;

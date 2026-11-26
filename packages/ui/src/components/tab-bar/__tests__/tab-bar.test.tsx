@@ -146,4 +146,33 @@ describe("TabBar", () => {
 
     await expect.element(screen.getByText("Catalogue")).toBeVisible();
   });
+
+  it("en petite taille, des onglets de 32 px au texte Callout, dans une barre resserrée", async () => {
+    await page.viewport(1280, 800);
+    const screen = await renderTabBar({ orientation: "horizontal", size: "small" });
+    const bar = screen.getByRole("navigation").element().firstElementChild;
+    const [home, catalogue] = screen.getByRole("link").elements();
+
+    await expect.element(screen.getByRole("link", { name: "Catalogue" })).toHaveStyle({
+      height: "32px",
+      paddingLeft: "12px",
+      paddingRight: "16px",
+      columnGap: "6px",
+      fontSize: "15px",
+    });
+    await expect.element(screen.getByTestId("loupe")).toHaveStyle({ width: "16px" });
+    expect(bar === null ? "" : getComputedStyle(bar).padding).toBe("4px");
+    expect(
+      (catalogue?.getBoundingClientRect().left ?? 0) - (home?.getBoundingClientRect().right ?? 0),
+    ).toBe(4);
+  });
+
+  it("en petite taille sur un écran étroit, des onglets ronds de 32 px", async () => {
+    await page.viewport(390, 800);
+    const screen = await renderTabBar({ orientation: "horizontal", size: "small" });
+
+    await expect
+      .element(screen.getByRole("link", { name: "Catalogue" }))
+      .toHaveStyle({ width: "32px", height: "32px", paddingLeft: "0px" });
+  });
 });

@@ -21,10 +21,13 @@ export type Tab = {
 
 export type TabBarOrientation = "vertical" | "horizontal";
 
+export type TabBarSize = "regular" | "small";
+
 export type TabBarProps = {
   readonly label: string;
   readonly tabs: readonly Tab[];
   readonly orientation?: TabBarOrientation;
+  readonly size?: TabBarSize;
 };
 
 const renderTab = ({
@@ -50,9 +53,14 @@ const renderTab = ({
     ),
   });
 
-export const TabBar = ({ label, tabs, orientation = "vertical" }: TabBarProps) => (
+export const TabBar = ({
+  label,
+  tabs,
+  orientation = "vertical",
+  size = "regular",
+}: TabBarProps) => (
   <nav aria-label={label}>
-    <ul className={styles.bar} data-orientation={orientation}>
+    <ul className={styles.bar} data-orientation={orientation} data-size={size}>
       {tabs.map((tab) => (
         <li key={tab.label}>{renderTab(tab)}</li>
       ))}

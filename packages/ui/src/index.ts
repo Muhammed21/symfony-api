@@ -52,6 +52,7 @@ export {
   TabBar,
   type TabBarOrientation,
   type TabBarProps,
+  type TabBarSize,
 } from "./components/tab-bar/tab-bar.tsx";
 export {
   TextField,
