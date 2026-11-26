@@ -20,6 +20,12 @@
     backdrop-filter var(--prime-duration-page) var(--prime-easing-standard);
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-l);
+}
+
 .navigationBar[data-scrolled] {
   background-color: var(--prime-color-window-glass);
   backdrop-filter: blur(var(--prime-blur-glass));

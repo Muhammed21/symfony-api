@@ -1,6 +1,6 @@
 import { Link as RouterLink, Outlet, useRouterState } from "@tanstack/react-router";
 import { House, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { TabBar } from "@prime/ui";
 
@@ -20,7 +20,7 @@ const useScrolled = () => {
   return scrolled;
 };
 
-export const AppShell = () => {
+export const AppShell = ({ account }: { readonly account: ReactNode }) => {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const scrolled = useScrolled();
   return (
@@ -29,24 +29,27 @@ export const AppShell = () => {
         <RouterLink to="/" aria-label="Prime Video" className={styles.logo}>
           <PrimeVideoLogo />
         </RouterLink>
-        <TabBar
-          label="Navigation principale"
-          orientation="horizontal"
-          tabs={[
-            {
-              label: "Accueil",
-              symbol: <House />,
-              current: pathname === "/",
-              render: (anchor) => <RouterLink {...anchor} to="/" />,
-            },
-            {
-              label: "Catalogue",
-              symbol: <Search />,
-              current: pathname.startsWith(CATALOGUE),
-              render: (anchor) => <RouterLink {...anchor} to={CATALOGUE} />,
-            },
-          ]}
-        />
+        <div className={styles.actions}>
+          <TabBar
+            label="Navigation principale"
+            orientation="horizontal"
+            tabs={[
+              {
+                label: "Accueil",
+                symbol: <House />,
+                current: pathname === "/",
+                render: (anchor) => <RouterLink {...anchor} to="/" />,
+              },
+              {
+                label: "Catalogue",
+                symbol: <Search />,
+                current: pathname.startsWith(CATALOGUE),
+                render: (anchor) => <RouterLink {...anchor} to={CATALOGUE} />,
+              },
+            ]}
+          />
+          {account}
+        </div>
       </header>
       <main>
         <div key={pathname} className={styles.content}>

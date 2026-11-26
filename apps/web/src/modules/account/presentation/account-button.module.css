@@ -1,0 +1,63 @@
+.account {
+  position: relative;
+  display: inline-grid;
+}
+
+.avatarButton {
+  display: grid;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: scale var(--prime-duration-fast) var(--prime-easing-standard);
+}
+
+.avatarButton:hover {
+  scale: 1.06;
+}
+
+.avatarButton:focus-visible {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: 2px;
+}
+
+.menu {
+  position: absolute;
+  inset-block-start: calc(100% + var(--prime-space-s));
+  inset-inline-end: 0;
+  display: grid;
+  row-gap: var(--prime-space-m);
+  min-inline-size: 240px;
+  padding: var(--prime-space-l);
+  border-radius: var(--prime-radius-large);
+  background-color: var(--prime-color-view-regular);
+  box-shadow: var(--prime-shadow-big);
+  backdrop-filter: blur(var(--prime-blur-glass));
+  animation: open var(--prime-duration-fast) var(--prime-easing-decelerate) both;
+}
+
+.email {
+  margin: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-secondary);
+  font: var(--prime-text-callout);
+  text-overflow: ellipsis;
+}
+
+@keyframes open {
+  from {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatarButton {
+    transition: none;
+  }
+
+  .menu {
+    animation: none;
+  }
+}

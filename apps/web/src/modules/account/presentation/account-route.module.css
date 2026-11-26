@@ -1,0 +1,84 @@
+.page {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  min-block-size: 100vh;
+  padding: var(--prime-size-navigation-bar) var(--prime-space-l) var(--prime-space-3xl);
+}
+
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent, var(--prime-color-view-scrim));
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  filter: blur(40px) brightness(0.55);
+  scale: 1.1;
+  animation: fade var(--prime-duration-slow) var(--prime-easing-standard) both;
+}
+
+.panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  row-gap: var(--prime-space-2xl);
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 400px;
+  padding: var(--prime-space-3xl) var(--prime-space-2xl);
+  border-radius: var(--prime-radius-panel);
+  background-color: var(--prime-color-view-regular);
+  box-shadow: var(--prime-shadow-big);
+  backdrop-filter: blur(var(--prime-blur-glass));
+}
+
+.title {
+  margin: 0;
+  text-align: center;
+  font: var(--prime-text-large-title);
+}
+
+.fields {
+  display: grid;
+  row-gap: var(--prime-space-l);
+}
+
+.switch {
+  margin-block-start: calc(-1 * var(--prime-space-s));
+  padding-inline: var(--prime-space-s);
+}
+
+.alert {
+  margin: 0;
+  padding: var(--prime-space-m) var(--prime-space-l);
+  border-radius: var(--prime-radius-medium);
+  background-color: var(--prime-color-view-recessed);
+  color: var(--prime-color-system-red);
+  font: var(--prime-text-callout);
+  text-align: center;
+}
+
+.submit {
+  display: grid;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop {
+    animation: none;
+  }
+}

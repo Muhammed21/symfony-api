@@ -18,7 +18,7 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 - Les paramètres de la spec 09 (`page`, `title`, `year`, `genre`) passent sur `/catalogue`.
 - **Navigation** horizontale en haut à droite, dans la barre du logo : Accueil (maison) et Catalogue (loupe), avec leur libellé. L'onglet de la page courante est sélectionné (`aria-current="page"`). Sous 600 px de large, seules les icônes restent, le nom de chaque onglet restant lu par les lecteurs d'écran.
 - **Pleine page** : le contenu couvre toute la largeur du navigateur, sans fenêtre ni coins arrondis (la fenêtre visionOS de la maquette n'a pas de sens dans un navigateur).
-- **Barre de navigation** (92 px) posée sur la bannière : le logo « prime video » à gauche, qui ramène à l'accueil, et la navigation à droite (logo Prime Video officiel en SVG, d'une seule couleur, celle du texte). L'avatar de la maquette n'est pas repris, l'application n'ayant pas encore de compte côté web.
+- **Barre de navigation** (92 px) posée sur la bannière : le logo « prime video » à gauche, qui ramène à l'accueil, et la navigation à droite (logo Prime Video officiel en SVG, d'une seule couleur, celle du texte). L'avatar de la maquette arrive avec le compte ([spec 12](12-front-connexion-et-compte.md)).
 
 ## Accueil
 
@@ -68,4 +68,4 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 
 ## Hors périmètre
 
-- Lecture vidéo, liste personnelle, page de détail, compte et avatar, défilement automatique de la bannière.
+- Lecture vidéo, liste personnelle, page de détail, compte et avatar (spec 12), défilement automatique de la bannière.

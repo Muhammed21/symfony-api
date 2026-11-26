@@ -12,7 +12,9 @@ import { commands, page } from "vitest/browser";
 import { AppShell } from "../app-shell.tsx";
 
 const renderShell = async (url: string) => {
-  const root = createRootRoute({ component: AppShell });
+  const root = createRootRoute({
+    component: () => <AppShell account={<button type="button">Compte factice</button>} />,
+  });
   const page = (path: string, text: string) =>
     createRoute({ getParentRoute: () => root, path, component: () => <p>{text}</p> });
   const router = createRouter({
@@ -83,9 +85,6 @@ describe("coque de l'application (spec 11)", () => {
     await expect.element(tabs).toBeVisible();
     const bar = tabs.element().firstElementChild;
     expect(bar === null ? "" : getComputedStyle(bar).flexDirection).toBe("row");
-    expect(
-      banner.element().getBoundingClientRect().right - tabs.element().getBoundingClientRect().right,
-    ).toBe(40);
     expect(
       screen.getByRole("navigation", { name: "Navigation principale" }).elements(),
     ).toHaveLength(1);
@@ -206,5 +205,26 @@ describe("coque de l'application (spec 11)", () => {
 
     expect(animationOf(pageContent(screen)).name).toBe("none");
     await commands.reduceMotion(false);
+  });
+
+  it("place le compte tout à droite de la barre, après la navigation", async () => {
+    await page.viewport(1280, 800);
+    const { screen } = await renderShell("/");
+    const banner = screen.getByRole("banner");
+    const account = banner.getByRole("button", { name: "Compte factice" }).element();
+    const navigation = banner.getByRole("navigation", { name: "Navigation principale" }).element();
+    const bar = banner.element().getBoundingClientRect();
+
+    expect(account.getBoundingClientRect().left - navigation.getBoundingClientRect().right).toBe(
+      16,
+    );
+    expect(bar.right - account.getBoundingClientRect().right).toBe(40);
+    expect(
+      Math.abs(
+        account.getBoundingClientRect().top +
+          account.getBoundingClientRect().height / 2 -
+          (bar.top + bar.height / 2),
+      ),
+    ).toBeLessThan(1);
   });
 });
