@@ -72,6 +72,12 @@
         "db:reset": [
             "@php bin/console doctrine:schema:drop --full-database --force",
             "@php bin/console doctrine:migrations:migrate --no-interaction",
+            "@php bin/console doctrine:fixtures:load --group=comptes --no-interaction",
+            "@php bin/console app:tmdb:import --pages=5"
+        ],
+        "db:reset:fixtures": [
+            "@php bin/console doctrine:schema:drop --full-database --force",
+            "@php bin/console doctrine:migrations:migrate --no-interaction",
             "@php bin/console doctrine:fixtures:load --no-interaction"
         ]
     },
@@ -94,6 +100,7 @@
         "symfony/maker-bundle": "^1.68"
     },
     "scripts-descriptions": {
-        "db:reset": "Recrée la base de développement et charge les données de test (ids stables)."
+        "db:reset": "Recrée la base de développement : les comptes de test, puis 100 vrais films importés de TMDB.",
+        "db:reset:fixtures": "Recrée la base de développement avec les données inventées des tests (ids stables), sans réseau."
     }
 }

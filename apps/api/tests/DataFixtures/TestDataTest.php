@@ -11,13 +11,16 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class TestDataTest extends ApiTestCase
 {
-    private function loadTestData(): void
+    /**
+     * @param list<string> $groups
+     */
+    private function loadTestData(array $groups = []): void
     {
         $container = static::getContainer();
         $entityManager = $container->get(EntityManagerInterface::class);
 
         (new ORMExecutor($entityManager, new ORMPurger($entityManager)))
-            ->execute($container->get('doctrine.fixtures.loader')->getFixtures());
+            ->execute($container->get('doctrine.fixtures.loader')->getFixtures($groups));
         $entityManager->clear();
         $this->actAsAnonymous();
     }
@@ -47,6 +50,18 @@ final class TestDataTest extends ApiTestCase
         self::assertSame(10, $this->requestJson('GET', '/genres')['total']);
         self::assertSame(6, $entityManager->getRepository(User::class)->count());
         self::assertSame(80, $entityManager->getRepository(Review::class)->count());
+    }
+
+    public function testTheAccountsGroupLoadsOnlyTheAccountsForRealMoviesToBeImported(): void
+    {
+        $this->loadTestData(['comptes']);
+        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+
+        self::assertSame(6, $entityManager->getRepository(User::class)->count());
+        self::assertSame(0, $this->requestJson('GET', '/movies')['total']);
+        self::assertSame(0, $this->requestJson('GET', '/genres')['total']);
+        self::assertSame(0, $entityManager->getRepository(Review::class)->count());
+        $this->logIn('admin@prime.local');
     }
 
     public function testGivesEachMovieAPosterAndABackdropFromTheSamePhoto(): void

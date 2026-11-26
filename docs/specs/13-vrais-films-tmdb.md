@@ -50,7 +50,7 @@ Correspondance d'un film :
 ## Données de test
 
 - Les tests PHPUnit gardent les fixtures Faker (spec 06) : rapides, déterministes, sans réseau.
-- `doctrine:fixtures:load` en développement garde pour l'instant les faux films : l'import s'ajoute par-dessus. **À valider** : ne plus charger que les utilisateurs en développement, puis lancer l'import.
+- En développement, `composer db:reset` charge les seuls comptes (groupe de fixtures `comptes`) puis lance `app:tmdb:import --pages=5` ; `composer db:reset:fixtures` garde les données inventées, sans réseau.
 
 ## Conditions d'utilisation de TMDB
 

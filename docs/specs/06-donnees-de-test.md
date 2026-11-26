@@ -14,7 +14,7 @@ Specs 01 à 05 terminées. Installer en dépendances de développement `doctrine
 pnpm db:reset   # ou : docker exec symfony-api composer db:reset
 ```
 
-Le script supprime toutes les tables, rejoue les migrations puis charge les fixtures (`doctrine:fixtures:load`) ; on peut le relancer autant de fois qu'on veut. Recréer les tables plutôt que les vider remet les compteurs d'ids SQLite à zéro : les films ont toujours les ids 1 à 40 et l'administrateur l'id 1, ce dont dépendent les fichiers `.http`. Les fixtures ne sont disponibles qu'en environnement `dev` et `test`.
+Le script supprime toutes les tables, rejoue les migrations, charge les seuls comptes (`doctrine:fixtures:load --group=comptes`) puis importe 100 vrais films de TMDB ([spec 13](13-vrais-films-tmdb.md)). `composer db:reset:fixtures` charge à la place toutes les données inventées ci-dessous, sans réseau ; ce sont aussi celles des tests. On peut relancer l'un ou l'autre autant de fois qu'on veut. Recréer les tables plutôt que les vider remet les compteurs d'ids SQLite à zéro : les films ont toujours les ids 1 à 40 et l'administrateur l'id 1, ce dont dépendent les fichiers `.http`. Les fixtures ne sont disponibles qu'en environnement `dev` et `test`.
 
 ## Contenu
 
