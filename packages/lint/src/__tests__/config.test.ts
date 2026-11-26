@@ -36,6 +36,7 @@ describe("le linter est linté (ADR 0003)", () => {
   });
 
   it.each([
+    "design-system-layers",
     "module-boundaries",
     "layer-dependencies",
     "no-disable-architecture",
@@ -105,6 +106,18 @@ describe("règles d'architecture, avec la vraie configuration", () => {
       `${CATALOGUE}/application/bad.ts`,
       'import { useState } from "react";\nexport const a = useState;\n',
       "prime(ui-in-presentation)",
+    ],
+    [
+      "un composant du design system qui lit les jetons en TypeScript",
+      "packages/ui/src/components/button/button.tsx",
+      'import { tokens } from "../../tokens/index.ts";\nexport const a = tokens;\n',
+      "prime(design-system-layers)",
+    ],
+    [
+      "des jetons qui importent un paquet",
+      "packages/ui/src/tokens/color.ts",
+      'import { z } from "zod";\nexport const a = z;\n',
+      "prime(design-system-layers)",
     ],
     [
       "un commentaire de désactivation",

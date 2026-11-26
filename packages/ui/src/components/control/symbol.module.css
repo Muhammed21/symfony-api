@@ -1,0 +1,11 @@
+.symbol {
+  display: inline-flex;
+  flex: none;
+  inline-size: var(--symbol-size);
+  block-size: var(--symbol-size);
+}
+
+.symbol > * {
+  inline-size: 100%;
+  block-size: 100%;
+}

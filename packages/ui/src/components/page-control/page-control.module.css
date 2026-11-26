@@ -1,0 +1,40 @@
+.dots {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  display: grid;
+  place-items: center;
+  inline-size: calc(var(--prime-size-page-control-dot) + var(--prime-space-m));
+  block-size: var(--prime-size-page-control-height);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.dot::before {
+  content: "";
+  inline-size: var(--prime-size-page-control-dot);
+  block-size: var(--prime-size-page-control-dot);
+  border-radius: var(--prime-radius-pill);
+  background-color: var(--prime-color-text-tertiary);
+  transition: background-color var(--prime-duration-fast);
+}
+
+.dot:hover::before {
+  background-color: var(--prime-color-text-secondary);
+}
+
+.dot[aria-current="page"]::before {
+  background-color: var(--prime-color-text-primary);
+}
+
+.dot:focus-visible {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: -2px;
+  border-radius: var(--prime-radius-pill);
+}

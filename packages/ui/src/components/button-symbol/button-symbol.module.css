@@ -1,0 +1,37 @@
+.button {
+  composes: control from "../control/control.module.css";
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--control-size);
+  block-size: var(--control-size);
+  padding: 0;
+}
+
+.button[data-size="mini"] {
+  --control-size: var(--prime-size-control-mini);
+  --symbol-size: var(--prime-size-symbol-mini);
+}
+
+.button[data-size="small"] {
+  --control-size: var(--prime-size-control-small);
+  --symbol-size: var(--prime-size-symbol-small);
+}
+
+.button[data-size="regular"] {
+  --control-size: var(--prime-size-control-regular);
+  --symbol-size: var(--prime-size-symbol-regular);
+}
+
+.button[data-size="large"] {
+  --control-size: var(--prime-size-control-large);
+  --symbol-size: var(--prime-size-symbol-large);
+}
+
+.button[data-size="extra-large"] {
+  --control-size: var(--prime-size-control-extra-large);
+  --symbol-size: var(--prime-size-symbol-extra-large);
+}
+
+.symbol {
+  composes: symbol from "../control/symbol.module.css";
+}

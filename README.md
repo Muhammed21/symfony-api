@@ -6,6 +6,8 @@ Monorepo [Turborepo](https://turborepo.com) + pnpm.
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `apps/api`                   | API Symfony 8.1 (PHP 8.5, Doctrine sur SQLite, JWT)                                                                             |
 | `apps/web`                   | frontend React 19 + Vite + TanStack Router/Query, en modules et couches ([ADR 0003](docs/adr/0003-architecture-du-frontend.md)) |
+| `apps/storybook`             | Storybook du design system ([ADR 0004](docs/adr/0004-design-system.md))                                                         |
+| `packages/ui`                | design system : jetons, thème CSS et composants React ([ADR 0004](docs/adr/0004-design-system.md))                              |
 | `packages/result`            | type `Result` partagé (erreurs attendues sans exceptions)                                                                       |
 | `packages/typescript-config` | configurations TypeScript strictes partagées                                                                                    |
 | `packages/lint`              | plugin oxlint `prime` : règles d'architecture du frontend ([ADR 0003](docs/adr/0003-architecture-du-frontend.md))               |
@@ -21,7 +23,7 @@ cp .env.example .env   # configuration du frontend (VITE_API_URL)
 pnpm --filter @prime/web exec playwright install chromium   # navigateur des tests frontend
 pnpm container:up      # lance le conteneur jetable de l'API
 pnpm db:reset          # base + données de test (admin@prime.local / password)
-pnpm dev               # API http://localhost:8000, frontend http://localhost:5173
+pnpm dev               # API http://localhost:8000, frontend http://localhost:5173, Storybook http://localhost:6006
 ```
 
 Premier clonage : créer les secrets locaux de l'API, voir `docs/specs/03-authentification.md`.
@@ -39,6 +41,7 @@ pnpm lint
 pnpm check-types
 pnpm build
 pnpm fmt               # formatage (oxfmt)
+pnpm --filter @prime/ui generate:theme   # régénère theme.css après une modification des jetons
 pnpm mutation          # Stryker
 pnpm container:down
 ```

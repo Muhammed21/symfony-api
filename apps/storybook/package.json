@@ -1,0 +1,35 @@
+{
+  "name": "@prime/storybook",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "storybook dev --port 6006 --no-open",
+    "build": "storybook build --output-dir dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prime/ui": "workspace:*",
+    "lucide-react": "^1.79.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@prime/typescript-config": "workspace:*",
+    "@storybook/addon-a11y": "^10.6.9",
+    "@storybook/addon-docs": "^10.6.9",
+    "@storybook/react-vite": "^10.6.9",
+    "@types/node": "^24.19.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/browser-playwright": "^5.1.1",
+    "playwright": "^1.65.1",
+    "storybook": "^10.6.9",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.1",
+    "vitest-browser-react": "^2.3.0"
+  }
+}

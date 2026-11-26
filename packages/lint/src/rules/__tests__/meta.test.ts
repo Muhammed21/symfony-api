@@ -2,6 +2,7 @@ import { RuleTester } from "oxlint/plugins-dev";
 import { describe, expect, it } from "vitest";
 
 import plugin from "../../index.ts";
+import { designSystemLayers } from "../design-system-layers.ts";
 import { layerDependencies } from "../layer-dependencies.ts";
 import { moduleBoundaries } from "../module-boundaries.ts";
 import { noDisableArchitecture } from "../no-disable-architecture.ts";
@@ -15,9 +16,10 @@ const tester = new RuleTester();
 const MODULES = "/repo/apps/web/src/modules";
 
 describe("plugin prime", () => {
-  it("expose ses cinq règles sous le nom prime", () => {
+  it("expose ses six règles sous le nom prime", () => {
     expect(plugin.meta?.name).toBe("prime");
     expect(Object.keys(plugin.rules).toSorted()).toEqual([
+      "design-system-layers",
       "layer-dependencies",
       "module-boundaries",
       "no-disable-architecture",
@@ -36,6 +38,37 @@ describe("plugin prime", () => {
     expect(rule.meta?.type).toBe("problem");
     expect(rule.meta?.docs?.description).toContain("ADR 0003");
   });
+
+  it("design-system-layers est un problème documenté qui cite l'ADR 0004", () => {
+    expect(designSystemLayers.meta?.type).toBe("problem");
+    expect(designSystemLayers.meta?.docs?.description).toContain("ADR 0004");
+  });
+});
+
+tester.run("design-system-layers (messages)", designSystemLayers, {
+  valid: [],
+  invalid: [
+    {
+      filename: "/repo/packages/ui/src/components/button-symbol/button-symbol.tsx",
+      code: 'import { tokens } from "../../tokens/index.ts";',
+      errors: [
+        {
+          message:
+            "La couche components du design system n'importe pas tokens : jetons ← thème ← composants, et les composants ne lisent les jetons qu'à travers les variables CSS (ADR 0004).",
+        },
+      ],
+    },
+    {
+      filename: "/repo/packages/ui/src/components/button-symbol/button-symbol.tsx",
+      code: 'import { Play } from "lucide-react";',
+      errors: [
+        {
+          message:
+            "La couche components du design system n'importe pas le paquet lucide-react : jetons et thème n'importent aucun paquet, les composants seulement react (ADR 0004).",
+        },
+      ],
+    },
+  ],
 });
 
 tester.run("module-boundaries (message)", moduleBoundaries, {

@@ -1,0 +1,30 @@
+.indicator {
+  inline-size: var(--indicator-size);
+  block-size: var(--indicator-size);
+  color: var(--prime-color-text-secondary);
+  animation: spin var(--prime-duration-spin) steps(8) infinite;
+}
+
+.indicator[data-size="small"] {
+  --indicator-size: var(--prime-size-activity-indicator-small);
+}
+
+.indicator[data-size="medium"] {
+  --indicator-size: var(--prime-size-activity-indicator-medium);
+}
+
+.indicator[data-size="large"] {
+  --indicator-size: var(--prime-size-activity-indicator-large);
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    animation-duration: calc(var(--prime-duration-spin) * 3);
+  }
+}

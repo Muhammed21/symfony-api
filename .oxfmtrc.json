@@ -1,7 +1,12 @@
 {
   "printWidth": 100,
   "tabWidth": 2,
-  "ignorePatterns": ["pnpm-lock.yaml", "apps/api/**", "**/reports/**"],
+  "ignorePatterns": [
+    "pnpm-lock.yaml",
+    "apps/api/**",
+    "**/reports/**",
+    "packages/ui/src/theme/theme.css"
+  ],
   "sortImports": {
     "ignoreCase": true,
     "newlinesBetween": true,

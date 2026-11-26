@@ -1,0 +1,4 @@
+body {
+  font: var(--prime-text-body);
+  color: var(--prime-color-text-primary);
+}

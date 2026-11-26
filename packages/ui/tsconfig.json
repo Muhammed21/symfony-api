@@ -1,0 +1,10 @@
+{
+  "extends": "@prime/typescript-config/react-library.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "exactOptionalPropertyTypes": true,
+    "types": ["node", "vite/client"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "*.config.ts"]
+}

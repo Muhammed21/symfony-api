@@ -1,0 +1,38 @@
+{
+  "name": "@prime/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./theme.css": "./src/theme/theme.css"
+  },
+  "scripts": {
+    "generate:theme": "node scripts/generate-theme.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check-types": "tsc --noEmit",
+    "mutation": "stryker run",
+    "mutation:ui": "stryker run stryker.browser.config.mjs"
+  },
+  "devDependencies": {
+    "@prime/typescript-config": "workspace:*",
+    "@stryker-mutator/core": "^10.1.1",
+    "@stryker-mutator/vitest-runner": "^10.1.1",
+    "@types/node": "^24.19.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/browser-playwright": "^5.1.1",
+    "playwright": "^1.65.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.1",
+    "vitest-browser-react": "^2.3.0"
+  },
+  "peerDependencies": {
+    "react": "^19.3.1"
+  }
+}

@@ -1,0 +1,11 @@
+.header {
+  display: flex;
+  align-items: center;
+  column-gap: var(--prime-space-l);
+}
+
+.title {
+  margin: 0;
+  font: var(--prime-text-title3);
+  color: var(--prime-color-text-primary);
+}

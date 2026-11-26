@@ -40,6 +40,7 @@
     ],
     "typescript/no-extraneous-class": "error",
     "react/react-in-jsx-scope": "off",
+    "prime/design-system-layers": "error",
     "prime/module-boundaries": "error",
     "prime/layer-dependencies": "error",
     "prime/no-disable-architecture": "error",

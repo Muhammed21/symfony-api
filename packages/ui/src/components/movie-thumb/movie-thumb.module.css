@@ -1,0 +1,42 @@
+.thumb {
+  overflow: hidden;
+  inline-size: var(--prime-size-thumb-width);
+  block-size: var(--thumb-height);
+  border-radius: var(--prime-radius-medium);
+  background-color: var(--prime-color-view-regular);
+  transition:
+    scale var(--prime-duration-fast),
+    box-shadow var(--prime-duration-fast);
+}
+
+.thumb[data-orientation="landscape"] {
+  --thumb-height: var(--prime-size-thumb-landscape-height);
+}
+
+.thumb[data-orientation="portrait"] {
+  --thumb-height: var(--prime-size-thumb-portrait-height);
+}
+
+.thumb:hover,
+.thumb:focus-within {
+  scale: var(--prime-scale-thumb-hover);
+  box-shadow: var(--prime-shadow-floating);
+}
+
+.image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  padding: var(--prime-space-m);
+  box-sizing: border-box;
+  font: var(--prime-text-headline);
+  color: var(--prime-color-text-secondary);
+  text-align: center;
+}
