@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { type AnyRootRoute, createRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  type AnyRootRoute,
+  createRoute,
+  Link as RouterLink,
+  useNavigate,
+} from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
 import { z } from "zod";
 
@@ -7,6 +12,7 @@ import type { Result } from "@prime/result";
 import {
   ActivityIndicator,
   ButtonTextAndSymbol,
+  Link,
   MovieThumb,
   PageControl,
   SectionHeader,
@@ -50,10 +56,12 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
       {lastPage > FIRST_PAGE && (
         <div className={styles.pages}>
           {page > FIRST_PAGE && (
-            <Link className={styles.pageLink} to="/" search={{ page: page - 1 }}>
-              <ChevronLeft aria-hidden="true" />
-              Précédent
-            </Link>
+            <Link
+              size="regular"
+              label="Précédent"
+              symbol={<ChevronLeft />}
+              render={(anchor) => <RouterLink {...anchor} to="/" search={{ page: page - 1 }} />}
+            />
           )}
           <PageControl
             label="Pagination"
@@ -62,10 +70,13 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
             onSelect={(selected) => void navigate({ to: "/", search: { page: selected } })}
           />
           {page < lastPage && (
-            <Link className={styles.pageLink} to="/" search={{ page: page + 1 }}>
-              Suivant
-              <ChevronRight aria-hidden="true" />
-            </Link>
+            <Link
+              size="regular"
+              label="Suivant"
+              symbol={<ChevronRight />}
+              symbolPlacement="trailing"
+              render={(anchor) => <RouterLink {...anchor} to="/" search={{ page: page + 1 }} />}
+            />
           )}
         </div>
       )}

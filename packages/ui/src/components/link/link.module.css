@@ -1,0 +1,33 @@
+.link {
+  composes: control from "../control/control.module.css";
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  column-gap: var(--prime-space-xs);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.link[data-size="small"] {
+  --symbol-size: var(--prime-size-symbol-small);
+  block-size: var(--prime-size-link-small);
+  padding-inline: var(--prime-space-2xs);
+  border-radius: var(--prime-radius-small);
+  font: var(--prime-text-callout);
+}
+
+.link[data-size="regular"] {
+  --symbol-size: var(--prime-size-symbol-regular);
+  block-size: var(--prime-size-control-regular);
+  padding-inline: var(--prime-space-xl);
+  border-radius: var(--prime-radius-pill);
+  font: var(--prime-text-headline);
+}
+
+.link[data-appearance="plain"] {
+  border-radius: var(--prime-radius-pill);
+}
+
+.symbol {
+  composes: symbol from "../control/symbol.module.css";
+}

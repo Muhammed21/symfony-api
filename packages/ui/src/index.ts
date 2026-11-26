@@ -15,6 +15,13 @@ export {
 } from "./components/button-text-and-symbol/button-text-and-symbol.tsx";
 export type { ControlAppearance } from "./components/control/control.ts";
 export {
+  Link,
+  type LinkAnchor,
+  type LinkProps,
+  type LinkSize,
+  type LinkSymbolPlacement,
+} from "./components/link/link.tsx";
+export {
   MovieThumb,
   type MovieThumbOrientation,
   type MovieThumbProps,
