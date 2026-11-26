@@ -31,7 +31,7 @@ jetons  ←  thème CSS  ←  composants React  ←  apps/web, apps/storybook
 
 Premier lot : jetons, thème, `ButtonSymbol`, `ButtonTextAndSymbol`, `SectionHeader`, `MovieThumb`, `PageControl`, `ActivityIndicator` ; puis `Link` ; puis `TextField` et `SearchToken` (filtres du catalogue, spec 09) ; puis `TabBar`, `LinkSymbol` et la légende de `MovieThumb` (accueil, spec 11).
 
-Valeurs non relevées dans Figma (quota de l'offre Starter atteint) et donc estimées, à vérifier dès que possible : taille des symboles hors bouton Large, couleurs de l'état Disabled, taille des points du `PageControl`, dessin de l'`ActivityIndicator`, style de texte des boutons texte, texte et marges de `Link` (marge de 4px au lieu des 3px relevés, pour rester sur l'échelle d'espacement), marges et ombre en creux du `TextField`, hauteur (32px), marges et texte du `SearchToken`, écarts et couleur de fond de la `TabBar` et seuil (600px) de sa version compacte, taille et dégradé de la légende de `MovieThumb`.
+Valeurs non relevées dans Figma (quota de l'offre Starter atteint) et donc estimées, à vérifier dès que possible : taille des symboles hors bouton Large, couleurs de l'état Disabled, taille des points du `PageControl`, dessin de l'`ActivityIndicator`, style de texte des boutons texte, texte et marges de `Link` (marge de 4px au lieu des 3px relevés, pour rester sur l'échelle d'espacement), marges et ombre en creux du `TextField`, hauteur (32px), marges et texte du `SearchToken`, écarts et couleur de fond de la `TabBar` et seuil (600px) de sa version compacte, durées (320 et 600 ms) et courbes d'accélération des animations (celles de Material 3, faute de valeurs dans le kit), taille et dégradé de la légende de `MovieThumb`.
 
 Tests :
 

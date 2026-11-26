@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
-import { page } from "vitest/browser";
+import { commands, page } from "vitest/browser";
 
 import { AppShell } from "../app-shell.tsx";
 
@@ -25,6 +25,18 @@ const renderShell = async (url: string) => {
   const screen = await render(<RouterProvider router={router} />);
   return { screen, router };
 };
+
+type Screen = Awaited<ReturnType<typeof renderShell>>["screen"];
+
+const pageContent = (screen: Screen) => screen.getByRole("main").element().firstElementChild;
+
+const animationOf = (element: Element | null) =>
+  element === null
+    ? { name: "", duration: "" }
+    : {
+        name: getComputedStyle(element).animationName,
+        duration: getComputedStyle(element).animationDuration,
+      };
 
 describe("coque de l'application (spec 11)", () => {
   it("place la page dans le contenu principal de la fenêtre", async () => {
@@ -120,7 +132,7 @@ describe("coque de l'application (spec 11)", () => {
 
     await expect
       .element(screen.getByRole("banner"))
-      .toHaveStyle({ position: "absolute", height: "92px" });
+      .toHaveStyle({ position: "fixed", height: "92px" });
   });
 
   it("tient sur un téléphone sans défilement horizontal", async () => {
@@ -141,5 +153,70 @@ describe("coque de l'application (spec 11)", () => {
     expect(page === null ? "" : getComputedStyle(page).borderRadius).toBe("0px");
     expect(page?.getBoundingClientRect().left).toBe(0);
     expect(page?.getBoundingClientRect().width).toBe(document.documentElement.clientWidth);
+  });
+
+  it("fait entrer chaque page en fondu, en 320 ms", async () => {
+    const { screen } = await renderShell("/");
+    await expect.element(screen.getByText("Page d'accueil")).toBeVisible();
+
+    expect(animationOf(pageContent(screen)).name).not.toBe("none");
+    expect(animationOf(pageContent(screen)).duration).toBe("0.32s");
+  });
+
+  it("rejoue l'entrée en changeant de page, pas en changeant de recherche", async () => {
+    const { screen, router } = await renderShell("/");
+    await expect.element(screen.getByText("Page d'accueil")).toBeVisible();
+    const home = pageContent(screen);
+
+    await screen.getByRole("link", { name: "Catalogue" }).click();
+    await expect.element(screen.getByText("Page du catalogue")).toBeVisible();
+    const catalogue = pageContent(screen);
+    await router.navigate({ to: "/catalogue", search: { page: 2 } });
+
+    expect(catalogue).not.toBe(home);
+    expect(pageContent(screen)).toBe(catalogue);
+  });
+
+  it("garde la barre du logo en haut de l'écran, sur fond de verre une fois la page défilée", async () => {
+    await page.viewport(1280, 600);
+    const { screen } = await renderShell("/");
+    const banner = screen.getByRole("banner");
+    document.body.style.minHeight = "3000px";
+
+    await expect.element(banner).toHaveStyle({
+      position: "fixed",
+      backgroundColor: "rgba(0, 0, 0, 0)",
+    });
+
+    window.scrollTo(0, 400);
+
+    await expect.element(banner).toHaveAttribute("data-scrolled", "true");
+    await expect.poll(() => getComputedStyle(banner.element()).backdropFilter).toBe("blur(50px)");
+    expect(getComputedStyle(banner.element()).backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+    expect(banner.element().getBoundingClientRect().top).toBe(0);
+    window.scrollTo(0, 0);
+    await expect.element(banner).not.toHaveAttribute("data-scrolled");
+    document.body.style.minHeight = "";
+  });
+
+  it("met la barre sur fond de verre dès l'ouverture d'une page déjà défilée", async () => {
+    await page.viewport(1280, 600);
+    document.body.style.minHeight = "3000px";
+    window.scrollTo(0, 400);
+
+    const { screen } = await renderShell("/");
+
+    await expect.element(screen.getByRole("banner")).toHaveAttribute("data-scrolled", "true");
+    window.scrollTo(0, 0);
+    document.body.style.minHeight = "";
+  });
+
+  it("supprime les animations pour qui préfère réduire les animations", async () => {
+    await commands.reduceMotion(true);
+    const { screen } = await renderShell("/");
+    await expect.element(screen.getByText("Page d'accueil")).toBeVisible();
+
+    expect(animationOf(pageContent(screen)).name).toBe("none");
+    await commands.reduceMotion(false);
   });
 });

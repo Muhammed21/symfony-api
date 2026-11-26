@@ -18,6 +18,7 @@ export const MovieThumb = ({
   orientation = "landscape",
 }: MovieThumbProps) => {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   return (
     <div className={styles.thumb} data-orientation={orientation} data-testid="movie-thumb">
       {image === undefined || failed ? (
@@ -28,6 +29,8 @@ export const MovieThumb = ({
             className={styles.image}
             src={image}
             alt={captioned ? "" : title}
+            data-loaded={loaded ? true : undefined}
+            onLoad={() => setLoaded(true)}
             onError={() => setFailed(true)}
           />
           {captioned && (

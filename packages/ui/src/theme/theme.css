@@ -87,7 +87,11 @@
   --prime-size-thumb-portrait-height: 336px;
   --prime-scale-thumb-hover: 1.18;
   --prime-duration-fast: 150ms;
+  --prime-duration-page: 320ms;
+  --prime-duration-slow: 600ms;
   --prime-duration-spin: 1000ms;
+  --prime-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --prime-easing-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
   --prime-shadow-small: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   --prime-shadow-big: 0px 40px 80px 0px rgba(0, 0, 0, 0.3), 0px 7px 10px 0px rgba(0, 0, 0, 0.09);
   --prime-shadow-floating: 0px 16px 52px 0px rgba(0, 0, 0, 0.6);

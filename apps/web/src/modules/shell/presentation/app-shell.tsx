@@ -1,5 +1,6 @@
 import { Link as RouterLink, Outlet, useRouterState } from "@tanstack/react-router";
 import { House, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { TabBar } from "@prime/ui";
 
@@ -9,11 +10,23 @@ import styles from "./app-shell.module.css";
 
 const CATALOGUE = "/catalogue";
 
+const useScrolled = () => {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 0);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+  return scrolled;
+};
+
 export const AppShell = () => {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const scrolled = useScrolled();
   return (
     <div className={styles.page}>
-      <header className={styles.navigationBar}>
+      <header className={styles.navigationBar} data-scrolled={scrolled ? true : undefined}>
         <RouterLink to="/" aria-label="Prime Video" className={styles.logo}>
           <PrimeVideoLogo />
         </RouterLink>
@@ -37,7 +50,9 @@ export const AppShell = () => {
         />
       </header>
       <main>
-        <Outlet />
+        <div key={pathname} className={styles.content}>
+          <Outlet />
+        </div>
       </main>
     </div>
   );

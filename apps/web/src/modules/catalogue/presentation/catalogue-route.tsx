@@ -12,6 +12,7 @@ import { ActivityIndicator, ButtonTextAndSymbol, Link, MovieThumb, PageControl }
 
 import type { AgeRating, Movie, MovieFilters } from "../domain/movie.ts";
 import { formatDuration } from "./duration.ts";
+import { riseInOrder } from "./motion.ts";
 import { MovieFilterBar } from "./movie-filters.tsx";
 import type { ListGenres, ListMovies } from "./use-cases.ts";
 
@@ -160,8 +161,8 @@ const Movies = ({
   return (
     <>
       <ul className={styles.grid}>
-        {movies.map((movie) => (
-          <li key={movie.id}>
+        {movies.map((movie, index) => (
+          <li key={movie.id} {...riseInOrder(index)}>
             <MovieCard movie={movie} />
           </li>
         ))}

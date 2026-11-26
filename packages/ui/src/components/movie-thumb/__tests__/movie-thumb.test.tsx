@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
-import { userEvent } from "vitest/browser";
+import { commands, userEvent } from "vitest/browser";
 
 import { MovieThumb, type MovieThumbProps } from "../movie-thumb.tsx";
 
@@ -17,6 +17,27 @@ describe("MovieThumb", () => {
     await expect
       .element(screen.getByRole("img", { name: "Le Grand Voyage" }))
       .toHaveAttribute("src", POSTER);
+  });
+
+  it("fait apparaître l'image en fondu une fois chargée", async () => {
+    const screen = await renderMovieThumb({ image: POSTER });
+    const image = screen.getByRole("img", { name: "Le Grand Voyage" });
+
+    await expect.element(image).toHaveStyle({ opacity: "1" });
+    await expect.element(image).toHaveStyle({
+      transitionProperty: "opacity",
+      transitionDuration: "0.32s",
+    });
+  });
+
+  it("garde l'image transparente tant qu'elle se charge", async () => {
+    const loading = "https://images.exemple.fr/en-chargement.jpg";
+    await commands.holdRequests(loading);
+    const screen = await renderMovieThumb({ image: loading });
+
+    await expect
+      .element(screen.getByRole("img", { name: "Le Grand Voyage" }))
+      .toHaveStyle({ opacity: "0" });
   });
 
   it("sans image, affiche le titre à la place", async () => {

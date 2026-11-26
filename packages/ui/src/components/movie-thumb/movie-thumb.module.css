@@ -29,6 +29,18 @@
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--prime-duration-page) var(--prime-easing-standard);
+}
+
+.image[data-loaded] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    transition: none;
+  }
 }
 
 .placeholder {

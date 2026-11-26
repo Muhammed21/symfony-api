@@ -44,6 +44,7 @@ const declarationsOf = (tokens: DesignTokens): readonly Declaration[] => [
   ...nestedDeclarations(`${PREFIX}-size`, tokens.size, pixels),
   ...scaleDeclarations(`${PREFIX}-scale`, tokens.scale, String),
   ...scaleDeclarations(`${PREFIX}-duration`, tokens.duration, (value) => `${value}ms`),
+  ...scaleDeclarations(`${PREFIX}-easing`, tokens.easing, String),
   ...scaleDeclarations(`${PREFIX}-shadow`, tokens.shadow, (shadows) =>
     shadows.map(boxShadow).join(", "),
   ),

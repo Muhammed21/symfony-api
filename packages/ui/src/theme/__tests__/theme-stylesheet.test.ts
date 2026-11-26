@@ -14,6 +14,7 @@ const aDesignTokens = (overrides: Partial<DesignTokens> = {}): DesignTokens => (
   size: {},
   scale: {},
   duration: {},
+  easing: {},
   shadow: {},
   blur: {},
   ...overrides,
@@ -94,6 +95,19 @@ describe("feuille de thème", () => {
       "--prime-font-family: Sans;",
       "--prime-scale-thumb-hover: 1.18;",
       "--prime-duration-fast: 150ms;",
+    ]);
+  });
+
+  it("écrit les courbes d'accélération telles quelles, après les durées", () => {
+    expect(
+      declarationsFor({
+        duration: { page: 320 },
+        easing: { emphasized: "cubic-bezier(0.2, 0, 0, 1)" },
+      }),
+    ).toEqual([
+      "--prime-font-family: Sans;",
+      "--prime-duration-page: 320ms;",
+      "--prime-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);",
     ]);
   });
 

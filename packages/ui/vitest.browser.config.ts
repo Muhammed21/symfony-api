@@ -1,6 +1,14 @@
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
+import type { BrowserCommand } from "vitest/node";
+
+const holdRequests: BrowserCommand<[url: string]> = async (context, url) => {
+  if (context.provider.name !== "playwright") {
+    throw new Error("holdRequests demande Playwright");
+  }
+  await context.page.route(url, () => undefined);
+};
 
 export default defineConfig({
   plugins: [react()],
@@ -13,6 +21,7 @@ export default defineConfig({
       provider: playwright(),
       headless: true,
       instances: [{ browser: "chromium" }],
+      commands: { holdRequests },
     },
   },
 });

@@ -17,5 +17,12 @@ export const blur = {
 
 export const duration = {
   fast: 150,
+  page: 320,
+  slow: 600,
   spin: 1000,
+} as const;
+
+export const easing = {
+  standard: "cubic-bezier(0.2, 0, 0, 1)",
+  decelerate: "cubic-bezier(0.05, 0.7, 0.1, 1)",
 } as const;

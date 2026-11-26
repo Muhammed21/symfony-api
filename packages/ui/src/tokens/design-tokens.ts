@@ -4,6 +4,8 @@ export type Pixels = number;
 
 export type Milliseconds = number;
 
+export type TimingFunction = string;
+
 export type TextStyle = {
   readonly weight: number;
   readonly size: Pixels;
@@ -30,6 +32,7 @@ export type DesignTokens = {
   readonly size: Scale<Scale<Pixels>>;
   readonly scale: Scale<number>;
   readonly duration: Scale<Milliseconds>;
+  readonly easing: Scale<TimingFunction>;
   readonly shadow: Scale<readonly Shadow[]>;
   readonly blur: Scale<Pixels>;
 };

@@ -131,3 +131,32 @@
 .status > p {
   margin: 0;
 }
+
+.backdrop {
+  animation: fade var(--prime-duration-slow) var(--prime-easing-standard) both;
+}
+
+.featuredContent {
+  animation: rise var(--prime-duration-slow) var(--prime-easing-decelerate) both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    scale: 1.04;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .featuredContent {
+    animation: none;
+  }
+}

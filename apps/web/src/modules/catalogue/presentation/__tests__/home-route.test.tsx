@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
+import { commands } from "vitest/browser";
 
 import { err, ok, type Result } from "@prime/result";
 
@@ -19,6 +20,7 @@ import type {
   MoviePage,
   MovieSort,
 } from "../../domain/movie.ts";
+import { catalogueRoute } from "../catalogue-route.tsx";
 import { homeRoute } from "../home-route.tsx";
 
 type MoviesQuery = {
@@ -112,9 +114,43 @@ const renderHome = async ({
   return { screen, router };
 };
 
+const renderHomeAndCatalogue = async ({
+  listMovies,
+  listGenres,
+}: {
+  readonly listMovies: ListMovies;
+  readonly listGenres: ListGenres;
+}) => {
+  const root = createRootRoute();
+  const router = createRouter({
+    routeTree: root.addChildren([
+      homeRoute({ parent: root, listMovies, listGenres }),
+      catalogueRoute({ parent: root, listMovies, listGenres }),
+    ]),
+    history: createMemoryHistory({ initialEntries: ["/"] }),
+  });
+  const screen = await render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+  return { screen, router };
+};
+
 type Screen = Awaited<ReturnType<typeof render>>;
 
 const featured = (screen: Screen) => screen.getByRole("region", { name: "À la une" });
+
+const backdrop = (screen: Screen) => featured(screen).element().querySelector("img");
+
+const animationOf = (element: Element | null | undefined) => {
+  const style = element === null || element === undefined ? undefined : getComputedStyle(element);
+  return {
+    name: style?.animationName,
+    duration: style?.animationDuration,
+    delay: style?.animationDelay,
+  };
+};
 
 describe("accueil (spec 11)", () => {
   it("met en avant le film le plus récent, sur sa bannière", async () => {
@@ -276,5 +312,122 @@ describe("accueil (spec 11)", () => {
 
     await expect.element(screen.getByRole("region", { name: "Nouveautés" })).toBeVisible();
     await expect.element(screen.getByRole("region", { name: "Action" })).not.toBeInTheDocument();
+  });
+
+  it("n'écrit que l'année au-dessus d'un film sans genre", async () => {
+    const { screen } = await renderHome({
+      listMovies: ({ sort }) =>
+        pageOf(sort === "recent" ? [makeMovie({ releaseYear: 2023, genres: [] })] : []),
+    });
+
+    await expect.element(featured(screen).getByText("2023", { exact: true })).toBeVisible();
+  });
+
+  it("n'affiche pas de film à la une quand il n'y a aucun film", async () => {
+    const { screen } = await renderHome({ listMovies: () => pageOf([]) });
+
+    await expect.element(screen.getByRole("region", { name: "Nouveautés" })).toBeInTheDocument();
+    await expect.element(featured(screen)).not.toBeInTheDocument();
+  });
+
+  it("ouvre le catalogue complet, page 1, depuis les nouveautés", async () => {
+    const { screen, router } = await renderHome();
+    const row = screen.getByRole("region", { name: "Nouveautés" });
+
+    await expect
+      .element(row.getByRole("link", { name: "Tout voir : Nouveautés" }))
+      .toHaveAttribute("href", "/catalogue?page=1");
+    await row.getByRole("link", { name: "Tout voir : Nouveautés" }).click();
+
+    await expect.element(screen.getByText("Page du catalogue")).toBeVisible();
+    expect(router.state.location.search).toEqual({ page: 1 });
+  });
+
+  it("garde les nouveautés pendant que les genres se chargent", async () => {
+    const { screen } = await renderHome({ listGenres: () => new Promise(() => {}) });
+
+    await expect.element(screen.getByRole("region", { name: "Nouveautés" })).toBeVisible();
+  });
+
+  it("ouvre le catalogue d'un genre sans attendre, ses films et les genres déjà chargés", async () => {
+    const answered = new Set<string>();
+    const listMovies: ListMovies = (query) => {
+      const key = JSON.stringify(query);
+      if (answered.has(key)) {
+        return new Promise(() => {});
+      }
+      answered.add(key);
+      return catalogue(query);
+    };
+    const listGenres: ListGenres = () => {
+      if (answered.has("genres")) {
+        return new Promise(() => {});
+      }
+      answered.add("genres");
+      return genres();
+    };
+    const { screen } = await renderHomeAndCatalogue({ listMovies, listGenres });
+    const row = screen.getByRole("region", { name: "Action" });
+    await expect.element(row.getByText("Heat")).toBeVisible();
+
+    await row.getByRole("link", { name: "Tout voir : Action" }).click();
+    await expect
+      .element(screen.getByRole("heading", { level: 1, name: "Catalogue" }))
+      .toBeVisible();
+
+    expect(screen.getByRole("progressbar").query()).toBeNull();
+    expect(screen.getByText("Ronin").query()).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Drame" }).query()).not.toBeNull();
+  });
+
+  it("fait entrer chaque film à la une en fondu, image et texte", async () => {
+    const { screen } = await renderHome();
+    await expect.element(featured(screen).getByRole("heading", { name: "Récent 1" })).toBeVisible();
+    const first = backdrop(screen);
+    const firstText = featured(screen)
+      .getByRole("heading", { name: "Récent 1" })
+      .element().parentElement;
+
+    await featured(screen).getByRole("button", { name: "Page 2" }).click();
+    await expect.element(featured(screen).getByRole("heading", { name: "Récent 2" })).toBeVisible();
+
+    expect(backdrop(screen)).not.toBe(first);
+    expect(animationOf(backdrop(screen))).toMatchObject({ duration: "0.6s" });
+    expect(animationOf(backdrop(screen)).name).not.toBe("none");
+    const text = featured(screen)
+      .getByRole("heading", { name: "Récent 2" })
+      .element().parentElement;
+    expect(text).not.toBe(firstText);
+    expect(animationOf(text).name).not.toBe("none");
+    expect(animationOf(text).duration).toBe("0.6s");
+  });
+
+  it("fait entrer les vignettes d'une rangée l'une après l'autre", async () => {
+    const { screen } = await renderHome();
+    const row = screen.getByRole("region", { name: "Nouveautés" });
+    await expect.element(row.getByText("Récent 6")).toBeVisible();
+
+    const thumbs = row.getByRole("listitem").elements();
+
+    expect(thumbs.map((thumb) => animationOf(thumb).delay)).toEqual([
+      "0s",
+      "0.04s",
+      "0.08s",
+      "0.12s",
+      "0.16s",
+      "0.2s",
+    ]);
+    expect(animationOf(thumbs[0]).name).not.toBe("none");
+  });
+
+  it("garde l'accueil immobile pour qui préfère réduire les animations", async () => {
+    await commands.reduceMotion(true);
+    const { screen } = await renderHome();
+    const row = screen.getByRole("region", { name: "Nouveautés" });
+    await expect.element(row.getByText("Récent 6")).toBeVisible();
+
+    expect(animationOf(backdrop(screen)).name).toBe("none");
+    expect(animationOf(row.getByRole("listitem").elements()[1]).name).toBe("none");
+    await commands.reduceMotion(false);
   });
 });

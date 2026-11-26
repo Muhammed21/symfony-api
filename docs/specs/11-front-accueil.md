@@ -38,9 +38,19 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 - Une rangée de genre vide n'apparaît pas, ni pendant son chargement ; en cas d'échec, elle disparaît sans gêner les autres.
 - Tant que les nouveautés n'ont pas répondu : un indicateur d'activité « Chargement de l'accueil ». Si elles échouent : `Impossible de charger les nouveautés.` et un bouton Réessayer.
 
+## Mouvement
+
+- Chaque page entre en fondu, en montant de 12 px (320 ms) ; changer de filtre ou de page dans le catalogue ne rejoue pas l'entrée.
+- La barre du logo reste en haut de l'écran ; dès que la page défile, elle prend un fond de verre flouté.
+- Changer de film à la une fait apparaître la nouvelle bannière en fondu, avec un léger recul de l'image, et remonter son texte (600 ms).
+- Les vignettes d'une rangée et les films de la grille entrent l'un après l'autre (40 ms d'écart) ; chaque image apparaît en fondu une fois chargée.
+- Ouvrir le catalogue d'un genre depuis l'accueil affiche aussitôt ses films, déjà chargés pour la rangée (même cache).
+- Qui préfère réduire les animations (`prefers-reduced-motion`) voit les mêmes écrans, sans mouvement.
+
 ## Design system
 
-- `MovieThumb` affiche le titre en légende sur l'image (`captioned`), et revient au titre seul si l'image ne se charge pas.
+- `MovieThumb` affiche le titre en légende sur l'image (`captioned`), fait apparaître l'image en fondu une fois chargée, et revient au titre seul si elle ne se charge pas.
+- Jetons de mouvement : durées `page` (320 ms) et `slow` (600 ms), courbes `standard` et `decelerate`.
 - Nouveau composant `LinkSymbol` : un lien qui a l'allure d'un `ButtonSymbol`, pour le chevron des rangées.
 - Nouveau composant `TabBar` : barre d'onglets verticale (celle de la maquette) ou horizontale (`orientation`), compacte sur écran étroit ; comme pour `Link`, l'application fournit ses propres liens.
 - La bannière n'est pas un composant du kit visionOS : elle reste dans `apps/web`, construite avec `ButtonSymbol`, `PageControl` et les jetons.
@@ -52,6 +62,7 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 - Le chevron d'une rangée de genre ouvre `/catalogue?genre=<id>` avec le genre déjà sélectionné.
 - L'onglet Catalogue, en haut à droite, ouvre `/catalogue` ; l'onglet de la page courante est signalé.
 - La page couvre toute la largeur du navigateur, sans coins arrondis ni défilement horizontal, y compris sur téléphone.
+- Les pages, la bannière et les vignettes s'animent à l'entrée, sauf avec `prefers-reduced-motion: reduce`.
 - Les boutons de la bannière sont désactivés et l'expliquent.
 - Un genre sans film ne produit pas de rangée ; un échec de chargement d'une rangée n'empêche pas les autres de s'afficher.
 

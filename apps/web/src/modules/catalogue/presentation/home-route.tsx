@@ -14,6 +14,7 @@ import {
 } from "@prime/ui";
 
 import type { Genre, Movie } from "../domain/movie.ts";
+import { riseInOrder } from "./motion.ts";
 import type { ListGenres, ListMovies } from "./use-cases.ts";
 
 import styles from "./home-route.module.css";
@@ -34,9 +35,14 @@ const FeaturedMovie = ({ movies }: { readonly movies: readonly Movie[] }) => {
   return (
     <section aria-label="À la une" className={styles.featured}>
       {movie.backdropUrl !== undefined && (
-        <img className={styles.backdrop} src={movie.backdropUrl} alt="" />
+        <img
+          key={`backdrop-${movie.id}`}
+          className={styles.backdrop}
+          src={movie.backdropUrl}
+          alt=""
+        />
       )}
-      <div className={styles.featuredContent}>
+      <div key={`content-${movie.id}`} className={styles.featuredContent}>
         <p className={styles.eyebrow}>{eyebrowOf(movie)}</p>
         <h2 className={styles.featuredTitle}>{movie.title}</h2>
         <div className={styles.actions}>
@@ -99,8 +105,8 @@ const MovieRow = ({
       />
     </div>
     <ul className={styles.thumbs}>
-      {movies.map((movie) => (
-        <li key={movie.id}>
+      {movies.map((movie, index) => (
+        <li key={movie.id} {...riseInOrder(index)}>
           <MovieThumb
             title={movie.title}
             captioned
@@ -120,7 +126,7 @@ const GenreRow = ({
   readonly listMovies: ListMovies;
 }) => {
   const { data } = useQuery({
-    queryKey: ["movies", FIRST_PAGE, { genre: genre.id }, "title"],
+    queryKey: ["movies", FIRST_PAGE, { genre: genre.id }],
     queryFn: () => listMovies({ page: FIRST_PAGE, filters: { genre: genre.id } }),
   });
   if (data?.ok !== true || data.value.movies.length === 0) {

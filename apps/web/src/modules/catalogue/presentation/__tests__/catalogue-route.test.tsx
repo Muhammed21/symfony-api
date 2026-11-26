@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
-import { userEvent } from "vitest/browser";
+import { commands, userEvent } from "vitest/browser";
 
 import { err, ok, type Result } from "@prime/result";
 
@@ -471,5 +471,35 @@ describe("filtres du catalogue (spec 09)", () => {
 
     await expect.element(filters.getByRole("searchbox")).toBeVisible();
     await expect.element(filters.getByRole("group", { name: "Genre" })).toBeVisible();
+  });
+
+  it("fait entrer les films de la grille l'un après l'autre", async () => {
+    const screen = await renderMovies(
+      listing({ movies: [1, 2, 3].map((id) => makeMovie({ id, title: `Film ${id}` })), total: 3 }),
+    );
+    await expect.element(screen.getByRole("heading", { name: "Film 3" })).toBeVisible();
+
+    const cards = [
+      ...(screen.getByRole("heading", { name: "Film 1" }).element().closest("ul")?.children ?? []),
+    ];
+
+    expect(cards.map((card) => getComputedStyle(card).animationDelay)).toEqual([
+      "0s",
+      "0.04s",
+      "0.08s",
+    ]);
+    expect(getComputedStyle(cards[0] ?? document.body).animationName).not.toBe("none");
+  });
+
+  it("garde la grille immobile pour qui préfère réduire les animations", async () => {
+    await commands.reduceMotion(true);
+    const screen = await renderMovies(listing());
+    const title = screen.getByRole("heading", { name: "Les Évadés" });
+    await expect.element(title).toBeVisible();
+
+    const card = title.element().closest("li");
+
+    expect(getComputedStyle(card ?? document.body).animationName).toBe("none");
+    await commands.reduceMotion(false);
   });
 });

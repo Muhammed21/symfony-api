@@ -1,0 +1,17 @@
+.rise {
+  animation: rise var(--prime-duration-page) var(--prime-easing-decelerate) both;
+  animation-delay: calc(var(--order, 0) * 40ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}
