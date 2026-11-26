@@ -1,0 +1,10 @@
+{
+  "printWidth": 100,
+  "tabWidth": 2,
+  "ignorePatterns": ["pnpm-lock.yaml", "apps/api/**", "**/reports/**"],
+  "sortImports": {
+    "ignoreCase": true,
+    "newlinesBetween": true,
+    "internalPattern": ["@prime/"]
+  }
+}

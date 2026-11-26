@@ -6,13 +6,14 @@ Premier écran du frontend (`apps/web`) : parcourir le catalogue page par page, 
 
 ## Prérequis
 
-Spec 01 (`GET /movies`), monorepo et proxy Vite (`/api/*` → API).
+Spec 01 (`GET /movies`), monorepo et proxy Vite (`/api/*` → API). Architecture : [ADR 0003](../adr/0003-architecture-du-frontend.md).
 
 ## Comportement
 
-- L'écran appelle `GET /api/movies?page=N&limit=12`, page 1 au chargement.
+- La page courante est dans l'adresse (`/?page=N`) : un lien se partage, le bouton Retour du navigateur fonctionne. Une page absente ou invalide (`0`, `-2`, `deux`, `1.5`) vaut la page 1.
+- L'écran appelle `GET /api/movies?page=N&limit=12` ; chaque page lue reste en cache (TanStack Query).
 - Chaque film affiche : titre, année, durée lisible (`2 h 22`, `45 min`), classification d'âge (`Tous publics` pour `ALL`, sinon `13+`…) et ses genres.
-- Sous la liste : `Page N sur M`, boutons **Précédent** et **Suivant**. Précédent est désactivé en page 1, Suivant sur la dernière page.
+- Sous la liste : `Page N sur M`, liens **Précédent** et **Suivant**. Pas de lien Précédent en page 1, ni de lien Suivant sur la dernière page.
 - Pendant le chargement : `Chargement des films…`.
 - Catalogue vide : `Aucun film pour le moment.`, sans pagination.
 - Erreur réseau, statut HTTP en erreur ou réponse au format inattendu : `Impossible de charger les films.` et un bouton **Réessayer** qui relance la même page.
@@ -21,8 +22,8 @@ Spec 01 (`GET /movies`), monorepo et proxy Vite (`/api/*` → API).
 ## Critères d'acceptation
 
 - Les films de la page 1 s'affichent avec leurs informations.
-- Suivant charge la page 2 et affiche `Page 2 sur M` ; Précédent revient à la page 1.
-- Les boutons sont désactivés aux extrémités.
+- `/?page=3` affiche la page 3 ; Suivant mène à la page suivante, Précédent à la précédente.
+- Pas de lien Précédent en page 1, ni Suivant sur la dernière page.
 - Les états chargement, vide et erreur s'affichent ; Réessayer recharge la page.
 
 ## Hors périmètre

@@ -1,26 +1,21 @@
-import react from '@vitejs/plugin-react'
-import { playwright } from '@vitest/browser-playwright'
-import { defineConfig } from 'vitest/config'
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
-const apiUrl = process.env.API_URL ?? 'http://localhost:8000'
+const API_URL = process.env["API_URL"] ?? "http://localhost:8000";
 
 export default defineConfig({
   plugins: [react()],
+  envDir: "../..",
   server: {
+    host: "127.0.0.1",
+    port: 5173,
+    strictPort: true,
     proxy: {
-      '/api': {
-        target: apiUrl,
+      "/api": {
+        target: API_URL,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
   },
-  test: {
-    browser: {
-      enabled: true,
-      headless: true,
-      provider: playwright(),
-      instances: [{ browser: 'chromium' }],
-    },
-  },
-})
+});

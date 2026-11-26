@@ -1,18 +1,23 @@
 {
-    "name": "prime-video",
-    "private": true,
-    "packageManager": "pnpm@11.25.0",
-    "scripts": {
-        "dev": "turbo run dev",
-        "build": "turbo run build",
-        "typecheck": "turbo run typecheck",
-        "test": "turbo run test",
-        "lint": "turbo run lint",
-        "container:up": "pnpm --filter @prime/api container:up",
-        "container:down": "pnpm --filter @prime/api container:down",
-        "db:reset": "pnpm --filter @prime/api db:reset"
-    },
-    "devDependencies": {
-        "turbo": "^2.11.13"
-    }
+  "name": "prime-video",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "container:up": "pnpm --filter @prime/api container:up",
+    "container:down": "pnpm --filter @prime/api container:down",
+    "db:reset": "pnpm --filter @prime/api db:reset",
+    "fmt": "oxfmt --write .",
+    "fmt:check": "oxfmt --check .",
+    "check-types": "turbo run check-types",
+    "test:integration": "turbo run test:integration",
+    "mutation": "turbo run mutation"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.80.0",
+    "turbo": "^2.11.13"
+  },
+  "packageManager": "pnpm@11.25.0"
 }
