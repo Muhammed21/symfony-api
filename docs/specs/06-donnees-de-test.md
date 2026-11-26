@@ -18,14 +18,14 @@ Le script supprime toutes les tables, rejoue les migrations puis charge les fixt
 
 ## Contenu
 
-| Donnée | Quantité | Détail |
-|---|---|---|
-| Administrateur | 1 | `admin@prime.local` / `password`, rôles `ROLE_USER` + `ROLE_ADMIN` |
-| Utilisateurs | 5 | `user1@prime.local` … `user5@prime.local` / `password` |
-| Genres | 10 | noms réels : Action, Animation, Aventure, Comédie, Documentaire, Drame, Horreur, Romance, Science-fiction, Thriller |
-| Films | 40 | titre (`catchPhrase`), synopsis (`realText`), année, durée et classification d'âge générés par Faker ; 1 à 3 genres chacun |
-| Avis | 80 | note de 1 à 5, commentaire dans 80 % des cas, **jamais deux avis du même utilisateur sur le même film** |
-| Titres similaires | 20 paires | jamais un film lié à lui-même |
+| Donnée            | Quantité  | Détail                                                                                                                     |
+| ----------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Administrateur    | 1         | `admin@prime.local` / `password`, rôles `ROLE_USER` + `ROLE_ADMIN`                                                         |
+| Utilisateurs      | 5         | `user1@prime.local` … `user5@prime.local` / `password`                                                                     |
+| Genres            | 10        | noms réels : Action, Animation, Aventure, Comédie, Documentaire, Drame, Horreur, Romance, Science-fiction, Thriller        |
+| Films             | 40        | titre (`catchPhrase`), synopsis (`realText`), année, durée et classification d'âge générés par Faker ; 1 à 3 genres chacun |
+| Avis              | 80        | note de 1 à 5, commentaire dans 80 % des cas, **jamais deux avis du même utilisateur sur le même film**                    |
+| Titres similaires | 20 paires | jamais un film lié à lui-même                                                                                              |
 
 - Faker est en français (`Faker\Factory::create('fr_FR')`) et reçoit une **graine fixe par film et par avis** (`$faker->seed(…)` juste avant ses tirages) : chaque chargement produit exactement les mêmes données, ce qui rend les requêtes `.http` reproductibles. Faker tire dans le générateur aléatoire global de PHP ; une graine par élément évite qu'un appel extérieur à ce générateur décale toutes les données suivantes.
 - Les mots de passe passent par `UserPasswordHasherInterface`, comme à l'inscription.

@@ -17,10 +17,10 @@ Specs 01 à 03 terminées (les routes sont réservées aux administrateurs).
 
 ## Routes
 
-| Méthode | Route | Accès | Rôle | Succès | Erreurs |
-|---|---|---|---|---|---|
-| `PUT` | `/movies/{id}/similar/{otherId}` | administrateur | lier deux films | 204 | 401, 403, 404, 422 |
-| `DELETE` | `/movies/{id}/similar/{otherId}` | administrateur | délier deux films | 204 | 401, 403, 404 |
+| Méthode  | Route                            | Accès          | Rôle              | Succès | Erreurs            |
+| -------- | -------------------------------- | -------------- | ----------------- | ------ | ------------------ |
+| `PUT`    | `/movies/{id}/similar/{otherId}` | administrateur | lier deux films   | 204    | 401, 403, 404, 422 |
+| `DELETE` | `/movies/{id}/similar/{otherId}` | administrateur | délier deux films | 204    | 401, 403, 404      |
 
 - `PUT` est **idempotent** : lier deux films déjà liés renvoie 204 sans rien changer.
 - `DELETE` sur deux films qui ne sont pas liés renvoie aussi 204.

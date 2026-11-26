@@ -10,14 +10,14 @@ Specs 01 à 03 terminées.
 
 ## L'avis
 
-| Champ | Type | Règles |
-|---|---|---|
-| `id` | entier | attribué par la base |
-| `rating` | entier | obligatoire, de 1 à 5 |
-| `comment` | texte ou `null` | facultatif, 1000 caractères maximum |
-| `createdAt` | date et heure | fixée automatiquement à la création, jamais envoyée par le client |
-| `author` | `User` | l'utilisateur connecté qui écrit l'avis, jamais envoyé par le client |
-| `movie` | `Movie` | le film de l'URL, jamais envoyé par le client |
+| Champ       | Type            | Règles                                                               |
+| ----------- | --------------- | -------------------------------------------------------------------- |
+| `id`        | entier          | attribué par la base                                                 |
+| `rating`    | entier          | obligatoire, de 1 à 5                                                |
+| `comment`   | texte ou `null` | facultatif, 1000 caractères maximum                                  |
+| `createdAt` | date et heure   | fixée automatiquement à la création, jamais envoyée par le client    |
+| `author`    | `User`          | l'utilisateur connecté qui écrit l'avis, jamais envoyé par le client |
+| `movie`     | `Movie`         | le film de l'URL, jamais envoyé par le client                        |
 
 ## Les associations
 
@@ -28,12 +28,12 @@ Specs 01 à 03 terminées.
 
 ## Routes
 
-| Méthode | Route | Accès | Rôle | Succès | Erreurs |
-|---|---|---|---|---|---|
-| `GET` | `/movies/{id}/reviews` | tout le monde | avis d'un film, paginés (5 par défaut), du plus récent au plus ancien | 200 | 404, 422 |
-| `POST` | `/movies/{id}/reviews` | connecté | donner son avis sur un film | 201 | 401, 404, 409, 422 |
-| `PUT` | `/reviews/{id}` | l'auteur uniquement | modifier sa note et son commentaire | 200 | 401, 403, 404, 422 |
-| `DELETE` | `/reviews/{id}` | l'auteur **ou** un administrateur | supprimer un avis | 204 | 401, 403, 404 |
+| Méthode  | Route                  | Accès                             | Rôle                                                                  | Succès | Erreurs            |
+| -------- | ---------------------- | --------------------------------- | --------------------------------------------------------------------- | ------ | ------------------ |
+| `GET`    | `/movies/{id}/reviews` | tout le monde                     | avis d'un film, paginés (5 par défaut), du plus récent au plus ancien | 200    | 404, 422           |
+| `POST`   | `/movies/{id}/reviews` | connecté                          | donner son avis sur un film                                           | 201    | 401, 404, 409, 422 |
+| `PUT`    | `/reviews/{id}`        | l'auteur uniquement               | modifier sa note et son commentaire                                   | 200    | 401, 403, 404, 422 |
+| `DELETE` | `/reviews/{id}`        | l'auteur **ou** un administrateur | supprimer un avis                                                     | 204    | 401, 403, 404      |
 
 - Un deuxième avis du même utilisateur sur le même film renvoie **409** : il doit modifier le premier.
 - Un administrateur peut **supprimer** n'importe quel avis (modération) mais ne peut **modifier** que les siens.
@@ -42,7 +42,14 @@ Specs 01 à 03 terminées.
 Un avis renvoyé :
 
 ```json
-{ "id": 7, "rating": 4, "comment": "Culte.", "createdAt": "2026-11-24T10:32:00+00:00", "author": { "id": 3 }, "movie": { "id": 4 } }
+{
+  "id": 7,
+  "rating": 4,
+  "comment": "Culte.",
+  "createdAt": "2026-11-24T10:32:00+00:00",
+  "author": { "id": 3 },
+  "movie": { "id": 4 }
+}
 ```
 
 L'auteur n'est exposé que par son `id` : l'e-mail est une donnée personnelle et ne doit pas apparaître publiquement.
@@ -50,6 +57,7 @@ L'auteur n'est exposé que par son `id` : l'e-mail est une donnée personnelle e
 ## Note moyenne sur les films
 
 `GET /movies/{id}` ajoute :
+
 - `averageRating` : moyenne des notes, arrondie à une décimale, `null` si le film n'a aucun avis ;
 - `reviewCount` : nombre d'avis.
 

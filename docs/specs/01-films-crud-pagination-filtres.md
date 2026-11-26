@@ -12,26 +12,26 @@ Pouvoir gérer les **films** du catalogue (créer, lire, modifier, supprimer) et
 
 ## Le film
 
-| Champ | Type | Règles |
-|---|---|---|
-| `id` | entier | attribué par la base, jamais envoyé par le client |
-| `title` | texte | obligatoire, 1 à 255 caractères |
-| `synopsis` | texte ou `null` | facultatif, 2000 caractères maximum |
-| `releaseYear` | entier | obligatoire, entre 1888 et l'année en cours + 5 |
-| `duration` | entier (minutes) | obligatoire, strictement positif |
-| `ageRating` | énumération | obligatoire, une valeur parmi `ALL`, `7+`, `13+`, `16+`, `18+` |
+| Champ         | Type             | Règles                                                         |
+| ------------- | ---------------- | -------------------------------------------------------------- |
+| `id`          | entier           | attribué par la base, jamais envoyé par le client              |
+| `title`       | texte            | obligatoire, 1 à 255 caractères                                |
+| `synopsis`    | texte ou `null`  | facultatif, 2000 caractères maximum                            |
+| `releaseYear` | entier           | obligatoire, entre 1888 et l'année en cours + 5                |
+| `duration`    | entier (minutes) | obligatoire, strictement positif                               |
+| `ageRating`   | énumération      | obligatoire, une valeur parmi `ALL`, `7+`, `13+`, `16+`, `18+` |
 
 `ageRating` est un enum PHP (`App\Enum\AgeRating`) ; une valeur hors liste renvoie 422.
 
 ## Routes
 
-| Méthode | Route | Rôle | Succès | Erreurs |
-|---|---|---|---|---|
-| `GET` | `/movies` | liste paginée et filtrée | 200 | 422 |
-| `GET` | `/movies/{id}` | détail d'un film | 200 | 404 |
-| `POST` | `/movies` | créer un film | 201 | 422 |
-| `PUT` | `/movies/{id}` | remplacer entièrement un film | 200 | 404, 422 |
-| `DELETE` | `/movies/{id}` | supprimer un film | 204 | 404 |
+| Méthode  | Route          | Rôle                          | Succès | Erreurs  |
+| -------- | -------------- | ----------------------------- | ------ | -------- |
+| `GET`    | `/movies`      | liste paginée et filtrée      | 200    | 422      |
+| `GET`    | `/movies/{id}` | détail d'un film              | 200    | 404      |
+| `POST`   | `/movies`      | créer un film                 | 201    | 422      |
+| `PUT`    | `/movies/{id}` | remplacer entièrement un film | 200    | 404, 422 |
+| `DELETE` | `/movies/{id}` | supprimer un film             | 204    | 404      |
 
 Pas de `PATCH` : `PUT` exige tous les champs obligatoires.
 
@@ -41,12 +41,12 @@ Jusqu'à la spec 03, toutes ces routes sont ouvertes à tous.
 
 `GET /movies?title=par&year=1972&page=2&limit=3`
 
-| Paramètre | Effet | Valeur invalide |
-|---|---|---|
-| `page` | numéro de page, 1 par défaut | < 1 → 422 |
-| `limit` | films par page, **5 par défaut** | < 1 ou > 100 → 422 |
-| `title` | le titre **contient** le texte, sans tenir compte des majuscules | (texte libre) |
-| `year` | année de sortie **exacte** | non entier → 422 |
+| Paramètre | Effet                                                            | Valeur invalide    |
+| --------- | ---------------------------------------------------------------- | ------------------ |
+| `page`    | numéro de page, 1 par défaut                                     | < 1 → 422          |
+| `limit`   | films par page, **5 par défaut**                                 | < 1 ou > 100 → 422 |
+| `title`   | le titre **contient** le texte, sans tenir compte des majuscules | (texte libre)      |
+| `year`    | année de sortie **exacte**                                       | non entier → 422   |
 
 - Les filtres se **cumulent** (ET logique) ; un filtre absent ou vide est ignoré.
 - Tri fixe : `title` croissant, puis `id` croissant (ordre stable d'une page à l'autre).
@@ -70,6 +70,7 @@ La liste n'expose pas le `synopsis` (groupe de sérialisation `movie:list`) ; le
 ## Critères d'acceptation
 
 Liste :
+
 - Sans paramètre, `GET /movies` renvoie les 5 premiers films triés par titre, avec `total` et `lastPage`.
 - `?page=2&limit=3` renvoie les films 4 à 6 de la liste triée.
 - `?page=2` seul renvoie 5 films (limite par défaut).
@@ -80,6 +81,7 @@ Liste :
 - `?page=0`, `?limit=0`, `?limit=101`, `?year=abc` renvoient 422.
 
 CRUD :
+
 - `POST /movies` avec un corps valide renvoie 201 et le film avec son `id`.
 - `POST /movies` sans `title`, avec `releaseYear: 1800`, `duration: 0` ou `ageRating: "12+"` renvoie 422 et nomme le champ fautif.
 - `GET /movies/{id}` renvoie le film avec son `synopsis` ; un id inconnu renvoie 404.

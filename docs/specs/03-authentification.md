@@ -22,22 +22,22 @@ Le compte administrateur (`admin@prime.local` / `password`) est créé par les d
 
 ## L'utilisateur
 
-| Champ | Type | Règles |
-|---|---|---|
-| `id` | entier | attribué par la base |
-| `email` | texte | obligatoire, format e-mail valide, **unique** sans tenir compte des majuscules |
-| `password` | texte | obligatoire à l'inscription, 8 caractères minimum, **enregistré chiffré**, jamais renvoyé dans une réponse |
-| `roles` | liste | `ROLE_USER` pour tous ; `ROLE_ADMIN` en plus pour les administrateurs |
+| Champ      | Type   | Règles                                                                                                     |
+| ---------- | ------ | ---------------------------------------------------------------------------------------------------------- |
+| `id`       | entier | attribué par la base                                                                                       |
+| `email`    | texte  | obligatoire, format e-mail valide, **unique** sans tenir compte des majuscules                             |
+| `password` | texte  | obligatoire à l'inscription, 8 caractères minimum, **enregistré chiffré**, jamais renvoyé dans une réponse |
+| `roles`    | liste  | `ROLE_USER` pour tous ; `ROLE_ADMIN` en plus pour les administrateurs                                      |
 
 `User` implémente `UserInterface` et `PasswordAuthenticatedUserInterface`. Le mot de passe est chiffré avec `UserPasswordHasherInterface`.
 
 ## Routes
 
-| Méthode | Route | Accès | Rôle | Succès | Erreurs |
-|---|---|---|---|---|---|
-| `POST` | `/register` | public | créer un compte utilisateur | 201 | 409, 422 |
-| `POST` | `/login` | public | obtenir un jeton JWT | 200 `{ "token": "…" }` | 401 |
-| `GET` | `/me` | connecté | voir son propre compte | 200 | 401 |
+| Méthode | Route       | Accès    | Rôle                        | Succès                 | Erreurs  |
+| ------- | ----------- | -------- | --------------------------- | ---------------------- | -------- |
+| `POST`  | `/register` | public   | créer un compte utilisateur | 201                    | 409, 422 |
+| `POST`  | `/login`    | public   | obtenir un jeton JWT        | 200 `{ "token": "…" }` | 401      |
+| `GET`   | `/me`       | connecté | voir son propre compte      | 200                    | 401      |
 
 - `/register` crée **toujours** un utilisateur simple (`ROLE_USER`). Un champ `roles` envoyé dans le corps est ignoré. Les administrateurs n'existent que via les données de test (spec 06).
 - Un e-mail déjà utilisé renvoie **409**.
@@ -48,9 +48,9 @@ Le compte administrateur (`admin@prime.local` / `password`) est créé par les d
 À partir de cette spec, chaque requête protégée doit porter `Authorization: Bearer <jeton>`.
 
 | Ressource | Lecture (`GET`) | Écriture (`POST`, `PUT`, `DELETE`) |
-|---|---|---|
-| Films | tout le monde | administrateur |
-| Genres | tout le monde | administrateur |
+| --------- | --------------- | ---------------------------------- |
+| Films     | tout le monde   | administrateur                     |
+| Genres    | tout le monde   | administrateur                     |
 
 - Accès déclaré avec `#[IsGranted('ROLE_ADMIN')]` sur les actions d'écriture ; les `GET` restent publics (`access_control` en `PUBLIC_ACCESS`).
 - Sans jeton, ou jeton expiré/invalide, sur une route protégée : **401**.
@@ -59,6 +59,7 @@ Le compte administrateur (`admin@prime.local` / `password`) est créé par les d
 ## Critères d'acceptation
 
 Inscription et connexion :
+
 - `POST /register` avec un e-mail et un mot de passe valides renvoie 201, sans le mot de passe dans la réponse.
 - `POST /register` avec un e-mail déjà pris (même en majuscules) renvoie 409.
 - `POST /register` avec un e-mail invalide ou un mot de passe de moins de 8 caractères renvoie 422.
@@ -68,6 +69,7 @@ Inscription et connexion :
 - `GET /me` avec le jeton renvoie l'utilisateur ; sans jeton, 401.
 
 Accès :
+
 - `GET /movies` et `GET /genres` répondent 200 sans jeton.
 - `POST /movies` sans jeton renvoie 401.
 - `POST /movies` avec le jeton d'un utilisateur simple renvoie 403.

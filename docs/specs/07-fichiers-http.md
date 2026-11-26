@@ -56,16 +56,17 @@ Ces identifiants sont ceux des données de test (spec 06), donc sans secret rée
   ```
 
   La syntaxe `{{loginAdmin.response.body.token}}` est celle de l'extension REST Client de VS Code ; dans PhpStorm, on enregistre le jeton avec un script de réponse (`> {% client.global.set("adminToken", response.body.token); %}`) puis on l'utilise via `{{adminToken}}`. Le fichier doit fonctionner dans l'éditeur choisi par l'équipe.
+
 - Les ids utilisés supposent les données de test chargées (spec 06).
 
 ## Requêtes attendues
 
-| Fichier | Requêtes minimales |
-|---|---|
-| `auth.http` | inscription réussie (201), e-mail déjà pris (409), mot de passe trop court (422), connexion admin et utilisateur (200), mauvais mot de passe (401), `/me` avec et sans jeton (200 / 401) |
-| `movies.http` | liste par défaut, `?page=2&limit=3`, `?title=…`, `?year=…`, `?genre=…`, filtres cumulés, `?page=0` (422) ; détail (200 / 404) ; création admin (201), sans jeton (401), utilisateur simple (403), invalide (422) ; `PUT` (200 / 422) ; `DELETE` (204) ; lier et délier des titres similaires (204), film lié à lui-même (422) |
-| `genres.http` | liste, détail, création (201), nom en double (422), renommage, suppression (204), et les cas 401 / 403 |
-| `reviews.http` | avis d'un film, poster un avis (201), deuxième avis (409), note à 6 (422), modifier le sien (200), modifier celui d'un autre (403), supprimer en tant qu'administrateur (204) |
+| Fichier        | Requêtes minimales                                                                                                                                                                                                                                                                                                            |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.http`    | inscription réussie (201), e-mail déjà pris (409), mot de passe trop court (422), connexion admin et utilisateur (200), mauvais mot de passe (401), `/me` avec et sans jeton (200 / 401)                                                                                                                                      |
+| `movies.http`  | liste par défaut, `?page=2&limit=3`, `?title=…`, `?year=…`, `?genre=…`, filtres cumulés, `?page=0` (422) ; détail (200 / 404) ; création admin (201), sans jeton (401), utilisateur simple (403), invalide (422) ; `PUT` (200 / 422) ; `DELETE` (204) ; lier et délier des titres similaires (204), film lié à lui-même (422) |
+| `genres.http`  | liste, détail, création (201), nom en double (422), renommage, suppression (204), et les cas 401 / 403                                                                                                                                                                                                                        |
+| `reviews.http` | avis d'un film, poster un avis (201), deuxième avis (409), note à 6 (422), modifier le sien (200), modifier celui d'un autre (403), supprimer en tant qu'administrateur (204)                                                                                                                                                 |
 
 ## Critères d'acceptation
 
