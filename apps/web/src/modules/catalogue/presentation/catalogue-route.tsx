@@ -8,35 +8,14 @@ import {
 import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
 import { z } from "zod";
 
-import type { Result } from "@prime/result";
-import {
-  ActivityIndicator,
-  ButtonTextAndSymbol,
-  Link,
-  MovieThumb,
-  PageControl,
-  SectionHeader,
-} from "@prime/ui";
+import { ActivityIndicator, ButtonTextAndSymbol, Link, MovieThumb, PageControl } from "@prime/ui";
 
-import type {
-  AgeRating,
-  CatalogueFailure,
-  Genre,
-  Movie,
-  MovieFilters,
-  MoviePage,
-} from "../domain/movie.ts";
+import type { AgeRating, Movie, MovieFilters } from "../domain/movie.ts";
 import { formatDuration } from "./duration.ts";
 import { MovieFilterBar } from "./movie-filters.tsx";
+import type { ListGenres, ListMovies } from "./use-cases.ts";
 
-import styles from "./movies-route.module.css";
-
-type ListMovies = (query: {
-  readonly page: number;
-  readonly filters: MovieFilters;
-}) => Promise<Result<MoviePage, CatalogueFailure>>;
-
-type ListGenres = () => Promise<Result<readonly Genre[], CatalogueFailure>>;
+import styles from "./catalogue-route.module.css";
 
 const FIRST_PAGE = 1;
 
@@ -57,7 +36,10 @@ const MovieCard = ({ movie }: { readonly movie: Movie }) => {
   const titleId = `movie-${movie.id}`;
   return (
     <article className={styles.card} aria-labelledby={titleId}>
-      <MovieThumb title={movie.title} />
+      <MovieThumb
+        title={movie.title}
+        {...(movie.posterUrl === undefined ? {} : { image: movie.posterUrl })}
+      />
       <h3 id={titleId} className={styles.cardTitle}>
         {movie.title}
       </h3>
@@ -83,7 +65,7 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
               render={(anchor) => (
                 <RouterLink
                   {...anchor}
-                  to="/"
+                  to="/catalogue"
                   search={(search: CatalogueSearch) => ({ ...search, page: page - 1 })}
                 />
               )}
@@ -95,7 +77,7 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
             current={page}
             onSelect={(selected) =>
               void navigate({
-                to: "/",
+                to: "/catalogue",
                 search: (search: CatalogueSearch) => ({ ...search, page: selected }),
               })
             }
@@ -109,7 +91,7 @@ const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPa
               render={(anchor) => (
                 <RouterLink
                   {...anchor}
-                  to="/"
+                  to="/catalogue"
                   search={(search: CatalogueSearch) => ({ ...search, page: page + 1 })}
                 />
               )}
@@ -129,7 +111,7 @@ const NoMatch = () => (
     <p>Aucun film ne correspond à ces filtres.</p>
     <Link
       label="Effacer les filtres"
-      render={(anchor) => <RouterLink {...anchor} to="/" search={{ page: FIRST_PAGE }} />}
+      render={(anchor) => <RouterLink {...anchor} to="/catalogue" search={{ page: FIRST_PAGE }} />}
     />
   </div>
 );
@@ -189,7 +171,7 @@ const Movies = ({
   );
 };
 
-export const moviesRoute = ({
+export const catalogueRoute = ({
   parent,
   listMovies,
   listGenres,
@@ -200,7 +182,7 @@ export const moviesRoute = ({
 }) => {
   const route = createRoute({
     getParentRoute: () => parent,
-    path: "/",
+    path: "/catalogue",
     validateSearch: (search: Readonly<Record<string, unknown>>): CatalogueSearch => ({
       page: Page.parse(search["page"]),
       title: Title.parse(search["title"]),
@@ -213,16 +195,17 @@ export const moviesRoute = ({
       const genres = useQuery({ queryKey: ["genres"], queryFn: listGenres });
       const filters = { title, year, genre };
       return (
-        <main className={styles.page}>
-          <h1 className={styles.brand}>Prime Video</h1>
-          <section className={styles.catalogue}>
-            <SectionHeader title="Catalogue" />
+        <div className={styles.page}>
+          <section className={styles.catalogue} aria-labelledby="catalogue-title">
+            <h1 id="catalogue-title" className={styles.title}>
+              Catalogue
+            </h1>
             <MovieFilterBar
               filters={filters}
               genres={genres.data?.ok === true ? genres.data.value : []}
               onChange={(change, { replace }) =>
                 void navigate({
-                  to: "/",
+                  to: "/catalogue",
                   search: (search: CatalogueSearch) => ({ ...search, ...change, page: FIRST_PAGE }),
                   replace,
                 })
@@ -230,7 +213,7 @@ export const moviesRoute = ({
             />
             <Movies page={page} filters={filters} listMovies={listMovies} />
           </section>
-        </main>
+        </div>
       );
     },
   });

@@ -1,12 +1,10 @@
 .page {
-  display: grid;
-  gap: var(--prime-space-2xl);
-  padding: var(--prime-space-2xl) var(--prime-space-3xl) var(--prime-space-3xl);
+  padding: var(--prime-size-navigation-bar) var(--prime-space-3xl) var(--prime-space-3xl);
 }
 
-.brand {
+.title {
   margin: 0;
-  font: var(--prime-text-title1);
+  font: var(--prime-text-large-title);
   color: var(--prime-color-text-primary);
 }
 

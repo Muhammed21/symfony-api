@@ -8,6 +8,8 @@ export type Movie = {
   readonly releaseYear: number;
   readonly duration: number;
   readonly ageRating: AgeRating;
+  readonly posterUrl: string | undefined;
+  readonly backdropUrl: string | undefined;
   readonly genres: readonly string[];
 };
 
@@ -16,6 +18,8 @@ export type MoviePage = {
   readonly total: number;
   readonly lastPage: number;
 };
+
+export type MovieSort = "title" | "recent";
 
 export type CatalogueFailure = "unavailable" | "invalid_response";
 

@@ -11,7 +11,7 @@ import {
   send,
 } from "../../../platform/http.ts";
 import type { CatalogueGateway } from "../application/catalogue-gateway.ts";
-import { AGE_RATINGS, type Movie, type MovieFilters } from "../domain/movie.ts";
+import { AGE_RATINGS, type Movie, type MovieFilters, type MovieSort } from "../domain/movie.ts";
 
 const GenreOutput = z.object({ id: z.number().int(), name: z.string() });
 
@@ -21,6 +21,8 @@ const MovieOutput = z.object({
   releaseYear: z.number().int(),
   duration: z.number().int(),
   ageRating: z.enum(AGE_RATINGS),
+  posterUrl: z.string().nullable(),
+  backdropUrl: z.string().nullable(),
   genres: z.array(GenreOutput),
 });
 
@@ -37,8 +39,15 @@ const GenrePageOutput = pageOutputOf(GenreOutput);
 
 const ALL_GENRES = 100;
 
-const movieOf = ({ genres, ...movie }: z.infer<typeof MovieOutput>): Movie => ({
+const movieOf = ({
+  genres,
+  posterUrl,
+  backdropUrl,
+  ...movie
+}: z.infer<typeof MovieOutput>): Movie => ({
   ...movie,
+  posterUrl: posterUrl ?? undefined,
+  backdropUrl: backdropUrl ?? undefined,
   genres: genres.map((genre) => genre.name),
 });
 
@@ -46,6 +55,9 @@ const filterParameters = ({ title, year, genre }: MovieFilters) =>
   Object.entries({ title, year, genre }).flatMap(([name, value]): [string, string][] =>
     value === undefined ? [] : [[name, String(value)]],
   );
+
+const sortParameters = (sort: MovieSort): [string, string][] =>
+  sort === "title" ? [] : [["sort", sort]];
 
 export const createHttpCatalogueGateway = ({
   apiUrl,
@@ -70,11 +82,12 @@ export const createHttpCatalogueGateway = ({
   };
 
   return {
-    listMovies: async ({ page, limit, filters }) => {
+    listMovies: async ({ page, limit, filters, sort }) => {
       const query = new URLSearchParams([
         ["page", String(page)],
         ["limit", String(limit)],
         ...filterParameters(filters),
+        ...sortParameters(sort),
       ]);
       const body = await getJson(`/movies?${query}`, MoviePageOutput);
       if (!body.ok) {

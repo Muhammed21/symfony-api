@@ -6,7 +6,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { createCatalogue } from "./modules/catalogue/catalogue-module.ts";
-import { moviesRoute } from "./modules/catalogue/presentation/movies-route.tsx";
+import { catalogueRoute } from "./modules/catalogue/presentation/catalogue-route.tsx";
+import { homeRoute } from "./modules/catalogue/presentation/home-route.tsx";
+import { AppShell } from "./modules/shell/presentation/app-shell.tsx";
 import { configOf } from "./platform/config.ts";
 
 const fetchFromBrowser = (url: string, init: RequestInit) => window.fetch(url, init);
@@ -14,15 +16,14 @@ const fetchFromBrowser = (url: string, init: RequestInit) => window.fetch(url, i
 const appRouter = ({ apiUrl }: { readonly apiUrl: string }) => {
   const catalogue = createCatalogue({ apiUrl, fetch: fetchFromBrowser });
 
-  const root = createRootRoute();
+  const root = createRootRoute({ component: AppShell });
+  const routeOptions = {
+    parent: root,
+    listMovies: catalogue.listMovies,
+    listGenres: catalogue.listGenres,
+  };
   return createRouter({
-    routeTree: root.addChildren([
-      moviesRoute({
-        parent: root,
-        listMovies: catalogue.listMovies,
-        listGenres: catalogue.listGenres,
-      }),
-    ]),
+    routeTree: root.addChildren([homeRoute(routeOptions), catalogueRoute(routeOptions)]),
   });
 };
 

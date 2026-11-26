@@ -1,0 +1,30 @@
+.page {
+  position: relative;
+  min-block-size: 100vh;
+  background-color: var(--prime-color-system-black);
+}
+
+.navigationBar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-l);
+  box-sizing: border-box;
+  block-size: var(--prime-size-navigation-bar);
+  padding-inline: var(--prime-space-3xl);
+}
+
+.logo {
+  display: inline-flex;
+  border-radius: var(--prime-radius-small);
+  color: inherit;
+  text-decoration: none;
+}
+
+.logo:focus-visible {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: 4px;
+}

@@ -18,7 +18,7 @@ import type {
   MovieFilters,
   MoviePage,
 } from "../../domain/movie.ts";
-import { moviesRoute } from "../movies-route.tsx";
+import { catalogueRoute } from "../catalogue-route.tsx";
 
 type MoviesQuery = { readonly page: number; readonly filters: MovieFilters };
 
@@ -39,6 +39,8 @@ const makeMovie = (overrides: Partial<Movie> = {}): Movie => ({
   releaseYear: 1994,
   duration: 142,
   ageRating: "13+",
+  posterUrl: undefined,
+  backdropUrl: undefined,
   genres: ["Drame"],
   ...overrides,
 });
@@ -60,7 +62,7 @@ const catalogueOfFourPages: ListMovies = ({ page }) =>
 const renderCatalogue = async ({
   listMovies,
   listGenres = genres,
-  url = "/",
+  url = "/catalogue",
 }: {
   readonly listMovies: ListMovies;
   readonly listGenres?: ListGenres;
@@ -68,7 +70,7 @@ const renderCatalogue = async ({
 }) => {
   const root = createRootRoute();
   const router = createRouter({
-    routeTree: root.addChildren([moviesRoute({ parent: root, listMovies, listGenres })]),
+    routeTree: root.addChildren([catalogueRoute({ parent: root, listMovies, listGenres })]),
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const screen = await render(
@@ -79,7 +81,7 @@ const renderCatalogue = async ({
   return { screen, router };
 };
 
-const renderMovies = async (listMovies: ListMovies, url = "/") =>
+const renderMovies = async (listMovies: ListMovies, url = "/catalogue") =>
   (await renderCatalogue({ listMovies, url })).screen;
 
 const recording = (answer: ListMovies = catalogueOfFourPages) => {
@@ -123,10 +125,7 @@ describe("page du catalogue (spec 08)", () => {
     );
 
     await expect
-      .element(screen.getByRole("heading", { level: 1, name: "Prime Video" }))
-      .toBeVisible();
-    await expect
-      .element(screen.getByRole("heading", { level: 2, name: "Catalogue" }))
+      .element(screen.getByRole("heading", { level: 1, name: "Catalogue" }))
       .toBeVisible();
     await expect
       .element(screen.getByRole("heading", { level: 3, name: "Les Évadés" }))
@@ -139,26 +138,41 @@ describe("page du catalogue (spec 08)", () => {
     await expect.element(roiLion).toMatchTextContent("Animation, Aventure");
   });
 
+  it("montre l'affiche de chaque film, avec son titre en légende", async () => {
+    const screen = await renderMovies(
+      listing({ movies: [makeMovie({ posterUrl: "https://images.exemple.fr/evades.jpg" })] }),
+    );
+
+    const card = screen.getByRole("article", { name: "Les Évadés" });
+
+    await expect.element(card).toBeVisible();
+    expect(card.element().querySelector("img")?.getAttribute("src")).toBe(
+      "https://images.exemple.fr/evades.jpg",
+    );
+  });
+
   it("lit la page dans l'adresse", async () => {
     const { asked, listMovies } = recording();
-    const screen = await renderMovies(listMovies, "/?page=3");
+    const screen = await renderMovies(listMovies, "/catalogue?page=3");
 
     await expect.element(screen.getByRole("heading", { name: "Film de la page 3" })).toBeVisible();
     await expect.element(screen.getByText("Page 3 sur 4")).toBeVisible();
     expect(asked).toEqual([{ page: 3, filters: NO_FILTERS }]);
   });
 
-  it.each(["/?page=0", "/?page=-2", "/?page=deux", "/?page=1.5"])(
-    "revient à la première page pour une adresse invalide (%s)",
-    async (url) => {
-      const screen = await renderMovies(catalogueOfFourPages, url);
+  it.each([
+    "/catalogue?page=0",
+    "/catalogue?page=-2",
+    "/catalogue?page=deux",
+    "/catalogue?page=1.5",
+  ])("revient à la première page pour une adresse invalide (%s)", async (url) => {
+    const screen = await renderMovies(catalogueOfFourPages, url);
 
-      await expect.element(screen.getByText("Page 1 sur 4")).toBeVisible();
-    },
-  );
+    await expect.element(screen.getByText("Page 1 sur 4")).toBeVisible();
+  });
 
   it("passe à la page suivante puis revient à la précédente", async () => {
-    const screen = await renderMovies(catalogueOfFourPages, "/?page=2");
+    const screen = await renderMovies(catalogueOfFourPages, "/catalogue?page=2");
     await expect.element(screen.getByText("Page 2 sur 4")).toBeVisible();
 
     await screen.getByRole("link", { name: "Suivant" }).click();
@@ -183,7 +197,7 @@ describe("page du catalogue (spec 08)", () => {
   });
 
   it("signale la page courante parmi les points de pagination", async () => {
-    const screen = await renderMovies(catalogueOfFourPages, "/?page=2");
+    const screen = await renderMovies(catalogueOfFourPages, "/catalogue?page=2");
 
     const pagination = screen.getByRole("navigation", { name: "Pagination" });
 
@@ -210,7 +224,7 @@ describe("page du catalogue (spec 08)", () => {
   });
 
   it("n'offre pas de page suivante sur la dernière page", async () => {
-    const screen = await renderMovies(catalogueOfFourPages, "/?page=4");
+    const screen = await renderMovies(catalogueOfFourPages, "/catalogue?page=4");
 
     await expect.element(screen.getByText("Page 4 sur 4")).toBeVisible();
     await expect.element(screen.getByRole("link", { name: "Suivant" })).not.toBeInTheDocument();
@@ -271,7 +285,7 @@ describe("page du catalogue (spec 08)", () => {
 describe("filtres du catalogue (spec 09)", () => {
   it("cherche un titre pendant la frappe, une fois la pause faite, en revenant en page 1", async () => {
     const { asked, listMovies } = recording();
-    const { screen, router } = await renderCatalogue({ listMovies, url: "/?page=3" });
+    const { screen, router } = await renderCatalogue({ listMovies, url: "/catalogue?page=3" });
     await expect.element(screen.getByText("Page 3 sur 4")).toBeVisible();
 
     await userEvent.type(searchField(screen), "par");
@@ -294,7 +308,7 @@ describe("filtres du catalogue (spec 09)", () => {
 
   it("ignore les espaces autour du titre et retire le filtre d'un champ vidé", async () => {
     const { asked, listMovies } = recording();
-    const { screen } = await renderCatalogue({ listMovies, url: "/?title=par" });
+    const { screen } = await renderCatalogue({ listMovies, url: "/catalogue?title=par" });
     await expect.element(searchField(screen)).toHaveValue("par");
 
     await searchField(screen).fill("  le parrain ");
@@ -318,7 +332,7 @@ describe("filtres du catalogue (spec 09)", () => {
 
   it("retire le filtre d'année quand elle n'a plus 4 chiffres", async () => {
     const { asked, listMovies } = recording();
-    const { screen } = await renderCatalogue({ listMovies, url: "/?year=1972" });
+    const { screen } = await renderCatalogue({ listMovies, url: "/catalogue?year=1972" });
     await expect.element(yearField(screen)).toHaveValue("1972");
 
     await yearField(screen).fill("197");
@@ -336,7 +350,7 @@ describe("filtres du catalogue (spec 09)", () => {
 
   it("filtre par genre au clic, en page 1, et « Tous » retire le filtre", async () => {
     const { asked, listMovies } = recording();
-    const { screen, router } = await renderCatalogue({ listMovies, url: "/?page=3" });
+    const { screen, router } = await renderCatalogue({ listMovies, url: "/catalogue?page=3" });
     const all = screen.getByRole("button", { name: "Tous" });
     const drame = screen.getByRole("button", { name: "Drame" });
     await expect.element(all).toHaveAttribute("aria-pressed", "true");
@@ -373,7 +387,7 @@ describe("filtres du catalogue (spec 09)", () => {
     const { asked, listMovies } = recording();
     const { screen } = await renderCatalogue({
       listMovies,
-      url: "/?title=par&year=1972&genre=6&page=2",
+      url: "/catalogue?title=par&year=1972&genre=6&page=2",
     });
 
     await expect.element(screen.getByText("Page 2 sur 4")).toBeVisible();
@@ -385,20 +399,24 @@ describe("filtres du catalogue (spec 09)", () => {
     expect(asked).toEqual([{ page: 2, filters: { title: "par", year: 1972, genre: 6 } }]);
   });
 
-  it.each(["/?title=", "/?title=%20%20", "/?year=abc", "/?year=0", "/?genre=-1", "/?genre=1.5"])(
-    "ignore un filtre invalide dans l'adresse (%s)",
-    async (url) => {
-      const { asked, listMovies } = recording();
-      const { screen } = await renderCatalogue({ listMovies, url });
+  it.each([
+    "/catalogue?title=",
+    "/catalogue?title=%20%20",
+    "/catalogue?year=abc",
+    "/catalogue?year=0",
+    "/catalogue?genre=-1",
+    "/catalogue?genre=1.5",
+  ])("ignore un filtre invalide dans l'adresse (%s)", async (url) => {
+    const { asked, listMovies } = recording();
+    const { screen } = await renderCatalogue({ listMovies, url });
 
-      await expect.element(screen.getByText("Page 1 sur 4")).toBeVisible();
-      expect(asked).toEqual([{ page: 1, filters: NO_FILTERS }]);
-    },
-  );
+    await expect.element(screen.getByText("Page 1 sur 4")).toBeVisible();
+    expect(asked).toEqual([{ page: 1, filters: NO_FILTERS }]);
+  });
 
   it("garde les filtres en changeant de page", async () => {
     const { asked, listMovies } = recording();
-    const { screen } = await renderCatalogue({ listMovies, url: "/?title=par&genre=6" });
+    const { screen } = await renderCatalogue({ listMovies, url: "/catalogue?title=par&genre=6" });
 
     await screen.getByRole("link", { name: "Suivant" }).click();
     await expect.element(screen.getByText("Page 2 sur 4")).toBeVisible();
@@ -418,7 +436,7 @@ describe("filtres du catalogue (spec 09)", () => {
         ? catalogueOfFourPages({ page, filters })
         : Promise.resolve(ok({ movies: [], total: 0, lastPage: 1 })),
     );
-    const { screen } = await renderCatalogue({ listMovies, url: "/?title=zzz&genre=6" });
+    const { screen } = await renderCatalogue({ listMovies, url: "/catalogue?title=zzz&genre=6" });
 
     await expect.element(screen.getByText("Aucun film ne correspond à ces filtres.")).toBeVisible();
     await expect.element(screen.getByText("Aucun film pour le moment.")).not.toBeInTheDocument();

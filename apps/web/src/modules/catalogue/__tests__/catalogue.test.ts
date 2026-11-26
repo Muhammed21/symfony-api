@@ -10,6 +10,8 @@ const makeMovieOutput = (overrides: Readonly<Record<string, unknown>> = {}) => (
   releaseYear: 1994,
   duration: 142,
   ageRating: "13+",
+  posterUrl: null,
+  backdropUrl: null,
   genres: [{ id: 6, name: "Drame" }],
   ...overrides,
 });
@@ -62,6 +64,45 @@ describe("lecture du catalogue dans l'app web (spec 08)", () => {
     await catalogue.listMovies({ page: 3, filters: { genre: 2 } });
 
     expect(calls.map((call) => call.url)).toEqual([`${API_URL}/movies?page=3&limit=12&genre=2`]);
+  });
+
+  it("demande les films les plus récents d'abord quand on le précise", async () => {
+    const { catalogue, calls } = answering(json(makePageOutput()));
+
+    await catalogue.listMovies({ page: 1, filters: { genre: 2 }, sort: "recent" });
+
+    expect(calls.map((call) => call.url)).toEqual([
+      `${API_URL}/movies?page=1&limit=12&genre=2&sort=recent`,
+    ]);
+  });
+
+  it("donne l'affiche et la bannière de chaque film, quand il en a", async () => {
+    const { catalogue } = answering(
+      json(
+        makePageOutput({
+          items: [
+            makeMovieOutput({
+              posterUrl: "https://images.exemple.fr/affiche.jpg",
+              backdropUrl: "https://images.exemple.fr/banniere.jpg",
+            }),
+            makeMovieOutput({ id: 2 }),
+          ],
+        }),
+      ),
+    );
+
+    const page = await catalogue.listMovies({ page: 1, filters: {} });
+
+    expect(
+      page.ok &&
+        page.value.movies.map(({ posterUrl, backdropUrl }) => ({ posterUrl, backdropUrl })),
+    ).toStrictEqual([
+      {
+        posterUrl: "https://images.exemple.fr/affiche.jpg",
+        backdropUrl: "https://images.exemple.fr/banniere.jpg",
+      },
+      { posterUrl: undefined, backdropUrl: undefined },
+    ]);
   });
 
   it("donne les films de la page avec le nombre total de films et de pages", async () => {

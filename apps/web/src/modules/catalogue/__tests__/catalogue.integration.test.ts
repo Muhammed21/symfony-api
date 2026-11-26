@@ -71,4 +71,13 @@ describe("catalogue contre la vraie API chargée avec les données de test (spec
     expect(names).toHaveLength(10);
     expect(names).toEqual(names.toSorted((a, b) => a.localeCompare(b)));
   });
+
+  it("donne les films les plus récents d'abord, chacun avec son affiche et sa bannière", async () => {
+    const page = await catalogue.listMovies({ page: 1, filters: {}, sort: "recent" });
+
+    const movies = page.ok ? page.value.movies : [];
+    const years = movies.map(({ releaseYear }) => releaseYear);
+    expect(years).toEqual(years.toSorted((a, b) => b - a));
+    expect(movies.every(({ posterUrl, backdropUrl }) => posterUrl && backdropUrl)).toBe(true);
+  });
 });

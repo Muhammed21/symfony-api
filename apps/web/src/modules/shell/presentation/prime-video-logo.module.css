@@ -1,0 +1,6 @@
+.logo {
+  display: block;
+  inline-size: auto;
+  block-size: 36px;
+  fill: var(--prime-color-text-primary);
+}
