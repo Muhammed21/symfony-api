@@ -230,4 +230,20 @@ describe("coque de l'application (spec 11)", () => {
       ),
     ).toBeLessThan(1);
   });
+
+  it("crédite TMDB en pied de page, avec son logo plus discret que le nôtre", async () => {
+    const { screen } = await renderShell("/");
+    const footer = screen.getByRole("contentinfo");
+    const tmdbLogo = footer.getByRole("img", { name: "TMDB" });
+    const notice = footer.getByText(
+      "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.",
+    );
+
+    await expect.element(tmdbLogo).toHaveAttribute("src", "/tmdb-logo.svg");
+    await expect.element(notice).toHaveAttribute("lang", "en");
+    await expect.poll(() => tmdbLogo.element().getBoundingClientRect().height).toBeGreaterThan(0);
+    expect(tmdbLogo.element().getBoundingClientRect().height).toBeLessThan(
+      screen.getByRole("link", { name: "Prime Video" }).element().getBoundingClientRect().height,
+    );
+  });
 });

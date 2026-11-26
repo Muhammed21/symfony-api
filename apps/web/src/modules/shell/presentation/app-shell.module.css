@@ -31,6 +31,24 @@
   backdrop-filter: blur(var(--prime-blur-glass));
 }
 
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-m);
+  padding: var(--prime-space-3xl);
+  color: var(--prime-color-text-tertiary);
+}
+
+.tmdbLogo {
+  block-size: 12px;
+}
+
+.notice {
+  margin: 0;
+  font: var(--prime-text-footnote);
+}
+
 .content {
   animation: enter var(--prime-duration-page) var(--prime-easing-decelerate) both;
 }

@@ -57,6 +57,13 @@ export const AppShell = ({ account }: { readonly account: ReactNode }) => {
           <Outlet />
         </div>
       </main>
+      <footer className={styles.footer}>
+        <img className={styles.tmdbLogo} src="/tmdb-logo.svg" alt="TMDB" />
+        <p lang="en" className={styles.notice}>
+          This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise
+          approved by TMDB.
+        </p>
+      </footer>
     </div>
   );
 };
