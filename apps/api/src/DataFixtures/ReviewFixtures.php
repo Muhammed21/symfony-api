@@ -26,16 +26,22 @@ final class ReviewFixtures extends Fixture implements DependentFixtureInterface
         $faker = Factory::create('fr_FR');
         $faker->seed(self::SEED);
 
+        $authorsAndMovies = array_values($faker->randomElements(self::allAuthorAndMoviePairs(), self::COUNT));
         $drafts = array_map(
-            static fn (array $authorAndMovie): array => [
-                'author' => $authorAndMovie[0],
-                'movie' => $authorAndMovie[1],
-                'input' => new ReviewInput(
-                    rating: $faker->numberBetween(ReviewInput::MIN_RATING, ReviewInput::MAX_RATING),
-                    comment: $faker->optional(0.8)->realText($faker->numberBetween(40, 300)),
-                ),
-            ],
-            $faker->randomElements(self::allAuthorAndMoviePairs(), self::COUNT),
+            static function (array $authorAndMovie, int $index) use ($faker): array {
+                $faker->seed(self::SEED * 1000 + $index);
+
+                return [
+                    'author' => $authorAndMovie[0],
+                    'movie' => $authorAndMovie[1],
+                    'input' => new ReviewInput(
+                        rating: $faker->numberBetween(ReviewInput::MIN_RATING, ReviewInput::MAX_RATING),
+                        comment: $faker->optional(0.8)->realText($faker->numberBetween(40, 300)),
+                    ),
+                ];
+            },
+            $authorsAndMovies,
+            array_keys($authorsAndMovies),
         );
 
         foreach ($drafts as $draft) {

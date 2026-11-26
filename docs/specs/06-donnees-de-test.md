@@ -27,7 +27,7 @@ Le script supprime toutes les tables, rejoue les migrations puis charge les fixt
 | Avis | 80 | note de 1 à 5, commentaire dans 80 % des cas, **jamais deux avis du même utilisateur sur le même film** |
 | Titres similaires | 20 paires | jamais un film lié à lui-même |
 
-- Faker est initialisé avec une **graine fixe** (`$faker->seed(…)`) et en français (`Faker\Factory::create('fr_FR')`) : chaque chargement produit exactement les mêmes données, ce qui rend les requêtes `.http` reproductibles.
+- Faker est en français (`Faker\Factory::create('fr_FR')`) et reçoit une **graine fixe par film et par avis** (`$faker->seed(…)` juste avant ses tirages) : chaque chargement produit exactement les mêmes données, ce qui rend les requêtes `.http` reproductibles. Faker tire dans le générateur aléatoire global de PHP ; une graine par élément évite qu'un appel extérieur à ce générateur décale toutes les données suivantes.
 - Les mots de passe passent par `UserPasswordHasherInterface`, comme à l'inscription.
 - Les valeurs respectent les règles de validation des specs 01 à 05 (années entre 1888 et l'année en cours + 5, durée positive, note de 1 à 5…).
 - Une fixture par entité (`UserFixtures`, `GenreFixtures`, `MovieFixtures`, `ReviewFixtures`), avec `DependentFixtureInterface` pour l'ordre de chargement.
@@ -35,8 +35,8 @@ Le script supprime toutes les tables, rejoue les migrations puis charge les fixt
 ## Critères d'acceptation
 
 - Après chargement : 6 utilisateurs dont 1 administrateur, 10 genres, 40 films, environ 80 avis.
-- `POST /api/login` avec `admin@prime.local` / `password` renvoie un jeton ; avec ce jeton, `POST /movies` renvoie 201.
-- `POST /api/login` avec `user1@prime.local` / `password` renvoie un jeton ; avec ce jeton, `POST /movies` renvoie 403.
+- `POST /login` avec `admin@prime.local` / `password` renvoie un jeton ; avec ce jeton, `POST /movies` renvoie 201.
+- `POST /login` avec `user1@prime.local` / `password` renvoie un jeton ; avec ce jeton, `POST /movies` renvoie 403.
 - Aucun couple (utilisateur, film) n'a deux avis.
 - Pour toute paire de titres similaires A–B, B–A existe aussi.
 - Deux chargements successifs donnent les mêmes titres de films.

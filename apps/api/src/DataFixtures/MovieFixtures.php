@@ -31,9 +31,9 @@ final class MovieFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
-        $faker->seed(self::SEED);
 
-        $drafts = array_map(fn (): array => $this->draftMovie($faker), range(1, self::COUNT));
+        $drafts = array_map(fn (int $number): array => $this->draftMovie($faker, $number), range(1, self::COUNT));
+        $faker->seed(self::SEED);
         $similarPairs = $faker->randomElements(self::allMoviePairs(), self::SIMILAR_PAIR_COUNT);
 
         $movies = array_map(
@@ -51,8 +51,10 @@ final class MovieFixtures extends Fixture implements DependentFixtureInterface
     /**
      * @return array{input: MovieInput, genreNames: list<string>}
      */
-    private function draftMovie(Generator $faker): array
+    private function draftMovie(Generator $faker, int $number): array
     {
+        $faker->seed(self::SEED * 1000 + $number);
+
         return [
             'input' => new MovieInput(
                 title: $faker->unique()->catchPhrase(),
