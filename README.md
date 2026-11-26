@@ -23,6 +23,10 @@ pnpm dev               # API http://localhost:8000, frontend http://localhost:51
 
 Premier clonage : créer les secrets locaux de l'API, voir `docs/specs/03-authentification.md`.
 
+## Frontend → API
+
+En dev, le frontend appelle l'API via le proxy Vite : `/api/movies` est transmis à `http://localhost:8000/movies` (le préfixe `/api` est retiré). La cible se change avec la variable `API_URL`.
+
 ## Autres commandes
 
 ```bash
