@@ -8,6 +8,7 @@ Monorepo [Turborepo](https://turborepo.com) + pnpm.
 | `apps/web`                   | frontend React 19 + Vite + TanStack Router/Query, en modules et couches ([ADR 0003](docs/adr/0003-architecture-du-frontend.md)) |
 | `packages/result`            | type `Result` partagé (erreurs attendues sans exceptions)                                                                       |
 | `packages/typescript-config` | configurations TypeScript strictes partagées                                                                                    |
+| `packages/lint`              | plugin oxlint `prime` : règles d'architecture du frontend ([ADR 0003](docs/adr/0003-architecture-du-frontend.md))               |
 | `docs/`                      | ADR et specs, communs à tout le projet                                                                                          |
 
 PHP et Composer ne sont pas installés sur la machine : l'API tourne dans un conteneur jetable `symfony-api` (image `composer:2`).

@@ -31,4 +31,4 @@ Tests :
 ## Conséquences
 
 - Plus de fichiers par écran qu'une app React « à plat » ; en échange chaque couche se teste seule et l'interface ne dépend jamais de `fetch`.
-- Les règles de dépendance entre couches ne sont pas encore vérifiées automatiquement (dezyn les impose avec un plugin oxlint maison, non repris).
+- Ces règles sont vérifiées par `pnpm lint` : plugin oxlint `prime` (`packages/lint`), repris de dezyn. Une règle d'architecture ne se désactive pas par commentaire ; pour l'assouplir, on change la règle et cette ADR.

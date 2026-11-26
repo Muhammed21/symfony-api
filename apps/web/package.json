@@ -9,7 +9,6 @@
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "check-types": "tsc --noEmit",
-    "lint": "oxlint --type-aware .",
     "mutation": "stryker run",
     "mutation:ui": "stryker run stryker.browser.config.mjs"
   },
@@ -30,8 +29,6 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/browser-playwright": "^5.1.1",
-    "oxlint": "^1.90.0",
-    "oxlint-tsgolint": "^7.0.2008",
     "playwright": "^1.65.1",
     "typescript": "~7.0.2",
     "vite": "^8.3.6",
