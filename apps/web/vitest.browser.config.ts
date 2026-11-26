@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     name: "browser",
     include: ["src/**/*.test.tsx"],
+    setupFiles: ["@prime/ui/theme.css", "./src/platform/global.css"],
     browser: {
       enabled: true,
       provider: playwright(),

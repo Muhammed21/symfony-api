@@ -1,3 +1,5 @@
+import "@prime/ui/theme.css";
+import "./platform/global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";

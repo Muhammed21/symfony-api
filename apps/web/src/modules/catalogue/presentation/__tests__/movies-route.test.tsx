@@ -74,6 +74,12 @@ describe("page du catalogue (spec 08)", () => {
     await expect
       .element(screen.getByRole("heading", { level: 1, name: "Prime Video" }))
       .toBeVisible();
+    await expect
+      .element(screen.getByRole("heading", { level: 2, name: "Catalogue" }))
+      .toBeVisible();
+    await expect
+      .element(screen.getByRole("heading", { level: 3, name: "Les Évadés" }))
+      .toBeVisible();
     const evades = screen.getByRole("article", { name: "Les Évadés" });
     await expect.element(evades).toMatchTextContent("1994 · 2 h 22 · 13+");
     await expect.element(evades).toMatchTextContent("Drame");
@@ -118,6 +124,35 @@ describe("page du catalogue (spec 08)", () => {
     await expect.element(screen.getByText("Page 2 sur 4")).toBeVisible();
   });
 
+  it("choisit une page par son point de pagination", async () => {
+    const screen = await renderMovies(catalogueOfFourPages);
+    await expect.element(screen.getByText("Page 1 sur 4")).toBeVisible();
+
+    await screen.getByRole("button", { name: "Page 3" }).click();
+
+    await expect.element(screen.getByRole("heading", { name: "Film de la page 3" })).toBeVisible();
+    await expect.element(screen.getByText("Page 3 sur 4")).toBeVisible();
+  });
+
+  it("signale la page courante parmi les points de pagination", async () => {
+    const screen = await renderMovies(catalogueOfFourPages, "/?page=2");
+
+    const pagination = screen.getByRole("navigation", { name: "Pagination" });
+
+    await expect
+      .element(pagination.getByRole("button", { name: "Page 2" }))
+      .toHaveAttribute("aria-current", "page");
+    expect(pagination.getByRole("button").elements()).toHaveLength(4);
+  });
+
+  it("n'affiche ni points ni liens quand tout tient sur une page", async () => {
+    const screen = await renderMovies(listing());
+
+    await expect.element(screen.getByText("Page 1 sur 1")).toBeVisible();
+    await expect.element(screen.getByRole("button", { name: "Page 1" })).not.toBeInTheDocument();
+    await expect.element(screen.getByRole("link")).not.toBeInTheDocument();
+  });
+
   it("n'offre pas de page précédente sur la première page", async () => {
     const screen = await renderMovies(catalogueOfFourPages);
 
@@ -138,6 +173,9 @@ describe("page du catalogue (spec 08)", () => {
     const screen = await renderMovies(() => new Promise(() => {}));
 
     await expect.element(screen.getByText("Chargement des films…")).toBeVisible();
+    await expect
+      .element(screen.getByRole("progressbar", { name: "Chargement des films" }))
+      .toBeVisible();
   });
 
   it("indique le chargement pendant le passage à une autre page", async () => {

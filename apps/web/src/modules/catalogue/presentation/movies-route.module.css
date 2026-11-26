@@ -1,0 +1,117 @@
+.page {
+  display: grid;
+  gap: var(--prime-space-2xl);
+  padding: var(--prime-space-2xl) var(--prime-space-3xl) var(--prime-space-3xl);
+}
+
+.brand {
+  margin: 0;
+  font: var(--prime-text-title1);
+  color: var(--prime-color-text-primary);
+}
+
+.catalogue {
+  display: grid;
+  gap: var(--prime-space-l);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--prime-size-thumb-width));
+  gap: var(--prime-space-2xl) var(--prime-space-l);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  gap: var(--prime-space-2xs);
+}
+
+.card > :first-child {
+  margin-block-end: var(--prime-space-s);
+}
+
+.cardTitle {
+  margin: 0;
+  font: var(--prime-text-headline);
+  color: var(--prime-color-text-primary);
+}
+
+.cardDetails {
+  margin: 0;
+  font: var(--prime-text-subheadline);
+  color: var(--prime-color-text-secondary);
+}
+
+.cardGenres {
+  margin: 0;
+  font: var(--prime-text-footnote);
+  color: var(--prime-color-text-tertiary);
+}
+
+.pagination {
+  display: grid;
+  justify-items: center;
+  gap: var(--prime-space-s);
+  padding-block-start: var(--prime-space-l);
+}
+
+.pages {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-l);
+}
+
+.pageLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-xs);
+  block-size: var(--prime-size-control-regular);
+  padding-inline: var(--prime-space-l);
+  border-radius: var(--prime-radius-pill);
+  background-color: var(--prime-color-control-idle);
+  backdrop-filter: blur(var(--prime-blur-glass));
+  font: var(--prime-text-headline);
+  color: var(--prime-color-text-primary);
+  text-decoration: none;
+  transition: background-color var(--prime-duration-fast);
+}
+
+.pageLink:hover {
+  background-color: var(--prime-color-control-hover);
+}
+
+.pageLink:active {
+  background-color: var(--prime-color-control-pressed);
+}
+
+.pageLink:focus-visible {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: 2px;
+}
+
+.pageLink > svg {
+  inline-size: var(--prime-size-symbol-regular);
+  block-size: var(--prime-size-symbol-regular);
+}
+
+.pageNumber {
+  margin: 0;
+  font: var(--prime-text-footnote);
+  color: var(--prime-color-text-secondary);
+}
+
+.status {
+  display: grid;
+  justify-items: center;
+  gap: var(--prime-space-l);
+  padding-block: var(--prime-space-3xl);
+  font: var(--prime-text-body);
+  color: var(--prime-color-text-secondary);
+}
+
+.status > p {
+  margin: 0;
+}

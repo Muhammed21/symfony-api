@@ -1,0 +1,7 @@
+body {
+  margin: 0;
+  min-block-size: 100vh;
+  background-color: var(--prime-color-system-black);
+  font: var(--prime-text-body);
+  color: var(--prime-color-text-primary);
+}

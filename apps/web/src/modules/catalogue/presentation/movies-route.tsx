@@ -1,11 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
-import { type AnyRootRoute, createRoute, Link } from "@tanstack/react-router";
+import { type AnyRootRoute, createRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight, RotateCw } from "lucide-react";
 import { z } from "zod";
 
 import type { Result } from "@prime/result";
+import {
+  ActivityIndicator,
+  ButtonTextAndSymbol,
+  MovieThumb,
+  PageControl,
+  SectionHeader,
+} from "@prime/ui";
 
 import type { AgeRating, CatalogueFailure, Movie, MoviePage } from "../domain/movie.ts";
 import { formatDuration } from "./duration.ts";
+
+import styles from "./movies-route.module.css";
 
 type ListMovies = (query: {
   readonly page: number;
@@ -20,33 +30,51 @@ const ageRatingLabel = (ageRating: AgeRating) => (ageRating === "ALL" ? "Tous pu
 const MovieCard = ({ movie }: { readonly movie: Movie }) => {
   const titleId = `movie-${movie.id}`;
   return (
-    <article aria-labelledby={titleId}>
-      <h2 id={titleId}>{movie.title}</h2>
-      <p>
+    <article className={styles.card} aria-labelledby={titleId}>
+      <MovieThumb title={movie.title} />
+      <h3 id={titleId} className={styles.cardTitle}>
+        {movie.title}
+      </h3>
+      <p className={styles.cardDetails}>
         {movie.releaseYear} · {formatDuration(movie.duration)} · {ageRatingLabel(movie.ageRating)}
       </p>
-      <p>{movie.genres.join(", ")}</p>
+      <p className={styles.cardGenres}>{movie.genres.join(", ")}</p>
     </article>
   );
 };
 
-const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPage: number }) => (
-  <nav aria-label="Pagination">
-    {page > FIRST_PAGE && (
-      <Link to="/" search={{ page: page - 1 }}>
-        Précédent
-      </Link>
-    )}
-    <p>
-      Page {page} sur {lastPage}
-    </p>
-    {page < lastPage && (
-      <Link to="/" search={{ page: page + 1 }}>
-        Suivant
-      </Link>
-    )}
-  </nav>
-);
+const Pagination = ({ page, lastPage }: { readonly page: number; readonly lastPage: number }) => {
+  const navigate = useNavigate();
+  return (
+    <div className={styles.pagination}>
+      {lastPage > FIRST_PAGE && (
+        <div className={styles.pages}>
+          {page > FIRST_PAGE && (
+            <Link className={styles.pageLink} to="/" search={{ page: page - 1 }}>
+              <ChevronLeft aria-hidden="true" />
+              Précédent
+            </Link>
+          )}
+          <PageControl
+            label="Pagination"
+            count={lastPage}
+            current={page}
+            onSelect={(selected) => void navigate({ to: "/", search: { page: selected } })}
+          />
+          {page < lastPage && (
+            <Link className={styles.pageLink} to="/" search={{ page: page + 1 }}>
+              Suivant
+              <ChevronRight aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+      )}
+      <p className={styles.pageNumber}>
+        Page {page} sur {lastPage}
+      </p>
+    </div>
+  );
+};
 
 const Movies = ({
   page,
@@ -60,25 +88,32 @@ const Movies = ({
     queryFn: () => listMovies({ page }),
   });
   if (data === undefined) {
-    return <p>Chargement des films…</p>;
+    return (
+      <div className={styles.status}>
+        <ActivityIndicator label="Chargement des films" />
+        <p>Chargement des films…</p>
+      </div>
+    );
   }
   if (!data.ok) {
     return (
-      <div role="alert">
+      <div role="alert" className={styles.status}>
         <p>Impossible de charger les films.</p>
-        <button type="button" onClick={() => void refetch()}>
-          Réessayer
-        </button>
+        <ButtonTextAndSymbol
+          label="Réessayer"
+          symbol={<RotateCw />}
+          onClick={() => void refetch()}
+        />
       </div>
     );
   }
   const { movies, lastPage } = data.value;
   if (movies.length === 0) {
-    return <p>Aucun film pour le moment.</p>;
+    return <p className={styles.status}>Aucun film pour le moment.</p>;
   }
   return (
     <>
-      <ul>
+      <ul className={styles.grid}>
         {movies.map((movie) => (
           <li key={movie.id}>
             <MovieCard movie={movie} />
@@ -106,9 +141,12 @@ export const moviesRoute = ({
     component: function MoviesPage() {
       const { page } = route.useSearch();
       return (
-        <main>
-          <h1>Prime Video</h1>
-          <Movies page={page} listMovies={listMovies} />
+        <main className={styles.page}>
+          <h1 className={styles.brand}>Prime Video</h1>
+          <section className={styles.catalogue}>
+            <SectionHeader title="Catalogue" />
+            <Movies page={page} listMovies={listMovies} />
+          </section>
         </main>
       );
     },
