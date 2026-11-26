@@ -17,6 +17,9 @@ class Genre
     #[Groups(['genre:read', 'movie:list', 'movie:read'])]
     private ?int $id = null;
 
+    #[ORM\Column(nullable: true, unique: true)]
+    private ?int $tmdbId = null;
+
     #[ORM\Column(length: 50, unique: true)]
     #[Groups(['genre:read', 'movie:list', 'movie:read'])]
     private string $name;
@@ -41,6 +44,16 @@ class Genre
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function linkToTmdb(int $tmdbId): void
+    {
+        $this->tmdbId = $tmdbId;
+    }
+
+    public function getTmdbId(): ?int
+    {
+        return $this->tmdbId;
     }
 
     public function getName(): string

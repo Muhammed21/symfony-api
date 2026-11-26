@@ -61,4 +61,14 @@ class MovieRepository extends ServiceEntityRepository
         $this->getEntityManager()->remove($movie);
         $this->getEntityManager()->flush();
     }
+
+    /**
+     * @return array<int, Movie>
+     */
+    public function findAllLinkedToTmdb(): array
+    {
+        $movies = $this->createQueryBuilder('movie')->andWhere('movie.tmdbId IS NOT NULL')->getQuery()->getResult();
+
+        return array_combine(array_map(static fn (Movie $movie): int => (int) $movie->getTmdbId(), $movies), $movies);
+    }
 }
