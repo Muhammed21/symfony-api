@@ -93,6 +93,7 @@ describe("TabBar", () => {
   it("ne montre les libellés qu'au survol de la barre", async () => {
     const screen = await renderTabBar();
     const label = screen.getByText("Catalogue");
+    await userEvent.unhover(screen.getByRole("link", { name: "Catalogue" }));
 
     await expect.element(label).not.toBeVisible();
     await userEvent.hover(screen.getByRole("link", { name: "Catalogue" }));

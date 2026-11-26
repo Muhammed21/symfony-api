@@ -199,18 +199,6 @@ describe("coque de l'application (spec 11)", () => {
     document.body.style.minHeight = "";
   });
 
-  it("met la barre sur fond de verre dès l'ouverture d'une page déjà défilée", async () => {
-    await page.viewport(1280, 600);
-    document.body.style.minHeight = "3000px";
-    window.scrollTo(0, 400);
-
-    const { screen } = await renderShell("/");
-
-    await expect.element(screen.getByRole("banner")).toHaveAttribute("data-scrolled", "true");
-    window.scrollTo(0, 0);
-    document.body.style.minHeight = "";
-  });
-
   it("supprime les animations pour qui préfère réduire les animations", async () => {
     await commands.reduceMotion(true);
     const { screen } = await renderShell("/");

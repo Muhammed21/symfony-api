@@ -100,6 +100,7 @@ describe("Link", () => {
 
   it("sans fond hors survol, en pilule", async () => {
     const screen = await renderLink({ appearance: "plain" });
+    await userEvent.unhover(screen.getByRole("link"));
 
     await expect
       .element(screen.getByRole("link"))

@@ -78,6 +78,7 @@ describe("ButtonSymbol", () => {
   it("sans fond, il ne montre son fond qu'au survol", async () => {
     const screen = await renderButtonSymbol({ appearance: "plain" });
     const button = screen.getByRole("button");
+    await userEvent.unhover(button);
 
     await expect.element(button).toHaveStyle({ backgroundColor: "rgba(0, 0, 0, 0)" });
     await userEvent.hover(button);
@@ -86,6 +87,7 @@ describe("ButtonSymbol", () => {
 
   it("mis en avant : fond blanc et symbole noir", async () => {
     const screen = await renderButtonSymbol({ appearance: "prominent" });
+    await userEvent.unhover(screen.getByRole("button"));
 
     await expect
       .element(screen.getByRole("button"))
