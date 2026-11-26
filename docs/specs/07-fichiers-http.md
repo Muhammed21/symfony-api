@@ -7,7 +7,7 @@ Pouvoir essayer **chaque route** de l'API à la main, depuis l'éditeur (PhpStor
 ## Organisation
 
 ```
-http/
+apps/api/http/
 ├── http-client.env.json   ← variables par environnement (baseUrl, identifiants de test)
 ├── auth.http              ← inscription, connexion, /me
 ├── movies.http            ← CRUD, pagination, filtres, titres similaires

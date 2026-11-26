@@ -1,0 +1,12 @@
+{
+    "name": "@prime/api",
+    "private": true,
+    "scripts": {
+        "container:up": "docker run -d --rm --name symfony-api -v \"$PWD\":/app -w /app -p 8000:8000 composer:2 sleep infinity",
+        "container:down": "docker stop symfony-api",
+        "dev": "docker exec symfony-api php -S 0.0.0.0:8000 -t public",
+        "test": "docker exec symfony-api php bin/phpunit",
+        "lint": "docker exec symfony-api php bin/console lint:container",
+        "db:reset": "docker exec symfony-api composer db:reset"
+    }
+}

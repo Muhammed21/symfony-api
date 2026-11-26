@@ -1,0 +1,16 @@
+{
+    "name": "prime-video",
+    "private": true,
+    "packageManager": "pnpm@11.25.0",
+    "scripts": {
+        "dev": "turbo run dev",
+        "test": "turbo run test",
+        "lint": "turbo run lint",
+        "container:up": "pnpm --filter @prime/api container:up",
+        "container:down": "pnpm --filter @prime/api container:down",
+        "db:reset": "pnpm --filter @prime/api db:reset"
+    },
+    "devDependencies": {
+        "turbo": "^2.11.13"
+    }
+}

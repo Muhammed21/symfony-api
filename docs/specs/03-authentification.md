@@ -11,12 +11,14 @@ Specs 01 et 02 terminées. Installer `symfony/security-bundle` et `lexik/jwt-aut
 Après un clonage du dépôt, ni la phrase secrète ni les clés ne sont présentes (elles ne sont pas versionnées) :
 
 ```bash
+cd apps/api
 echo "JWT_PASSPHRASE=$(openssl rand -hex 32)" > .env.local
 cp .env.local .env.test.local   # l'environnement de test ne lit pas .env.local
+echo "APP_SECRET=$(openssl rand -hex 16)" >> .env.local
 docker exec symfony-api php bin/console lexik:jwt:generate-keypair
 ```
 
-Le compte administrateur (`admin@prime.local` / `password`) est créé par les données de test (spec 06) : `docker exec symfony-api composer db:reset`.
+Le compte administrateur (`admin@prime.local` / `password`) est créé par les données de test (spec 06) : `pnpm db:reset`.
 
 ## L'utilisateur
 
