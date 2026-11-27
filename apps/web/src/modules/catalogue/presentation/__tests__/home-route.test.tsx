@@ -241,13 +241,48 @@ describe("accueil (spec 11)", () => {
     expect(router.state.location.pathname).toBe("/films/550/bande-annonce");
   });
 
-  it("sans bande-annonce, présente lecture, liste et détails comme bientôt disponibles", async () => {
+  it("sans bande-annonce, présente lecture et liste comme bientôt disponibles", async () => {
     const { screen } = await renderHome();
 
-    for (const name of ["Lecture", "Ajouter à ma liste", "Plus d'infos"]) {
+    for (const name of ["Lecture", "Ajouter à ma liste"]) {
       await expect.element(featured(screen).getByRole("button", { name })).toBeDisabled();
     }
     await expect.element(featured(screen)).toMatchTextContent("Bientôt disponible");
+  });
+
+  it.each([
+    ["avec", "SUXWAEX2jlg"],
+    ["sans", undefined],
+  ])(
+    "ouvre la page du film à la une par « Plus d'infos », %s bande-annonce",
+    async (_case, trailerKey) => {
+      const { screen, router } = await renderHome({
+        listMovies: ({ sort }) =>
+          pageOf(sort === "recent" ? [makeMovie({ id: 550, trailerKey })] : []),
+      });
+      const moreInfo = featured(screen).getByRole("link", { name: "Plus d'infos" });
+
+      await expect.element(moreInfo).toHaveAttribute("href", "/films/550/bande-annonce");
+      await moreInfo.click();
+
+      await expect.element(screen.getByText("Page de la bande-annonce")).toBeVisible();
+      expect(router.state.location.pathname).toBe("/films/550/bande-annonce");
+    },
+  );
+
+  it("ouvre la page d'un film depuis sa vignette", async () => {
+    const { screen, router } = await renderHome();
+    const row = screen.getByRole("region", { name: "Action" });
+    const heat = row.getByRole("link", { name: "Heat" });
+
+    await expect.element(heat).toHaveAttribute("href", "/films/1/bande-annonce");
+    expect(row.getByRole("link", { name: "Ronin" }).element().getAttribute("href")).toBe(
+      "/films/2/bande-annonce",
+    );
+    await heat.click();
+
+    await expect.element(screen.getByText("Page de la bande-annonce")).toBeVisible();
+    expect(router.state.location.pathname).toBe("/films/1/bande-annonce");
   });
 
   it("aligne les nouveautés dans une rangée qui mène au catalogue", async () => {

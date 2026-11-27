@@ -3,18 +3,13 @@ import { type AnyRootRoute, createRoute, Link as RouterLink } from "@tanstack/re
 import { ArrowLeft, RotateCw, Star } from "lucide-react";
 import type { ReactNode } from "react";
 
-import {
-  ActivityIndicator,
-  ButtonTextAndSymbol,
-  LinkSymbol,
-  MovieThumb,
-  SectionHeader,
-} from "@prime/ui";
+import { ActivityIndicator, ButtonTextAndSymbol, LinkSymbol, SectionHeader } from "@prime/ui";
 
-import { type MovieDetail, type SimilarMovie, thumbnailOf } from "../domain/movie.ts";
+import type { MovieDetail, SimilarMovie } from "../domain/movie.ts";
 import { formatDuration } from "./duration.ts";
 import { riseInOrder } from "./motion.ts";
 import { ageRatingLabel, eyebrowOf } from "./movie-labels.ts";
+import { MovieThumbLink } from "./movie-thumb-link.tsx";
 import type { GetMovie } from "./use-cases.ts";
 
 import styles from "./trailer-route.module.css";
@@ -70,25 +65,11 @@ const SimilarMovies = ({ movies }: { readonly movies: readonly SimilarMovie[] })
   <section aria-label="Titres similaires" className={styles.similar}>
     <SectionHeader title="Titres similaires" />
     <ul className={styles.thumbs}>
-      {movies.map((movie, index) => {
-        const thumbnail = thumbnailOf(movie);
-        return (
-          <li key={movie.id} {...riseInOrder(index)}>
-            <RouterLink
-              className={styles.thumbLink}
-              to="/films/$movieId/bande-annonce"
-              params={{ movieId: String(movie.id) }}
-              aria-label={movie.title}
-            >
-              <MovieThumb
-                title={movie.title}
-                captioned
-                {...(thumbnail === undefined ? {} : { image: thumbnail })}
-              />
-            </RouterLink>
-          </li>
-        );
-      })}
+      {movies.map((movie, index) => (
+        <li key={movie.id} {...riseInOrder(index)}>
+          <MovieThumbLink movie={movie} />
+        </li>
+      ))}
     </ul>
   </section>
 );

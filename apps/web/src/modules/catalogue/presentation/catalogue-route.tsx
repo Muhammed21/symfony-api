@@ -39,7 +39,13 @@ const MovieCard = ({ movie }: { readonly movie: Movie }) => {
     <article className={styles.card} aria-labelledby={titleId}>
       <MovieThumb title={movie.title} {...(thumbnail === undefined ? {} : { image: thumbnail })} />
       <h3 id={titleId} className={styles.cardTitle}>
-        {movie.title}
+        <RouterLink
+          className={styles.cardLink}
+          to="/films/$movieId/bande-annonce"
+          params={{ movieId: String(movie.id) }}
+        >
+          {movie.title}
+        </RouterLink>
       </h3>
       <p className={styles.cardDetails}>
         {movie.releaseYear} · {formatDuration(movie.duration)} · {ageRatingLabel(movie.ageRating)}

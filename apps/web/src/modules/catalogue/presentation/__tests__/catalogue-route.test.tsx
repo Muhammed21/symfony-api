@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   createMemoryHistory,
   createRootRoute,
+  createRoute,
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
@@ -70,8 +71,16 @@ const renderCatalogue = async ({
   readonly url?: string;
 }) => {
   const root = createRootRoute();
+  const trailerStub = createRoute({
+    getParentRoute: () => root,
+    path: "/films/$movieId/bande-annonce",
+    component: () => <p>Page du film</p>,
+  });
   const router = createRouter({
-    routeTree: root.addChildren([catalogueRoute({ parent: root, listMovies, listGenres })]),
+    routeTree: root.addChildren([
+      catalogueRoute({ parent: root, listMovies, listGenres }),
+      trailerStub,
+    ]),
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const screen = await render(
@@ -164,6 +173,32 @@ describe("page du catalogue (spec 08)", () => {
     );
   });
 
+  it("mène à la page de chaque film par son titre", async () => {
+    const screen = await renderMovies(
+      listing({ movies: [makeMovie(), makeMovie({ id: 2, title: "Heat" })] }),
+    );
+
+    await expect
+      .element(screen.getByRole("link", { name: "Les Évadés" }))
+      .toHaveAttribute("href", "/films/1/bande-annonce");
+    await expect
+      .element(screen.getByRole("link", { name: "Heat" }))
+      .toHaveAttribute("href", "/films/2/bande-annonce");
+  });
+
+  it("ouvre la page d'un film d'un clic n'importe où sur sa carte", async () => {
+    const { screen, router } = await renderCatalogue({
+      listMovies: listing({ movies: [makeMovie({ id: 7 })] }),
+    });
+    const card = screen.getByRole("article", { name: "Les Évadés" });
+    await expect.element(card).toBeVisible();
+
+    await card.getByTestId("movie-thumb").click({ force: true });
+
+    await expect.element(screen.getByText("Page du film")).toBeVisible();
+    expect(router.state.location.pathname).toBe("/films/7/bande-annonce");
+  });
+
   it("lit la page dans l'adresse", async () => {
     const { asked, listMovies } = recording();
     const screen = await renderMovies(listMovies, "/catalogue?page=3");
@@ -225,7 +260,9 @@ describe("page du catalogue (spec 08)", () => {
 
     await expect.element(screen.getByText("Page 1 sur 1")).toBeVisible();
     await expect.element(screen.getByRole("button", { name: "Page 1" })).not.toBeInTheDocument();
-    await expect.element(screen.getByRole("link")).not.toBeInTheDocument();
+    for (const name of ["Précédent", "Suivant"]) {
+      await expect.element(screen.getByRole("link", { name })).not.toBeInTheDocument();
+    }
   });
 
   it("n'offre pas de page précédente sur la première page", async () => {

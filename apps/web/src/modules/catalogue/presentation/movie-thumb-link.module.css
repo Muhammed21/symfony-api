@@ -1,0 +1,11 @@
+.link {
+  display: block;
+  border-radius: var(--prime-radius-medium);
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: 2px;
+}

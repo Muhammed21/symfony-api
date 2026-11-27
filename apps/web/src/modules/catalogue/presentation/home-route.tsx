@@ -8,14 +8,14 @@ import {
   ButtonSymbol,
   ButtonTextAndSymbol,
   LinkSymbol,
-  MovieThumb,
   PageControl,
   SectionHeader,
 } from "@prime/ui";
 
-import { type Genre, type Movie, thumbnailOf } from "../domain/movie.ts";
+import type { Genre, Movie } from "../domain/movie.ts";
 import { riseInOrder } from "./motion.ts";
 import { eyebrowOf } from "./movie-labels.ts";
+import { MovieThumbLink } from "./movie-thumb-link.tsx";
 import type { ListGenres, ListMovies } from "./use-cases.ts";
 
 import styles from "./home-route.module.css";
@@ -74,7 +74,18 @@ const FeaturedMovie = ({ movies }: { readonly movies: readonly Movie[] }) => {
             </div>
           )}
           <ButtonSymbol size="large" label="Ajouter à ma liste" symbol={<Plus />} disabled />
-          <ButtonSymbol size="large" label="Plus d'infos" symbol={<Info />} disabled />
+          <LinkSymbol
+            size="large"
+            label="Plus d'infos"
+            symbol={<Info />}
+            render={(anchor) => (
+              <RouterLink
+                {...anchor}
+                to="/films/$movieId/bande-annonce"
+                params={{ movieId: String(movie.id) }}
+              />
+            )}
+          />
         </div>
         <p className={styles.soon}>Bientôt disponible</p>
       </div>
@@ -122,18 +133,11 @@ const MovieRow = ({
       />
     </div>
     <ul className={styles.thumbs}>
-      {movies.map((movie, index) => {
-        const thumbnail = thumbnailOf(movie);
-        return (
-          <li key={movie.id} {...riseInOrder(index)}>
-            <MovieThumb
-              title={movie.title}
-              captioned
-              {...(thumbnail === undefined ? {} : { image: thumbnail })}
-            />
-          </li>
-        );
-      })}
+      {movies.map((movie, index) => (
+        <li key={movie.id} {...riseInOrder(index)}>
+          <MovieThumbLink movie={movie} />
+        </li>
+      ))}
     </ul>
   </section>
 );

@@ -23,6 +23,7 @@
 }
 
 .card {
+  position: relative;
   display: grid;
   gap: var(--prime-space-2xs);
 }
@@ -35,6 +36,27 @@
   margin: 0;
   font: var(--prime-text-headline);
   color: var(--prime-color-text-primary);
+}
+
+.cardLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--prime-radius-medium);
+}
+
+.cardLink:focus-visible {
+  outline: none;
+}
+
+.cardLink:focus-visible::after {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: 4px;
 }
 
 .cardDetails {
