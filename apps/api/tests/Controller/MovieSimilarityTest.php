@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class MovieSimilarityTest extends ApiTestCase
 {
     /**
-     * @return list<array{id: int, title: string}>
+     * @return list<array{id: int, title: string, posterUrl: ?string, backdropUrl: ?string}>
      */
     private function similarMoviesOf(int $movieId): array
     {
@@ -18,11 +18,30 @@ final class MovieSimilarityTest extends ApiTestCase
     /**
      * @param array<string, mixed> $movie
      *
-     * @return array{id: int, title: string}
+     * @return array{id: int, title: string, posterUrl: ?string, backdropUrl: ?string}
      */
     private static function reference(array $movie): array
     {
-        return ['id' => $movie['id'], 'title' => $movie['title']];
+        return ['id' => $movie['id'], 'title' => $movie['title'], 'posterUrl' => $movie['posterUrl'], 'backdropUrl' => $movie['backdropUrl']];
+    }
+
+    public function testSimilarTitlesCarryTheirImages(): void
+    {
+        $godfather = $this->createMovie(['title' => 'Le Parrain']);
+        $goodfellas = $this->createMovie([
+            'title' => 'Les Affranchis',
+            'posterUrl' => 'https://images.exemple.fr/affiche.jpg',
+            'backdropUrl' => 'https://images.exemple.fr/banniere.jpg',
+        ]);
+
+        $this->requestJson('PUT', sprintf('/movies/%d/similar/%d', $godfather['id'], $goodfellas['id']));
+
+        self::assertSame([[
+            'id' => $goodfellas['id'],
+            'title' => 'Les Affranchis',
+            'posterUrl' => 'https://images.exemple.fr/affiche.jpg',
+            'backdropUrl' => 'https://images.exemple.fr/banniere.jpg',
+        ]], $this->similarMoviesOf($godfather['id']));
     }
 
     public function testLinkingTwoMoviesMakesEachSimilarToTheOther(): void

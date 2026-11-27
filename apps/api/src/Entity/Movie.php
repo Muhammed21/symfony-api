@@ -138,7 +138,7 @@ class Movie
     }
 
     /**
-     * @return list<array{id: ?int, title: string}>
+     * @return list<array{id: ?int, title: string, posterUrl: ?string, backdropUrl: ?string}>
      */
     #[Groups(['movie:read'])]
     public function getSimilarMovies(): array
@@ -146,7 +146,12 @@ class Movie
         $movies = $this->similarMovies->getValues();
         usort($movies, static fn (Movie $a, Movie $b): int => strcmp($a->getTitle(), $b->getTitle()));
 
-        return array_map(static fn (Movie $movie): array => ['id' => $movie->getId(), 'title' => $movie->getTitle()], $movies);
+        return array_map(static fn (Movie $movie): array => [
+            'id' => $movie->getId(),
+            'title' => $movie->getTitle(),
+            'posterUrl' => $movie->getPosterUrl(),
+            'backdropUrl' => $movie->getBackdropUrl(),
+        ], $movies);
     }
 
     public function getId(): ?int

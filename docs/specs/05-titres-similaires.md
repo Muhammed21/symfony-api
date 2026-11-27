@@ -27,7 +27,7 @@ Specs 01 à 03 terminées (les routes sont réservées aux administrateurs).
 - `{id}` égal à `{otherId}` renvoie 422.
 - L'un des deux films inexistant : 404.
 
-`GET /movies/{id}` ajoute `similarMovies`, une liste de `{ "id", "title" }` triée par titre. Elle n'apparaît pas dans `GET /movies`. Les titres similaires ne sont pas imbriqués à plusieurs niveaux (le groupe de sérialisation `movie:similar` n'expose que `id` et `title`, ce qui évite les références circulaires).
+`GET /movies/{id}` ajoute `similarMovies`, une liste de `{ "id", "title", "posterUrl", "backdropUrl" }` triée par titre (les images servent aux vignettes de la page d'un film, spec 14). Elle n'apparaît pas dans `GET /movies`. Les titres similaires ne sont pas imbriqués à plusieurs niveaux (`Movie::getSimilarMovies()` ne rend que ces quatre champs, ce qui évite les références circulaires).
 
 ## Critères d'acceptation
 
