@@ -1,1 +1,1 @@
-export type ControlAppearance = "platter" | "plain" | "prominent";
+export type ControlAppearance = "platter" | "plain" | "prominent" | "glass";

@@ -12,9 +12,9 @@ const meta = {
     render: { control: false },
     size: {
       control: "inline-radio",
-      options: ["mini", "small", "regular", "large", "extra-large"],
+      options: ["mini", "small", "medium", "regular", "large", "extra-large"],
     },
-    appearance: { control: "inline-radio", options: ["platter", "plain", "prominent"] },
+    appearance: { control: "inline-radio", options: ["platter", "plain", "prominent", "glass"] },
   },
 } satisfies Meta<typeof LinkSymbol>;
 

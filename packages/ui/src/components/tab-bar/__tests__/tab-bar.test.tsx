@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
-import { page, userEvent } from "vitest/browser";
+import { commands, page, userEvent } from "vitest/browser";
 
 import { TabBar, type TabBarProps } from "../tab-bar.tsx";
 
@@ -13,8 +13,33 @@ const TABS: TabBarProps["tabs"] = [
   { label: "Catalogue", symbol: SEARCH, current: false, href: "/catalogue" },
 ];
 
+const ON_CATALOGUE: TabBarProps["tabs"] = TABS.map((tab) => ({
+  ...tab,
+  current: tab.label === "Catalogue",
+}));
+
+const NOWHERE: TabBarProps["tabs"] = TABS.map((tab) => ({ ...tab, current: false }));
+
 const renderTabBar = (overrides: Partial<TabBarProps> = {}) =>
   render(<TabBar label="Navigation principale" tabs={TABS} {...overrides} />);
+
+type Screen = Awaited<ReturnType<typeof renderTabBar>>;
+
+const indicatorOf = (screen: Screen) =>
+  screen.getByRole("navigation").element().querySelector<HTMLElement>("li[aria-hidden='true']");
+
+const boxOf = (element: Element | null | undefined) => {
+  const box = element?.getBoundingClientRect();
+  return [box?.left, box?.top, box?.width, box?.height].map((value) => Math.round(value ?? -1));
+};
+
+const coversTab = (screen: Screen, name: string) =>
+  boxOf(indicatorOf(screen)).join() === boxOf(screen.getByRole("link", { name }).element()).join();
+
+const LIQUID_GLASS = {
+  backgroundColor: "rgba(255, 255, 255, 0.08)",
+  backdropFilter: "blur(16px) saturate(1.8)",
+};
 
 describe("TabBar", () => {
   it("est une navigation nommée, avec un lien par onglet", async () => {
@@ -78,16 +103,124 @@ describe("TabBar", () => {
     await expect.element(screen.getByTestId("loupe")).toHaveStyle({ width: "24px" });
   });
 
-  it("met l'onglet courant en avant, les autres sans fond hors survol", async () => {
+  it("barre en verre liquide : verre clair et saturé, reflet sur le bord haut", async () => {
+    const screen = await renderTabBar();
+    const bar = screen.getByRole("navigation").element().firstElementChild;
+    const style = bar === null ? undefined : getComputedStyle(bar);
+
+    expect({
+      backgroundColor: style?.backgroundColor,
+      backdropFilter: style?.backdropFilter,
+    }).toEqual(LIQUID_GLASS);
+    expect(style?.boxShadow).toContain("rgba(255, 255, 255, 0.4) 0px 1px 0px 0px inset");
+    expect(style?.boxShadow).toContain("rgba(0, 0, 0, 0.3) 0px 8px 32px 0px");
+  });
+
+  it("pose sous l'onglet courant une pastille de verre plus claire, les autres sans fond hors survol", async () => {
     const screen = await renderTabBar();
     const catalogue = screen.getByRole("link", { name: "Catalogue" });
 
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+    expect(getComputedStyle(indicatorOf(screen) ?? document.body).backgroundColor).toBe(
+      "rgba(255, 255, 255, 0.2)",
+    );
     await expect
       .element(screen.getByRole("link", { name: "Accueil" }))
-      .toHaveStyle({ backgroundColor: "rgba(255, 255, 255, 0.26)" });
+      .toHaveStyle({ backgroundColor: "rgba(0, 0, 0, 0)" });
     await expect.element(catalogue).toHaveStyle({ backgroundColor: "rgba(0, 0, 0, 0)" });
     await userEvent.hover(catalogue);
     await expect.element(catalogue).toHaveStyle({ backgroundColor: "rgba(255, 255, 255, 0.18)" });
+  });
+
+  it("garde la pastille derrière le symbole et le libellé de l'onglet", async () => {
+    await page.viewport(1280, 800);
+    const screen = await renderTabBar({ orientation: "horizontal", size: "small" });
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+    const label = screen.getByText("Accueil").element().getBoundingClientRect();
+
+    expect(
+      document
+        .elementFromPoint(label.left + label.width / 2, label.top + label.height / 2)
+        ?.closest("a"),
+    ).toBe(screen.getByRole("link", { name: "Accueil" }).element());
+  });
+
+  it("place la pastille d'emblée à l'affichage, sans la faire glisser", async () => {
+    await page.viewport(1280, 800);
+    const screen = await renderTabBar({ orientation: "horizontal", size: "small" });
+
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+    expect(indicatorOf(screen)?.getAnimations()).toEqual([]);
+  });
+
+  it("fait glisser la pastille, avec un rebond, vers le nouvel onglet courant", async () => {
+    await page.viewport(1280, 800);
+    const screen = await renderTabBar({ orientation: "horizontal", size: "small" });
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+    const indicator = indicatorOf(screen);
+
+    await screen.rerender(
+      <TabBar
+        label="Navigation principale"
+        tabs={ON_CATALOGUE}
+        orientation="horizontal"
+        size="small"
+      />,
+    );
+
+    await expect.poll(() => indicator?.getAnimations().length ?? 0).toBeGreaterThan(0);
+    expect(indicatorOf(screen)).toBe(indicator);
+    const style = getComputedStyle(indicator ?? document.body);
+    expect(style.transitionDuration.split(", ")).toContain("0.45s");
+    expect(style.transitionTimingFunction).toContain("cubic-bezier(0.34, 1.3, 0.64, 1)");
+    await expect.poll(() => coversTab(screen, "Catalogue")).toBe(true);
+  });
+
+  it("suit l'onglet courant quand sa taille change", async () => {
+    await page.viewport(1280, 800);
+    const screen = await renderTabBar({ orientation: "horizontal", size: "small" });
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+
+    await page.viewport(390, 800);
+
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+    expect(boxOf(indicatorOf(screen))[2]).toBe(32);
+  });
+
+  it("n'a pas de pastille quand aucun onglet n'est courant", async () => {
+    const screen = await renderTabBar({ tabs: NOWHERE });
+
+    await expect.element(screen.getByRole("link", { name: "Accueil" })).toBeVisible();
+    expect(indicatorOf(screen)).toBeNull();
+  });
+
+  it("retire la pastille en quittant les pages des onglets", async () => {
+    const screen = await renderTabBar();
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+
+    await screen.rerender(<TabBar label="Navigation principale" tabs={NOWHERE} />);
+
+    await expect.poll(() => indicatorOf(screen)).toBeNull();
+  });
+
+  it("déplace la pastille sans glisser pour qui préfère réduire les animations", async () => {
+    await commands.reduceMotion(true);
+    await page.viewport(1280, 800);
+    const screen = await renderTabBar({ orientation: "horizontal", size: "small" });
+    await expect.poll(() => coversTab(screen, "Accueil")).toBe(true);
+
+    await screen.rerender(
+      <TabBar
+        label="Navigation principale"
+        tabs={ON_CATALOGUE}
+        orientation="horizontal"
+        size="small"
+      />,
+    );
+
+    await expect.poll(() => coversTab(screen, "Catalogue")).toBe(true);
+    expect(indicatorOf(screen)?.getAnimations()).toEqual([]);
+    await commands.reduceMotion(false);
   });
 
   it("ne montre les libellés qu'au survol de la barre", async () => {

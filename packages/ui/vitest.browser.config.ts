@@ -10,6 +10,13 @@ const holdRequests: BrowserCommand<[url: string]> = async (context, url) => {
   await context.page.route(url, () => undefined);
 };
 
+const reduceMotion: BrowserCommand<[reduce: boolean]> = async (context, reduce) => {
+  if (context.provider.name !== "playwright") {
+    throw new Error("reduceMotion demande Playwright");
+  }
+  await context.page.emulateMedia({ reducedMotion: reduce ? "reduce" : "no-preference" });
+};
+
 export default defineConfig({
   plugins: [react()],
   test: {
@@ -21,7 +28,7 @@ export default defineConfig({
       provider: playwright(),
       headless: true,
       instances: [{ browser: "chromium" }],
-      commands: { holdRequests },
+      commands: { holdRequests, reduceMotion },
     },
   },
 });

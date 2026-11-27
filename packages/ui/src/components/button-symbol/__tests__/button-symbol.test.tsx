@@ -41,6 +41,7 @@ describe("ButtonSymbol", () => {
   it.each([
     ["mini", "28px"],
     ["small", "32px"],
+    ["medium", "40px"],
     ["regular", "44px"],
     ["large", "52px"],
     ["extra-large", "64px"],
@@ -66,6 +67,14 @@ describe("ButtonSymbol", () => {
       .toHaveStyle({ width: "24px", height: "24px" });
   });
 
+  it("taille medium : un symbole de 16 px, comme les onglets de la petite barre", async () => {
+    const screen = await renderButtonSymbol({ size: "medium" });
+
+    await expect
+      .element(screen.getByTestId("symbole"))
+      .toHaveStyle({ width: "16px", height: "16px" });
+  });
+
   it("sur fond de verre par défaut, plus clair au survol", async () => {
     const screen = await renderButtonSymbol();
     const button = screen.getByRole("button");
@@ -81,6 +90,22 @@ describe("ButtonSymbol", () => {
     await userEvent.unhover(button);
 
     await expect.element(button).toHaveStyle({ backgroundColor: "rgba(0, 0, 0, 0)" });
+    await userEvent.hover(button);
+    await expect.element(button).toHaveStyle({ backgroundColor: "rgba(255, 255, 255, 0.18)" });
+  });
+
+  it("en verre liquide : verre clair et saturé, reflet sur le bord haut, plus clair au survol", async () => {
+    const screen = await renderButtonSymbol({ appearance: "glass" });
+    const button = screen.getByRole("button");
+    await userEvent.unhover(button);
+
+    await expect.element(button).toHaveStyle({
+      backgroundColor: "rgba(255, 255, 255, 0.08)",
+      backdropFilter: "blur(16px) saturate(1.8)",
+    });
+    expect(getComputedStyle(button.element()).boxShadow).toContain(
+      "rgba(255, 255, 255, 0.4) 0px 1px 0px 0px inset",
+    );
     await userEvent.hover(button);
     await expect.element(button).toHaveStyle({ backgroundColor: "rgba(255, 255, 255, 0.18)" });
   });

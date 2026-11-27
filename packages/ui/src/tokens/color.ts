@@ -39,6 +39,10 @@ export const color = {
   window: {
     glass: "rgba(128, 128, 128, 0.3)",
   },
+  liquidGlass: {
+    fill: "rgba(255, 255, 255, 0.08)",
+    selected: "rgba(255, 255, 255, 0.2)",
+  },
   separator: {
     default: "rgba(255, 255, 255, 0.12)",
   },

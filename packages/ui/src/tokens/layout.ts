@@ -19,7 +19,7 @@ export const radius = {
 } as const;
 
 export const size = {
-  control: { mini: 28, small: 32, regular: 44, large: 52, extraLarge: 64 },
+  control: { mini: 28, small: 32, medium: 40, regular: 44, large: 52, extraLarge: 64 },
   symbol: { mini: 14, small: 16, regular: 20, large: 24, extraLarge: 28 },
   link: { small: 26 },
   navigation: { bar: 92 },

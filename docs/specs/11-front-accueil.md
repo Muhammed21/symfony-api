@@ -53,6 +53,7 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 - Jetons de mouvement : durées `page` (320 ms) et `slow` (600 ms), courbes `standard` et `decelerate`.
 - Nouveau composant `LinkSymbol` : un lien qui a l'allure d'un `ButtonSymbol`, pour le chevron des rangées.
 - Nouveau composant `TabBar` : barre d'onglets verticale (celle de la maquette) ou horizontale (`orientation`), en taille `regular` (44 px) ou `small` (32 px), compacte sur écran étroit ; comme pour `Link`, l'application fournit ses propres liens.
+- Verre liquide, à la manière d'Apple : la barre d'onglets est un verre clair (blanc à 8 %), flou léger et couleurs saturées (`blur(16px) saturate(180%)`), avec un reflet sur le bord haut, un liseré clair et une ombre portée (jetons `liquidGlass`). Sous l'onglet courant, une pastille de verre plus claire glisse d'un onglet à l'autre en 450 ms avec un léger rebond (`easing.spring`), sans glisser à l'affichage ni pour qui préfère réduire les animations. Les boutons-symboles ont la même matière avec `appearance="glass"`, et une taille `medium` (40 px, la hauteur de la petite barre).
 - La bannière n'est pas un composant du kit visionOS : elle reste dans `apps/web`, construite avec `ButtonSymbol`, `PageControl` et les jetons.
 
 ## Critères d'acceptation

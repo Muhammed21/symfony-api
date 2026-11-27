@@ -1,13 +1,28 @@
 .bar {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-s);
   margin: 0;
   padding: var(--prime-space-m);
   border-radius: var(--prime-radius-pill);
-  background-color: var(--prime-color-window-glass);
-  backdrop-filter: blur(var(--prime-blur-glass));
+  background-color: var(--prime-color-liquid-glass-fill);
+  backdrop-filter: blur(var(--prime-blur-liquid-glass)) saturate(180%);
+  box-shadow: var(--prime-shadow-liquid-glass);
   list-style: none;
+}
+
+.indicator {
+  position: absolute;
+  inset: 0 auto auto 0;
+  border-radius: var(--prime-radius-pill);
+  background-color: var(--prime-color-liquid-glass-selected);
+  box-shadow: var(--prime-shadow-liquid-glass-selected);
+  pointer-events: none;
+  transition:
+    translate var(--prime-duration-glide) var(--prime-easing-spring),
+    width var(--prime-duration-glide) var(--prime-easing-spring),
+    height var(--prime-duration-glide) var(--prime-easing-spring);
 }
 
 .tab {
@@ -23,8 +38,9 @@
   backdrop-filter: none;
 }
 
-.tab[aria-current="page"] {
-  background-color: var(--prime-color-control-pressed);
+.tab[aria-current="page"],
+.tab[aria-current="page"]:hover {
+  background-color: transparent;
 }
 
 .symbol {
@@ -98,5 +114,11 @@
 
   .bar[data-orientation="horizontal"] .label {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    transition: none;
   }
 }

@@ -6,7 +6,14 @@ import { ButtonSymbol, type ButtonSymbolSize } from "@prime/ui";
 
 import { Row } from "../story-layout.tsx";
 
-const SIZES: readonly ButtonSymbolSize[] = ["mini", "small", "regular", "large", "extra-large"];
+const SIZES: readonly ButtonSymbolSize[] = [
+  "mini",
+  "small",
+  "medium",
+  "regular",
+  "large",
+  "extra-large",
+];
 
 const meta = {
   title: "Composants/ButtonSymbol",
@@ -22,7 +29,7 @@ const meta = {
   argTypes: {
     symbol: { control: false },
     size: { control: "inline-radio", options: SIZES },
-    appearance: { control: "inline-radio", options: ["platter", "plain", "prominent"] },
+    appearance: { control: "inline-radio", options: ["platter", "plain", "prominent", "glass"] },
   },
 } satisfies Meta<typeof ButtonSymbol>;
 

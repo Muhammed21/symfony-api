@@ -20,7 +20,7 @@ const meta = {
   argTypes: {
     symbol: { control: false },
     size: { control: "inline-radio", options: ["regular", "large"] },
-    appearance: { control: "inline-radio", options: ["platter", "plain", "prominent"] },
+    appearance: { control: "inline-radio", options: ["platter", "plain", "prominent", "glass"] },
   },
 } satisfies Meta<typeof ButtonTextAndSymbol>;
 

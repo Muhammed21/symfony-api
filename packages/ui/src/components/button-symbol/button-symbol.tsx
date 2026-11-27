@@ -4,7 +4,7 @@ import type { ControlAppearance } from "../control/control.ts";
 
 import styles from "./button-symbol.module.css";
 
-export type ButtonSymbolSize = "mini" | "small" | "regular" | "large" | "extra-large";
+export type ButtonSymbolSize = "mini" | "small" | "medium" | "regular" | "large" | "extra-large";
 
 export type ButtonSymbolProps = {
   readonly label: string;

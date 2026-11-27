@@ -13,6 +13,12 @@
   backdrop-filter: none;
 }
 
+.control[data-appearance="glass"] {
+  background-color: var(--prime-color-liquid-glass-fill);
+  backdrop-filter: blur(var(--prime-blur-liquid-glass)) saturate(180%);
+  box-shadow: var(--prime-shadow-liquid-glass);
+}
+
 .control:hover {
   background-color: var(--prime-color-control-hover);
 }

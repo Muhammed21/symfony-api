@@ -17,6 +17,11 @@
   --symbol-size: var(--prime-size-symbol-small);
 }
 
+.button[data-size="medium"] {
+  --control-size: var(--prime-size-control-medium);
+  --symbol-size: var(--prime-size-symbol-small);
+}
+
 .button[data-size="regular"] {
   --control-size: var(--prime-size-control-regular);
   --symbol-size: var(--prime-size-symbol-regular);
