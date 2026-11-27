@@ -24,6 +24,15 @@ const makePageOutput = (overrides: Readonly<Record<string, unknown>> = {}) => ({
   ...overrides,
 });
 
+const makeMovieDetailOutput = (overrides: Readonly<Record<string, unknown>> = {}) => ({
+  ...makeMovieOutput({ id: 550, title: "Fight Club", trailerKey: "SUXWAEX2jlg" }),
+  synopsis: "Le narrateur vit seul.",
+  similarMovies: [],
+  averageRating: null,
+  reviewCount: 0,
+  ...overrides,
+});
+
 type Call = { readonly url: string; readonly init: RequestInit };
 
 const answering = (response: () => Promise<Response>) => {
@@ -257,20 +266,16 @@ describe("genres du catalogue (spec 09)", () => {
 
 describe("un film du catalogue (spec 14)", () => {
   it("demande le film à l'API par son identifiant", async () => {
-    const { catalogue, calls } = answering(json(makeMovieOutput({ id: 550 })));
+    const { catalogue, calls } = answering(json(makeMovieDetailOutput()));
 
     await catalogue.getMovie(550);
 
     expect(calls).toEqual([{ url: `${API_URL}/movies/550`, init: { method: "GET" } }]);
   });
 
-  it("donne le film avec sa bande-annonce", async () => {
+  it("donne le film avec sa bande-annonce, son synopsis et ses avis", async () => {
     const { catalogue } = answering(
-      json({
-        ...makeMovieOutput({ id: 550, title: "Fight Club", trailerKey: "SUXWAEX2jlg" }),
-        synopsis: "Le narrateur vit seul.",
-        similarMovies: [],
-      }),
+      json(makeMovieDetailOutput({ averageRating: 4.5, reviewCount: 2 })),
     );
 
     expect(await catalogue.getMovie(550)).toStrictEqual({
@@ -278,6 +283,7 @@ describe("un film du catalogue (spec 14)", () => {
       value: {
         id: 550,
         title: "Fight Club",
+        synopsis: "Le narrateur vit seul.",
         releaseYear: 1994,
         duration: 142,
         ageRating: "13+",
@@ -285,8 +291,55 @@ describe("un film du catalogue (spec 14)", () => {
         backdropUrl: undefined,
         trailerKey: "SUXWAEX2jlg",
         genres: ["Drame"],
+        averageRating: 4.5,
+        reviewCount: 2,
+        similarMovies: [],
       },
     });
+  });
+
+  it("donne un film sans synopsis ni avis", async () => {
+    const { catalogue } = answering(json(makeMovieDetailOutput({ synopsis: null })));
+
+    const movie = await catalogue.getMovie(550);
+
+    expect(
+      movie.ok && {
+        synopsis: movie.value.synopsis,
+        averageRating: movie.value.averageRating,
+        reviewCount: movie.value.reviewCount,
+      },
+    ).toStrictEqual({ synopsis: undefined, averageRating: undefined, reviewCount: 0 });
+  });
+
+  it("donne les titres similaires avec leurs images, quand ils en ont", async () => {
+    const { catalogue } = answering(
+      json(
+        makeMovieDetailOutput({
+          similarMovies: [
+            {
+              id: 680,
+              title: "Pulp Fiction",
+              posterUrl: "https://images.exemple.fr/affiche.jpg",
+              backdropUrl: "https://images.exemple.fr/banniere.jpg",
+            },
+            { id: 807, title: "Seven", posterUrl: null, backdropUrl: null },
+          ],
+        }),
+      ),
+    );
+
+    const movie = await catalogue.getMovie(550);
+
+    expect(movie.ok && movie.value.similarMovies).toStrictEqual([
+      {
+        id: 680,
+        title: "Pulp Fiction",
+        posterUrl: "https://images.exemple.fr/affiche.jpg",
+        backdropUrl: "https://images.exemple.fr/banniere.jpg",
+      },
+      { id: 807, title: "Seven", posterUrl: undefined, backdropUrl: undefined },
+    ]);
   });
 
   it("signale un film inexistant", async () => {
@@ -301,8 +354,12 @@ describe("un film du catalogue (spec 14)", () => {
     expect(await catalogue.getMovie(550)).toEqual({ ok: false, error: "unavailable" });
   });
 
-  it("signale une réponse invalide pour un film au format inattendu", async () => {
-    const { catalogue } = answering(json({ id: "pas-un-nombre" }));
+  it.each([
+    ["un film au format inattendu", { id: "pas-un-nombre" }],
+    ["un film sans ses titres similaires", makeMovieDetailOutput({ similarMovies: undefined })],
+    ["une note qui n'est pas un nombre", makeMovieDetailOutput({ averageRating: "4,5" })],
+  ])("signale une réponse invalide pour %s", async (_case, body) => {
+    const { catalogue } = answering(json(body));
 
     expect(await catalogue.getMovie(550)).toEqual({ ok: false, error: "invalid_response" });
   });

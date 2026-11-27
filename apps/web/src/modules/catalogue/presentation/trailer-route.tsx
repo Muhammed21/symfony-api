@@ -1,10 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { type AnyRootRoute, createRoute, Link as RouterLink } from "@tanstack/react-router";
-import { ArrowLeft, RotateCw } from "lucide-react";
+import { ArrowLeft, RotateCw, Star } from "lucide-react";
+import type { ReactNode } from "react";
 
-import { ActivityIndicator, ButtonTextAndSymbol, LinkSymbol } from "@prime/ui";
+import {
+  ActivityIndicator,
+  ButtonTextAndSymbol,
+  LinkSymbol,
+  MovieThumb,
+  SectionHeader,
+} from "@prime/ui";
 
-import type { Movie } from "../domain/movie.ts";
+import { type MovieDetail, type SimilarMovie, thumbnailOf } from "../domain/movie.ts";
+import { formatDuration } from "./duration.ts";
+import { riseInOrder } from "./motion.ts";
+import { ageRatingLabel, eyebrowOf } from "./movie-labels.ts";
 import type { GetMovie } from "./use-cases.ts";
 
 import styles from "./trailer-route.module.css";
@@ -17,7 +27,12 @@ const youtubeEmbedOf = (trailerKey: string) =>
 const movieIdOf = (param: string): number | undefined =>
   /^\d+$/u.test(param) ? Number(param) : undefined;
 
-const Player = ({ movie }: { readonly movie: Movie }) =>
+const ratingOf = ({ averageRating, reviewCount }: MovieDetail) =>
+  averageRating === undefined
+    ? "Pas encore d'avis"
+    : `${averageRating.toLocaleString("fr-FR")} / 5 · ${reviewCount} avis`;
+
+const Player = ({ movie }: { readonly movie: MovieDetail }) =>
   movie.trailerKey === undefined ? (
     <p className={styles.message}>Ce film n'a pas encore de bande-annonce.</p>
   ) : (
@@ -32,6 +47,89 @@ const Player = ({ movie }: { readonly movie: Movie }) =>
     </div>
   );
 
+const Details = ({ movie }: { readonly movie: MovieDetail }) => (
+  <section aria-label="À propos du film" className={styles.details}>
+    <ul className={styles.facts}>
+      <li className={styles.badge}>{ageRatingLabel(movie.ageRating)}</li>
+      <li>{movie.releaseYear}</li>
+      <li>{formatDuration(movie.duration)}</li>
+      <li className={styles.rating}>
+        <Star aria-hidden="true" />
+        {ratingOf(movie)}
+      </li>
+    </ul>
+    {movie.synopsis !== undefined && (
+      <p data-synopsis className={styles.synopsis}>
+        {movie.synopsis}
+      </p>
+    )}
+  </section>
+);
+
+const SimilarMovies = ({ movies }: { readonly movies: readonly SimilarMovie[] }) => (
+  <section aria-label="Titres similaires" className={styles.similar}>
+    <SectionHeader title="Titres similaires" />
+    <ul className={styles.thumbs}>
+      {movies.map((movie, index) => {
+        const thumbnail = thumbnailOf(movie);
+        return (
+          <li key={movie.id} {...riseInOrder(index)}>
+            <RouterLink
+              className={styles.thumbLink}
+              to="/films/$movieId/bande-annonce"
+              params={{ movieId: String(movie.id) }}
+              aria-label={movie.title}
+            >
+              <MovieThumb
+                title={movie.title}
+                captioned
+                {...(thumbnail === undefined ? {} : { image: thumbnail })}
+              />
+            </RouterLink>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+);
+
+const MoviePage = ({ movie }: { readonly movie: MovieDetail }) => (
+  <>
+    {movie.backdropUrl !== undefined && (
+      <div className={styles.ambient}>
+        <img className={styles.backdrop} src={movie.backdropUrl} alt="" />
+      </div>
+    )}
+    <div className={styles.screen}>
+      <BackLink />
+      <header className={styles.header}>
+        <p className={styles.eyebrow}>{eyebrowOf(movie)}</p>
+        <h1 className={styles.title}>{movie.title}</h1>
+      </header>
+      <div className={styles.body}>
+        <Player movie={movie} />
+        <Details movie={movie} />
+      </div>
+    </div>
+    {movie.similarMovies.length > 0 && <SimilarMovies movies={movie.similarMovies} />}
+  </>
+);
+
+const BackLink = () => (
+  <LinkSymbol
+    label="Retour"
+    symbol={<ArrowLeft />}
+    render={(anchor) => <RouterLink {...anchor} to="/" />}
+  />
+);
+
+const Status = ({ children }: { readonly children: ReactNode }) => (
+  <div className={styles.screen}>
+    <BackLink />
+    {children}
+  </div>
+);
+
 const Trailer = ({
   movieId,
   getMovie,
@@ -41,28 +139,31 @@ const Trailer = ({
 }) => {
   const movie = useQuery({ queryKey: ["movie", movieId], queryFn: () => getMovie(movieId) });
   if (movie.data === undefined) {
-    return <ActivityIndicator label="Chargement de la bande-annonce" />;
-  }
-  if (!movie.data.ok) {
-    return movie.data.error === "not_found" ? (
-      <p className={styles.message}>{NOT_FOUND}</p>
-    ) : (
-      <div role="alert" className={styles.failure}>
-        <p className={styles.message}>Impossible de charger la bande-annonce.</p>
-        <ButtonTextAndSymbol
-          label="Réessayer"
-          symbol={<RotateCw />}
-          onClick={() => void movie.refetch()}
-        />
-      </div>
+    return (
+      <Status>
+        <ActivityIndicator label="Chargement de la bande-annonce" />
+      </Status>
     );
   }
-  return (
-    <>
-      <h1 className={styles.title}>{movie.data.value.title}</h1>
-      <Player movie={movie.data.value} />
-    </>
-  );
+  if (!movie.data.ok) {
+    return (
+      <Status>
+        {movie.data.error === "not_found" ? (
+          <p className={styles.message}>{NOT_FOUND}</p>
+        ) : (
+          <div role="alert" className={styles.failure}>
+            <p className={styles.message}>Impossible de charger la bande-annonce.</p>
+            <ButtonTextAndSymbol
+              label="Réessayer"
+              symbol={<RotateCw />}
+              onClick={() => void movie.refetch()}
+            />
+          </div>
+        )}
+      </Status>
+    );
+  }
+  return <MoviePage movie={movie.data.value} />;
 };
 
 export const trailerRoute = ({
@@ -79,15 +180,12 @@ export const trailerRoute = ({
       const movieId = movieIdOf(route.useParams().movieId);
       return (
         <div className={styles.page}>
-          <LinkSymbol
-            label="Retour"
-            symbol={<ArrowLeft />}
-            render={(anchor) => <RouterLink {...anchor} to="/" />}
-          />
           {movieId === undefined ? (
-            <p className={styles.message}>{NOT_FOUND}</p>
+            <Status>
+              <p className={styles.message}>{NOT_FOUND}</p>
+            </Status>
           ) : (
-            <Trailer movieId={movieId} getMovie={getMovie} />
+            <Trailer key={movieId} movieId={movieId} getMovie={getMovie} />
           )}
         </div>
       );

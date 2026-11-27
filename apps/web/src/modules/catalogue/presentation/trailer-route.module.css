@@ -1,33 +1,153 @@
 .page {
+  position: relative;
+  isolation: isolate;
+  padding-block-end: var(--prime-space-3xl);
+}
+
+.ambient {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  block-size: 80vh;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+.backdrop {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+  filter: blur(24px);
+  scale: 1.1;
+  animation: fade var(--prime-duration-slow) var(--prime-easing-standard) both;
+}
+
+.screen {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   row-gap: var(--prime-space-2xl);
   box-sizing: border-box;
-  block-size: 100dvh;
   padding: var(--prime-size-navigation-bar) var(--prime-space-3xl) var(--prime-space-3xl);
+}
+
+.body {
+  display: grid;
+  gap: var(--prime-space-2xl);
+  align-self: stretch;
+}
+
+.header {
+  display: grid;
+  row-gap: var(--prime-space-s);
+  animation: rise var(--prime-duration-slow) var(--prime-easing-decelerate) both;
+}
+
+.eyebrow {
+  margin: 0;
+  font: var(--prime-text-footnote);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--prime-color-text-secondary);
 }
 
 .title {
   margin: 0;
   font: var(--prime-text-large-title);
-}
-
-.stage {
-  flex: 1;
-  align-self: stretch;
-  min-block-size: 0;
-  container-type: size;
+  color: var(--prime-color-text-primary);
 }
 
 .player {
   display: block;
-  inline-size: min(100cqi, 100cqb * 16 / 9);
+  inline-size: 100%;
   aspect-ratio: 16 / 9;
   border: none;
   border-radius: var(--prime-radius-large);
   background-color: var(--prime-color-view-thicker);
   box-shadow: var(--prime-shadow-big);
+}
+
+.details {
+  display: grid;
+  align-content: start;
+  row-gap: var(--prime-space-l);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-s) var(--prime-space-l);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--prime-text-subheadline);
+  color: var(--prime-color-text-secondary);
+}
+
+.badge {
+  padding: var(--prime-space-2xs) var(--prime-space-xs);
+  border: 1px solid var(--prime-color-text-tertiary);
+  border-radius: var(--prime-radius-small);
+  font: var(--prime-text-footnote);
+  color: var(--prime-color-text-primary);
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-xs);
+}
+
+.rating > svg {
+  inline-size: 1em;
+  block-size: 1em;
+  color: var(--prime-color-system-yellow);
+  fill: currentColor;
+}
+
+.synopsis {
+  max-inline-size: 65ch;
+  margin: 0;
+  font: var(--prime-text-body);
+  color: var(--prime-color-text-primary);
+}
+
+.similar {
+  display: grid;
+  gap: var(--prime-space-l);
+  padding-block-start: var(--prime-space-3xl);
+}
+
+.similar > :first-child {
+  padding-inline: var(--prime-space-3xl);
+}
+
+.thumbs {
+  display: flex;
+  gap: var(--prime-space-l);
+  overflow-x: auto;
+  margin: calc(-1 * var(--prime-space-l)) 0;
+  padding: var(--prime-space-l) var(--prime-space-3xl);
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.thumbs > li {
+  flex: none;
+}
+
+.thumbLink {
+  display: block;
+  border-radius: var(--prime-radius-medium);
+  color: inherit;
+  text-decoration: none;
+}
+
+.thumbLink:focus-visible {
+  outline: 2px solid var(--prime-color-text-primary);
+  outline-offset: 2px;
 }
 
 .failure {
@@ -40,4 +160,50 @@
   margin: 0;
   color: var(--prime-color-text-secondary);
   font: var(--prime-text-body);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@media (orientation: landscape) and (min-width: 1000px) {
+  .screen {
+    block-size: 100dvh;
+  }
+
+  .body {
+    flex: 1;
+    min-block-size: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  }
+
+  .stage {
+    min-block-size: 0;
+    container-type: size;
+  }
+
+  .player {
+    inline-size: min(100cqi, 100cqb * 16 / 9);
+  }
+
+  .details {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .header {
+    animation: none;
+  }
 }

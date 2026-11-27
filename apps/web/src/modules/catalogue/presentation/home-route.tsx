@@ -15,6 +15,7 @@ import {
 
 import { type Genre, type Movie, thumbnailOf } from "../domain/movie.ts";
 import { riseInOrder } from "./motion.ts";
+import { eyebrowOf } from "./movie-labels.ts";
 import type { ListGenres, ListMovies } from "./use-cases.ts";
 
 import styles from "./home-route.module.css";
@@ -22,9 +23,6 @@ import styles from "./home-route.module.css";
 const FEATURED_COUNT = 5;
 
 const FIRST_PAGE = 1;
-
-const eyebrowOf = ({ releaseYear, genres }: Movie) =>
-  [String(releaseYear), genres.join(", ")].filter((part) => part !== "").join(" · ");
 
 const FeaturedMovie = ({ movies }: { readonly movies: readonly Movie[] }) => {
   const [current, setCurrent] = useState(FIRST_PAGE);

@@ -3,7 +3,7 @@ import type { Result } from "@prime/result";
 import type {
   CatalogueFailure,
   Genre,
-  Movie,
+  MovieDetail,
   MovieFilters,
   MoviePage,
   MovieSort,
@@ -17,5 +17,5 @@ export type CatalogueGateway = {
     readonly sort: MovieSort;
   }) => Promise<Result<MoviePage, CatalogueFailure>>;
   readonly listGenres: () => Promise<Result<readonly Genre[], CatalogueFailure>>;
-  readonly getMovie: (id: number) => Promise<Result<Movie, CatalogueFailure>>;
+  readonly getMovie: (id: number) => Promise<Result<MovieDetail, CatalogueFailure>>;
 };

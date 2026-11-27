@@ -10,10 +10,11 @@ import { z } from "zod";
 
 import { ActivityIndicator, ButtonTextAndSymbol, Link, MovieThumb, PageControl } from "@prime/ui";
 
-import { type AgeRating, type Movie, type MovieFilters, thumbnailOf } from "../domain/movie.ts";
+import { type Movie, type MovieFilters, thumbnailOf } from "../domain/movie.ts";
 import { formatDuration } from "./duration.ts";
 import { riseInOrder } from "./motion.ts";
 import { MovieFilterBar } from "./movie-filters.tsx";
+import { ageRatingLabel } from "./movie-labels.ts";
 import type { ListGenres, ListMovies } from "./use-cases.ts";
 
 import styles from "./catalogue-route.module.css";
@@ -30,8 +31,6 @@ type CatalogueSearch = { readonly page: number } & MovieFilters;
 
 const hasFilters = ({ title, year, genre }: MovieFilters) =>
   [title, year, genre].some((value) => value !== undefined);
-
-const ageRatingLabel = (ageRating: AgeRating) => (ageRating === "ALL" ? "Tous publics" : ageRating);
 
 const MovieCard = ({ movie }: { readonly movie: Movie }) => {
   const titleId = `movie-${movie.id}`;

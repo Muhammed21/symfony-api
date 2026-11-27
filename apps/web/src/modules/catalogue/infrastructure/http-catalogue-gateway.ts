@@ -8,8 +8,10 @@ import {
   AGE_RATINGS,
   type CatalogueFailure,
   type Movie,
+  type MovieDetail,
   type MovieFilters,
   type MovieSort,
+  type SimilarMovie,
 } from "../domain/movie.ts";
 
 const GenreOutput = z.object({ id: z.number().int(), name: z.string() });
@@ -24,6 +26,20 @@ const MovieOutput = z.object({
   backdropUrl: z.string().nullable(),
   trailerKey: z.string().nullable(),
   genres: z.array(GenreOutput),
+});
+
+const SimilarMovieOutput = z.object({
+  id: z.number().int(),
+  title: z.string(),
+  posterUrl: z.string().nullable(),
+  backdropUrl: z.string().nullable(),
+});
+
+const MovieDetailOutput = MovieOutput.extend({
+  synopsis: z.string().nullable(),
+  averageRating: z.number().nullable(),
+  reviewCount: z.number().int(),
+  similarMovies: z.array(SimilarMovieOutput),
 });
 
 const pageOutputOf = <Item extends z.ZodType>(item: Item) =>
@@ -53,6 +69,30 @@ const movieOf = ({
   backdropUrl: backdropUrl ?? undefined,
   trailerKey: trailerKey ?? undefined,
   genres: genres.map((genre) => genre.name),
+});
+
+const similarMovieOf = ({
+  posterUrl,
+  backdropUrl,
+  ...movie
+}: z.infer<typeof SimilarMovieOutput>): SimilarMovie => ({
+  ...movie,
+  posterUrl: posterUrl ?? undefined,
+  backdropUrl: backdropUrl ?? undefined,
+});
+
+const movieDetailOf = ({
+  synopsis,
+  averageRating,
+  reviewCount,
+  similarMovies,
+  ...movie
+}: z.infer<typeof MovieDetailOutput>): MovieDetail => ({
+  ...movieOf(movie),
+  synopsis: synopsis ?? undefined,
+  averageRating: averageRating ?? undefined,
+  reviewCount,
+  similarMovies: similarMovies.map(similarMovieOf),
 });
 
 const filterParameters = ({ title, year, genre }: MovieFilters) =>
@@ -108,8 +148,8 @@ export const createHttpCatalogueGateway = ({
       return body.ok ? ok(body.value.items) : body;
     },
     getMovie: async (id) => {
-      const body = await getJson(`/movies/${id}`, MovieOutput);
-      return body.ok ? ok(movieOf(body.value)) : body;
+      const body = await getJson(`/movies/${id}`, MovieDetailOutput);
+      return body.ok ? ok(movieDetailOf(body.value)) : body;
     },
   };
 };

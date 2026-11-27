@@ -14,7 +14,16 @@ export type Movie = {
   readonly genres: readonly string[];
 };
 
-export const thumbnailOf = (movie: Movie): string | undefined =>
+export type SimilarMovie = Pick<Movie, "id" | "title" | "posterUrl" | "backdropUrl">;
+
+export type MovieDetail = Movie & {
+  readonly synopsis: string | undefined;
+  readonly averageRating: number | undefined;
+  readonly reviewCount: number;
+  readonly similarMovies: readonly SimilarMovie[];
+};
+
+export const thumbnailOf = (movie: SimilarMovie): string | undefined =>
   movie.backdropUrl ?? movie.posterUrl;
 
 export type MoviePage = {

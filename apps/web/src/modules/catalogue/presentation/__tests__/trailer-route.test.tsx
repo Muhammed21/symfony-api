@@ -12,23 +12,32 @@ import { page } from "vitest/browser";
 
 import { err, ok, type Result } from "@prime/result";
 
-import type { CatalogueFailure, Movie } from "../../domain/movie.ts";
+import type { CatalogueFailure, MovieDetail } from "../../domain/movie.ts";
 import { trailerRoute } from "../trailer-route.tsx";
 import type { GetMovie } from "../use-cases.ts";
 
-const FIGHT_CLUB: Movie = {
+const FIGHT_CLUB: MovieDetail = {
   id: 550,
   title: "Fight Club",
+  synopsis: "Le narrateur, sans identité précise, vit seul, travaille seul, dort seul.",
   releaseYear: 1999,
   duration: 139,
   ageRating: "16+",
   posterUrl: undefined,
   backdropUrl: undefined,
   trailerKey: "SUXWAEX2jlg",
-  genres: ["Drame"],
+  genres: ["Drame", "Thriller"],
+  averageRating: undefined,
+  reviewCount: 0,
+  similarMovies: [],
 };
 
-type Answer = Result<Movie, CatalogueFailure>;
+const makeMovie = (overrides: Partial<MovieDetail> = {}): MovieDetail => ({
+  ...FIGHT_CLUB,
+  ...overrides,
+});
+
+type Answer = Result<MovieDetail, CatalogueFailure>;
 
 const NEVER_ANSWERED = new Promise<Answer>(() => {});
 
@@ -67,6 +76,16 @@ type Screen = Awaited<ReturnType<typeof renderTrailer>>["screen"];
 
 const player = (screen: Screen) => screen.getByTitle("Bande-annonce de Fight Club");
 
+const details = (screen: Screen) => screen.getByRole("region", { name: "À propos du film" });
+
+const similar = (screen: Screen) => screen.getByRole("region", { name: "Titres similaires" });
+
+const top = (element: Element) => element.getBoundingClientRect().top;
+
+const box = (element: Element) => element.getBoundingClientRect();
+
+const answeringOnly = (movie: MovieDetail) => answering(ok(movie)).getMovie;
+
 describe("bande-annonce d'un film (spec 14)", () => {
   it("lit la bande-annonce YouTube du film, sous son titre", async () => {
     const { asked, getMovie } = answering(ok(FIGHT_CLUB));
@@ -103,6 +122,147 @@ describe("bande-annonce d'un film (spec 14)", () => {
     expect(document.documentElement.scrollWidth).toBe(width);
   });
 
+  it("présente l'année et les genres au-dessus du titre, comme la bannière de l'accueil", async () => {
+    const { screen } = await renderTrailer();
+
+    await expect.element(screen.getByText("1999 · Drame, Thriller")).toBeVisible();
+  });
+
+  it("décrit le film après le lecteur : classification, année, durée et synopsis", async () => {
+    const { screen } = await renderTrailer();
+
+    await expect.element(details(screen).getByText("16+", { exact: true })).toBeVisible();
+    await expect.element(details(screen).getByText("2 h 19")).toBeVisible();
+    await expect.element(details(screen).getByText(FIGHT_CLUB.synopsis ?? "")).toBeVisible();
+    expect(top(details(screen).element())).toBeGreaterThan(top(player(screen).element()));
+  });
+
+  it.each([
+    [1440, 900, "à côté du lecteur"],
+    [390, 844, "sous le lecteur"],
+  ])("en %i × %i, place la fiche du film %s", async (width, height, place) => {
+    await page.viewport(width, height);
+    const { screen } = await renderTrailer();
+    await expect.element(player(screen)).toBeVisible();
+    const playerBox = box(player(screen).element());
+    const detailsBox = box(details(screen).element());
+
+    expect(
+      place === "à côté du lecteur"
+        ? detailsBox.left >= playerBox.right && detailsBox.top === playerBox.top
+        : detailsBox.top >= playerBox.bottom,
+    ).toBe(true);
+  });
+
+  it("dit d'un film tous publics qu'il l'est", async () => {
+    const { screen } = await renderTrailer({
+      getMovie: answeringOnly(makeMovie({ ageRating: "ALL" })),
+    });
+
+    await expect.element(details(screen).getByText("Tous publics")).toBeVisible();
+  });
+
+  it("n'invente pas de synopsis quand le film n'en a pas", async () => {
+    const { screen } = await renderTrailer({
+      getMovie: answeringOnly(makeMovie({ synopsis: undefined })),
+    });
+
+    await expect.element(details(screen)).toBeVisible();
+    expect(details(screen).element().querySelector("p[data-synopsis]")).toBeNull();
+  });
+
+  it.each([
+    [4.5, 2, "4,5 / 5 · 2 avis"],
+    [3, 1, "3 / 5 · 1 avis"],
+  ])("donne la note moyenne %s et le nombre d'avis", async (averageRating, reviewCount, text) => {
+    const { screen } = await renderTrailer({
+      getMovie: answeringOnly(makeMovie({ averageRating, reviewCount })),
+    });
+
+    await expect.element(details(screen).getByText(text)).toBeVisible();
+  });
+
+  it("dit quand le film n'a pas encore d'avis", async () => {
+    const { screen } = await renderTrailer();
+
+    await expect.element(details(screen).getByText("Pas encore d'avis")).toBeVisible();
+  });
+
+  it("met la bannière du film en fond, fondue dans le noir", async () => {
+    const { screen } = await renderTrailer({
+      getMovie: answeringOnly(makeMovie({ backdropUrl: "https://images.exemple.fr/banniere.jpg" })),
+    });
+    await expect.element(player(screen)).toBeVisible();
+
+    const backdrop = screen.container.querySelector<HTMLImageElement>('img[alt=""]');
+    expect(backdrop?.getAttribute("src")).toBe("https://images.exemple.fr/banniere.jpg");
+    expect(getComputedStyle(backdrop?.parentElement ?? document.body).maskImage).toContain(
+      "linear-gradient",
+    );
+  });
+
+  it("sans bannière, n'affiche aucune image de fond", async () => {
+    const { screen } = await renderTrailer();
+    await expect.element(player(screen)).toBeVisible();
+
+    expect(screen.container.querySelector('img[alt=""]')).toBeNull();
+  });
+
+  it("propose les titres similaires, qui mènent à leur bande-annonce", async () => {
+    const { screen, router } = await renderTrailer({
+      getMovie: answering(
+        ok(
+          makeMovie({
+            similarMovies: [
+              {
+                id: 680,
+                title: "Pulp Fiction",
+                posterUrl: "https://images.exemple.fr/affiche.jpg",
+                backdropUrl: "https://images.exemple.fr/banniere.jpg",
+              },
+              { id: 807, title: "Seven", posterUrl: undefined, backdropUrl: undefined },
+            ],
+          }),
+        ),
+        ok(makeMovie({ id: 680, title: "Pulp Fiction" })),
+      ).getMovie,
+    });
+    const pulpFiction = similar(screen).getByRole("link", { name: "Pulp Fiction" });
+
+    await expect.element(pulpFiction).toHaveAttribute("href", "/films/680/bande-annonce");
+    await expect
+      .element(similar(screen).getByRole("link", { name: "Seven" }))
+      .toHaveAttribute("href", "/films/807/bande-annonce");
+    expect(pulpFiction.element().querySelector("img")?.getAttribute("src")).toBe(
+      "https://images.exemple.fr/banniere.jpg",
+    );
+
+    await pulpFiction.click();
+
+    await expect
+      .element(screen.getByRole("heading", { level: 1, name: "Pulp Fiction" }))
+      .toBeVisible();
+    expect(router.state.location.pathname).toBe("/films/680/bande-annonce");
+  });
+
+  it("sans titre similaire, n'affiche pas la rangée", async () => {
+    const { screen } = await renderTrailer();
+    await expect.element(player(screen)).toBeVisible();
+
+    await expect.element(similar(screen)).not.toBeInTheDocument();
+  });
+
+  it("garde la fiche du film quand il n'a pas de bande-annonce", async () => {
+    const { screen } = await renderTrailer({
+      getMovie: answeringOnly(makeMovie({ trailerKey: undefined })),
+    });
+
+    await expect
+      .element(screen.getByText("Ce film n'a pas encore de bande-annonce."))
+      .toBeVisible();
+    await expect.element(details(screen).getByText("2 h 19")).toBeVisible();
+  });
+
   it("ramène à l'accueil", async () => {
     const { screen, router } = await renderTrailer();
 
@@ -122,7 +282,7 @@ describe("bande-annonce d'un film (spec 14)", () => {
 
   it("dit quand le film n'a pas de bande-annonce", async () => {
     const { screen } = await renderTrailer({
-      getMovie: answering(ok({ ...FIGHT_CLUB, trailerKey: undefined })).getMovie,
+      getMovie: answering(ok(makeMovie({ trailerKey: undefined }))).getMovie,
     });
 
     await expect
@@ -148,10 +308,24 @@ describe("bande-annonce d'un film (spec 14)", () => {
     },
   );
 
+  it("en passant à un autre film, n'affiche jamais le précédent pendant le chargement", async () => {
+    const { screen, router } = await renderTrailer({
+      getMovie: answering(ok(FIGHT_CLUB), NEVER_ANSWERED).getMovie,
+    });
+    await expect.element(player(screen)).toBeVisible();
+
+    await router.navigate({ to: "/films/$movieId/bande-annonce", params: { movieId: "680" } });
+
+    await expect
+      .element(screen.getByRole("progressbar", { name: "Chargement de la bande-annonce" }))
+      .toBeVisible();
+    await expect.element(screen.getByText("Fight Club")).not.toBeInTheDocument();
+  });
+
   it("passe d'un film à l'autre sans garder la bande-annonce du premier", async () => {
     const { asked, getMovie } = answering(
       ok(FIGHT_CLUB),
-      ok({ ...FIGHT_CLUB, id: 680, title: "Pulp Fiction", trailerKey: "s7EdQ4FqbhY" }),
+      ok(makeMovie({ id: 680, title: "Pulp Fiction", trailerKey: "s7EdQ4FqbhY" })),
     );
     const { screen, router } = await renderTrailer({ getMovie });
     await expect.element(player(screen)).toBeVisible();
