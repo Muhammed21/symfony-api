@@ -25,7 +25,7 @@ php bin/console app:tmdb:import --pages=5
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Genres                | `GET /genre/movie/list`                                                                                                                               | `Genre` (nom français), retrouvé par `tmdbId`, sinon par son nom sans tenir compte de la casse, sinon créé |
 | Liste des films       | `GET /discover/movie?sort_by=popularity.desc&vote_count.gte=100&page=N` (20 films par page ; 100 votes au moins écartent les films pas encore sortis) | identifiants à importer, sans doublon                                                                      |
-| Détail de chaque film | `GET /movie/{id}?append_to_response=release_dates,recommendations`                                                                                    | `Movie` (ci-dessous)                                                                                       |
+| Détail de chaque film | `GET /movie/{id}?append_to_response=release_dates,recommendations,videos&include_video_language=fr,en`                                                | `Movie` (ci-dessous)                                                                                       |
 | Titres similaires     | `recommendations` du détail, limités aux films importés                                                                                               | `similarMovies` (spec 05)                                                                                  |
 
 Correspondance d'un film :
@@ -59,7 +59,7 @@ Correspondance d'un film :
 - Usage **non commercial** uniquement, ce qui couvre un projet d'école.
 - Attribution obligatoire : le logo TMDB, moins visible que le nôtre, et la phrase exacte : « This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB. » Dans le front : un pied de page (spec à part ou ajout à la spec 11).
 - Pas de conservation au-delà de 6 mois ; tout purger si l'accès est retiré.
-- TMDB ne fournit **aucun fichier vidéo de film** : seulement des bandes-annonces hébergées sur YouTube (spec 14, qui ajoutera leur clé à l'import).
+- TMDB ne fournit **aucun fichier vidéo de film** : seulement des bandes-annonces hébergées sur YouTube (spec 14 : leur clé est importée dans `trailerKey`).
 
 ## Critères d'acceptation
 

@@ -21,12 +21,12 @@ Le frontend (`apps/web`) commence avec un seul écran, mais doit grandir (détai
 
 Tests :
 
-| Fichier                             | Lancé par                           | Ce qu'il vérifie                                                 |
-| ----------------------------------- | ----------------------------------- | ---------------------------------------------------------------- |
-| `__tests__/*.test.ts`               | `pnpm test` (Node)                  | un module via sa fabrique, avec un faux `fetch`                  |
-| `presentation/__tests__/*.test.tsx` | `pnpm test` (Chromium)              | une route avec de faux cas d'usage                               |
-| `__tests__/*.integration.test.ts`   | `pnpm test:integration`             | un module contre la vraie API (conteneur lancé, `pnpm db:reset`) |
-| Stryker                             | `pnpm mutation`, `pnpm mutation:ui` | l'efficacité des tests unitaires puis navigateur                 |
+| Fichier                             | Lancé par                           | Ce qu'il vérifie                                                          |
+| ----------------------------------- | ----------------------------------- | ------------------------------------------------------------------------- |
+| `__tests__/*.test.ts`               | `pnpm test` (Node)                  | un module via sa fabrique, avec un faux `fetch`                           |
+| `presentation/__tests__/*.test.tsx` | `pnpm test` (Chromium)              | une route avec de faux cas d'usage                                        |
+| `__tests__/*.integration.test.ts`   | `pnpm test:integration`             | un module contre la vraie API (conteneur lancé, `pnpm db:reset:fixtures`) |
+| Stryker                             | `pnpm mutation`, `pnpm mutation:ui` | l'efficacité des tests unitaires puis navigateur                          |
 
 ## Conséquences
 

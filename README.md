@@ -22,7 +22,7 @@ pnpm install
 cp .env.example .env   # configuration du frontend (VITE_API_URL)
 pnpm --filter @prime/web exec playwright install chromium   # navigateur des tests frontend
 pnpm container:up      # lance le conteneur jetable de l'API
-pnpm db:reset          # base + données de test (admin@prime.local / password)
+pnpm db:reset          # base + comptes de test (admin@prime.local / password) + 100 vrais films TMDB (TMDB_API_KEY dans apps/api/.env.local)
 pnpm dev               # API http://localhost:8000, frontend http://localhost:5173, Storybook http://localhost:6006
 ```
 
@@ -36,7 +36,7 @@ En dev, le frontend appelle l'API via le proxy Vite : `/api/movies` est transmis
 
 ```bash
 pnpm test              # tests de toutes les applications
-pnpm test:integration  # frontend contre la vraie API (conteneur et serveur lancés, pnpm db:reset)
+pnpm test:integration  # frontend contre la vraie API (conteneur et serveur lancés, pnpm db:reset:fixtures)
 pnpm lint
 pnpm check-types
 pnpm build

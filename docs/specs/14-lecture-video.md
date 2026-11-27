@@ -1,6 +1,17 @@
 # 14 : Lecture vidéo
 
-> Décision : **la bande-annonce d'abord**. La lecture du film entier (préparation par ffmpeg) vient dans un second temps ; ses choix sont déjà fixés ci-dessous.
+> Décision : **la bande-annonce d'abord** (livrée, voir « Bande-annonce : ce qui est fait »). La lecture du film entier (préparation par ffmpeg) vient dans un second temps ; ses choix sont déjà fixés ci-dessous.
+
+## Bande-annonce : ce qui est fait
+
+- **Import** (spec 13) : le détail TMDB demande aussi `videos` (`append_to_response=release_dates,recommendations,videos`, `include_video_language=fr,en`). Parmi les vidéos YouTube de type `Trailer` (jamais un extrait ni un teaser), on garde la française d'abord, puis l'officielle, puis la première. Sa clé va dans `Movie.trailerKey` (colonne nullable, migration `Version20261126232203`). 98 des 100 films importés en ont une.
+- **API** : `trailerKey` (clé YouTube ou `null`) dans `GET /movies` et `GET /movies/{id}`. Lecture ouverte à tous.
+- **Front** :
+  - bannière de l'accueil : « Bande-annonce » (lien) quand le film à la une en a une ; sinon « Lecture » reste désactivé avec « Bientôt disponible » ;
+  - page `/films/$movieId/bande-annonce` : bouton retour vers l'accueil, titre, lecteur `youtube-nocookie.com` en lecture automatique, 16:9, entier dans la fenêtre quelle que soit sa taille ;
+  - états : chargement, film inexistant (ou identifiant qui n'est pas un nombre, sans appel), film sans bande-annonce, échec avec « Réessayer » ;
+  - nouveau cas d'usage `getMovie(id)` (`GET /movies/{id}`, 404 → `not_found`).
+- Une vraie page plutôt qu'une fenêtre par-dessus l'accueil : partageable, le bouton retour du navigateur marche.
 
 ## Objectif
 
@@ -8,7 +19,7 @@ Rendre actif le bouton « Lecture » de la bannière (aujourd'hui désactivé, s
 
 ## Prérequis
 
-Spec 13 (vrais films, `trailerKey`). ffmpeg sur la machine qui prépare les vidéos.
+Spec 13 (vrais films). `trailerKey` est ajouté à l'import par cette spec. ffmpeg sur la machine qui prépare les vidéos.
 
 ## Faut-il reprendre le service vidéo de twitch ?
 
@@ -60,9 +71,9 @@ php bin/console app:video:package <movieId> chemin/vers/sintel.mp4
 
 ## Front
 
-- Page `/films/:id/lecture` en plein écran, fond noir, bouton retour.
+- Page `/films/:id/lecture` pour le film entier, sur le modèle de la page bande-annonce.
 - Film : `<video>` avec [hls.js](https://github.com/video-dev/hls.js) (Chrome et Firefox ne lisent pas HLS seuls ; Safari le lit nativement).
-- Bande-annonce : lecteur YouTube intégré.
+- Bande-annonce : déjà faite (`/films/$movieId/bande-annonce`).
 - Bannière de l'accueil : « Lecture » pour un film, « Bande-annonce » pour une bande-annonce, désactivé sans `playback` (« Bientôt disponible », comme aujourd'hui).
 - Crédit Creative Commons sous le titre des films Blender.
 
@@ -70,8 +81,8 @@ php bin/console app:video:package <movieId> chemin/vers/sintel.mp4
 
 - `app:video:package` produit une playlist VOD lisible par ffprobe, et `GET /movies/{id}` rend `playback.kind = "film"`.
 - Sur `/films/:id/lecture`, le film démarre, et l'avance rapide au milieu du film fonctionne.
-- Un film sans fichier mais avec bande-annonce ouvre le lecteur YouTube.
-- Un film sans rien garde le bouton désactivé.
+- ✅ Un film sans fichier mais avec bande-annonce ouvre le lecteur YouTube.
+- ✅ Un film sans rien garde le bouton désactivé.
 - Les segments sont servis en `immutable`, la playlist en `application/vnd.apple.mpegurl`.
 
 ## Hors périmètre

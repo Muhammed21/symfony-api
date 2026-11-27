@@ -9,6 +9,7 @@
     "container:up": "pnpm --filter @prime/api container:up",
     "container:down": "pnpm --filter @prime/api container:down",
     "db:reset": "pnpm --filter @prime/api db:reset",
+    "db:reset:fixtures": "pnpm --filter @prime/api db:reset:fixtures",
     "fmt": "oxfmt --write .",
     "fmt:check": "oxfmt --check .",
     "check-types": "turbo run check-types",

@@ -7,6 +7,7 @@
         "dev": "docker exec symfony-api php -S 0.0.0.0:8000 -t public",
         "test": "docker exec symfony-api php bin/phpunit",
         "lint": "docker exec symfony-api php bin/console lint:container",
-        "db:reset": "docker exec symfony-api composer db:reset"
+        "db:reset": "docker exec symfony-api composer db:reset",
+        "db:reset:fixtures": "docker exec symfony-api composer db:reset:fixtures"
     }
 }
