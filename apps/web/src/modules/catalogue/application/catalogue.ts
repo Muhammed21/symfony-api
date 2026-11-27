@@ -3,6 +3,7 @@ import type { Result } from "@prime/result";
 import type {
   CatalogueFailure,
   Genre,
+  Movie,
   MovieFilters,
   MoviePage,
   MovieSort,
@@ -23,4 +24,5 @@ export const catalogueUseCases = ({ gateway }: { readonly gateway: CatalogueGate
   }): Promise<Result<MoviePage, CatalogueFailure>> =>
     gateway.listMovies({ page, limit: MOVIES_PER_PAGE, filters, sort }),
   listGenres: (): Promise<Result<readonly Genre[], CatalogueFailure>> => gateway.listGenres(),
+  getMovie: (id: number): Promise<Result<Movie, CatalogueFailure>> => gateway.getMovie(id),
 });

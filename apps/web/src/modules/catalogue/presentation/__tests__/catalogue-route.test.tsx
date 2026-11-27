@@ -41,6 +41,7 @@ const makeMovie = (overrides: Partial<Movie> = {}): Movie => ({
   ageRating: "13+",
   posterUrl: undefined,
   backdropUrl: undefined,
+  trailerKey: undefined,
   genres: ["Drame"],
   ...overrides,
 });

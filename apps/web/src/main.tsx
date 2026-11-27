@@ -11,6 +11,7 @@ import { accountRoute } from "./modules/account/presentation/account-route.tsx";
 import { createCatalogue } from "./modules/catalogue/catalogue-module.ts";
 import { catalogueRoute } from "./modules/catalogue/presentation/catalogue-route.tsx";
 import { homeRoute } from "./modules/catalogue/presentation/home-route.tsx";
+import { trailerRoute } from "./modules/catalogue/presentation/trailer-route.tsx";
 import { AppShell } from "./modules/shell/presentation/app-shell.tsx";
 import { configOf } from "./platform/config.ts";
 
@@ -52,6 +53,7 @@ const appRouter = ({
     routeTree: root.addChildren([
       homeRoute(routeOptions),
       catalogueRoute(routeOptions),
+      trailerRoute({ parent: root, getMovie: catalogue.getMovie }),
       accountRoute({ parent: root, account, loadBackdrop }),
     ]),
   });

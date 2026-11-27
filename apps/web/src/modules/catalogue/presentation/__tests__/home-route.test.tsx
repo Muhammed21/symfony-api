@@ -41,6 +41,7 @@ const makeMovie = (overrides: Partial<Movie> = {}): Movie => ({
   ageRating: "13+",
   posterUrl: "https://images.exemple.fr/affiche.jpg",
   backdropUrl: "https://images.exemple.fr/banniere.jpg",
+  trailerKey: undefined,
   genres: ["Drame"],
   ...overrides,
 });
@@ -99,10 +100,16 @@ const renderHome = async ({
     path: "/catalogue",
     component: () => <p>Page du catalogue</p>,
   });
+  const trailerStub = createRoute({
+    getParentRoute: () => root,
+    path: "/films/$movieId/bande-annonce",
+    component: () => <p>Page de la bande-annonce</p>,
+  });
   const router = createRouter({
     routeTree: root.addChildren([
       homeRoute({ parent: root, listMovies, listGenres }),
       catalogueStub,
+      trailerStub,
     ]),
     history: createMemoryHistory({ initialEntries: ["/"] }),
   });
@@ -212,7 +219,29 @@ describe("accueil (spec 11)", () => {
     expect(featured(screen).element().querySelector("img")).toBeNull();
   });
 
-  it("présente lecture, liste et détails comme bientôt disponibles", async () => {
+  it("ouvre la bande-annonce du film à la une, quand il en a une", async () => {
+    const { screen, router } = await renderHome({
+      listMovies: ({ sort }) =>
+        pageOf(sort === "recent" ? [makeMovie({ id: 550, trailerKey: "SUXWAEX2jlg" })] : []),
+    });
+    const trailer = featured(screen).getByRole("link", { name: "Bande-annonce" });
+
+    await expect.element(trailer).toHaveAttribute("href", "/films/550/bande-annonce");
+    await expect.element(featured(screen)).toMatchTextContent("Bande-annonce");
+    await expect
+      .element(featured(screen).getByRole("button", { name: "Lecture" }))
+      .not.toBeInTheDocument();
+    await expect
+      .element(featured(screen).getByRole("button", { name: "Ajouter à ma liste" }))
+      .toBeDisabled();
+
+    await trailer.click();
+
+    await expect.element(screen.getByText("Page de la bande-annonce")).toBeVisible();
+    expect(router.state.location.pathname).toBe("/films/550/bande-annonce");
+  });
+
+  it("sans bande-annonce, présente lecture, liste et détails comme bientôt disponibles", async () => {
     const { screen } = await renderHome();
 
     for (const name of ["Lecture", "Ajouter à ma liste", "Plus d'infos"]) {

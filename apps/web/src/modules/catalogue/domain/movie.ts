@@ -10,6 +10,7 @@ export type Movie = {
   readonly ageRating: AgeRating;
   readonly posterUrl: string | undefined;
   readonly backdropUrl: string | undefined;
+  readonly trailerKey: string | undefined;
   readonly genres: readonly string[];
 };
 
@@ -24,7 +25,7 @@ export type MoviePage = {
 
 export type MovieSort = "title" | "recent";
 
-export type CatalogueFailure = "unavailable" | "invalid_response";
+export type CatalogueFailure = "unavailable" | "invalid_response" | "not_found";
 
 export type MovieFilters = {
   readonly title?: string | undefined;

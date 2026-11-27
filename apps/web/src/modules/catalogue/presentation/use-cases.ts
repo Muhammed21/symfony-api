@@ -3,6 +3,7 @@ import type { Result } from "@prime/result";
 import type {
   CatalogueFailure,
   Genre,
+  Movie,
   MovieFilters,
   MoviePage,
   MovieSort,
@@ -15,3 +16,5 @@ export type ListMovies = (query: {
 }) => Promise<Result<MoviePage, CatalogueFailure>>;
 
 export type ListGenres = () => Promise<Result<readonly Genre[], CatalogueFailure>>;
+
+export type GetMovie = (id: number) => Promise<Result<Movie, CatalogueFailure>>;

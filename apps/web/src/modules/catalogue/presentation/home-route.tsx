@@ -46,16 +46,35 @@ const FeaturedMovie = ({ movies }: { readonly movies: readonly Movie[] }) => {
         <p className={styles.eyebrow}>{eyebrowOf(movie)}</p>
         <h2 className={styles.featuredTitle}>{movie.title}</h2>
         <div className={styles.actions}>
-          <div className={styles.play}>
-            <ButtonSymbol
-              size="extra-large"
-              appearance="prominent"
-              label="Lecture"
-              symbol={<Play />}
-              disabled
-            />
-            <span aria-hidden="true">Lecture</span>
-          </div>
+          {movie.trailerKey === undefined ? (
+            <div className={styles.play}>
+              <ButtonSymbol
+                size="extra-large"
+                appearance="prominent"
+                label="Lecture"
+                symbol={<Play />}
+                disabled
+              />
+              <span aria-hidden="true">Lecture</span>
+            </div>
+          ) : (
+            <div className={styles.play}>
+              <LinkSymbol
+                size="extra-large"
+                appearance="prominent"
+                label="Bande-annonce"
+                symbol={<Play />}
+                render={(anchor) => (
+                  <RouterLink
+                    {...anchor}
+                    to="/films/$movieId/bande-annonce"
+                    params={{ movieId: String(movie.id) }}
+                  />
+                )}
+              />
+              <span aria-hidden="true">Bande-annonce</span>
+            </div>
+          )}
           <ButtonSymbol size="large" label="Ajouter à ma liste" symbol={<Plus />} disabled />
           <ButtonSymbol size="large" label="Plus d'infos" symbol={<Info />} disabled />
         </div>

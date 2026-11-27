@@ -1,0 +1,43 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: var(--prime-space-2xl);
+  box-sizing: border-box;
+  block-size: 100dvh;
+  padding: var(--prime-size-navigation-bar) var(--prime-space-3xl) var(--prime-space-3xl);
+}
+
+.title {
+  margin: 0;
+  font: var(--prime-text-large-title);
+}
+
+.stage {
+  flex: 1;
+  align-self: stretch;
+  min-block-size: 0;
+  container-type: size;
+}
+
+.player {
+  display: block;
+  inline-size: min(100cqi, 100cqb * 16 / 9);
+  aspect-ratio: 16 / 9;
+  border: none;
+  border-radius: var(--prime-radius-large);
+  background-color: var(--prime-color-view-thicker);
+  box-shadow: var(--prime-shadow-big);
+}
+
+.failure {
+  display: grid;
+  justify-items: start;
+  row-gap: var(--prime-space-l);
+}
+
+.message {
+  margin: 0;
+  color: var(--prime-color-text-secondary);
+  font: var(--prime-text-body);
+}

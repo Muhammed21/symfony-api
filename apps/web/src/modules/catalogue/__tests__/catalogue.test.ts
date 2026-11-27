@@ -12,6 +12,7 @@ const makeMovieOutput = (overrides: Readonly<Record<string, unknown>> = {}) => (
   ageRating: "13+",
   posterUrl: null,
   backdropUrl: null,
+  trailerKey: null,
   genres: [{ id: 6, name: "Drame" }],
   ...overrides,
 });
@@ -102,6 +103,23 @@ describe("lecture du catalogue dans l'app web (spec 08)", () => {
         backdropUrl: "https://images.exemple.fr/banniere.jpg",
       },
       { posterUrl: undefined, backdropUrl: undefined },
+    ]);
+  });
+
+  it("donne la bande-annonce YouTube de chaque film, quand il en a une", async () => {
+    const { catalogue } = answering(
+      json(
+        makePageOutput({
+          items: [makeMovieOutput({ trailerKey: "SUXWAEX2jlg" }), makeMovieOutput({ id: 2 })],
+        }),
+      ),
+    );
+
+    const page = await catalogue.listMovies({ page: 1, filters: {} });
+
+    expect(page.ok && page.value.movies.map(({ trailerKey }) => trailerKey)).toStrictEqual([
+      "SUXWAEX2jlg",
+      undefined,
     ]);
   });
 
@@ -234,5 +252,58 @@ describe("genres du catalogue (spec 09)", () => {
     const { catalogue } = answering(response);
 
     expect(await catalogue.listGenres()).toEqual({ ok: false, error: "invalid_response" });
+  });
+});
+
+describe("un film du catalogue (spec 14)", () => {
+  it("demande le film à l'API par son identifiant", async () => {
+    const { catalogue, calls } = answering(json(makeMovieOutput({ id: 550 })));
+
+    await catalogue.getMovie(550);
+
+    expect(calls).toEqual([{ url: `${API_URL}/movies/550`, init: { method: "GET" } }]);
+  });
+
+  it("donne le film avec sa bande-annonce", async () => {
+    const { catalogue } = answering(
+      json({
+        ...makeMovieOutput({ id: 550, title: "Fight Club", trailerKey: "SUXWAEX2jlg" }),
+        synopsis: "Le narrateur vit seul.",
+        similarMovies: [],
+      }),
+    );
+
+    expect(await catalogue.getMovie(550)).toStrictEqual({
+      ok: true,
+      value: {
+        id: 550,
+        title: "Fight Club",
+        releaseYear: 1994,
+        duration: 142,
+        ageRating: "13+",
+        posterUrl: undefined,
+        backdropUrl: undefined,
+        trailerKey: "SUXWAEX2jlg",
+        genres: ["Drame"],
+      },
+    });
+  });
+
+  it("signale un film inexistant", async () => {
+    const { catalogue } = answering(json({ title: "Not Found" }, 404));
+
+    expect(await catalogue.getMovie(999_999)).toEqual({ ok: false, error: "not_found" });
+  });
+
+  it("se dit indisponible quand l'API répond 503", async () => {
+    const { catalogue } = answering(json({ title: "Erreur" }, 503));
+
+    expect(await catalogue.getMovie(550)).toEqual({ ok: false, error: "unavailable" });
+  });
+
+  it("signale une réponse invalide pour un film au format inattendu", async () => {
+    const { catalogue } = answering(json({ id: "pas-un-nombre" }));
+
+    expect(await catalogue.getMovie(550)).toEqual({ ok: false, error: "invalid_response" });
   });
 });
