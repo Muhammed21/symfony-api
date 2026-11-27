@@ -20,6 +20,16 @@
   background-color: var(--prime-color-view-thicker);
 }
 
+.featured::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  block-size: calc(2 * var(--prime-size-navigation-bar));
+  background-image: linear-gradient(var(--prime-color-view-scrim), transparent);
+  pointer-events: none;
+}
+
 .featured::after {
   content: "";
   position: absolute;

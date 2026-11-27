@@ -205,6 +205,28 @@ describe("accueil (spec 11)", () => {
       .not.toBeInTheDocument();
   });
 
+  it("assombrit le haut de la bannière pour garder le logo et la navigation lisibles", async () => {
+    const { screen } = await renderHome();
+    await expect.element(featured(screen)).toBeVisible();
+    const scrim = getComputedStyle(featured(screen).element(), "::before");
+
+    expect({
+      position: scrim.position,
+      top: scrim.top,
+      height: scrim.height,
+      zIndex: scrim.zIndex,
+      pointerEvents: scrim.pointerEvents,
+      backgroundImage: scrim.backgroundImage,
+    }).toEqual({
+      position: "absolute",
+      top: "0px",
+      height: "184px",
+      zIndex: "1",
+      pointerEvents: "none",
+      backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0))",
+    });
+  });
+
   it("garde la bannière sans image quand le film n'en a pas", async () => {
     const { screen } = await renderHome({
       listMovies: ({ sort }) =>

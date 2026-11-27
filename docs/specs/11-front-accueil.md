@@ -25,7 +25,7 @@ Specs 08, 09 et 10 (images et tri `recent`). Design system `@prime/ui` ([ADR 000
 ### Bannière (560 px)
 
 - Les 5 films les plus récents (`GET /movies?sort=recent&limit=5`), un à la fois.
-- L'image de bannière (`backdropUrl`) remplit la bannière ; un dégradé noir couvre sa moitié basse. Sans image, un fond sombre uni.
+- L'image de bannière (`backdropUrl`) remplit la bannière ; un dégradé noir couvre sa moitié basse, un autre son haut (deux hauteurs de barre de navigation, 184 px, noir à 80 % vers transparent) pour garder le logo et les onglets lisibles sur une image claire. Sans image, un fond sombre uni.
 - En bas à gauche (marge de 40 px) : un sur-titre en capitales espacées (année · genres), le titre en très grand à la place du logo du film, puis les actions.
 - Actions de la maquette : bouton rond « Lecture » (64 px) suivi du texte, puis « Ajouter à ma liste » (+) et « Plus d'infos » (i), 52 px. **Il n'y a ni lecture vidéo, ni liste, ni page de détail** : ces boutons sont affichés mais désactivés, avec la mention « Bientôt disponible » écrite dessous (un bouton désactivé ne reçoit pas le survol).
 - Un `PageControl` centré en bas passe d'un film à l'autre ; pas de défilement automatique.
