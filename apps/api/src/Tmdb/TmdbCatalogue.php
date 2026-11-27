@@ -60,7 +60,10 @@ class TmdbCatalogue
      */
     public function movie(int $id): array
     {
-        return $this->get("/movie/{$id}", ['append_to_response' => 'release_dates,recommendations']);
+        return $this->get("/movie/{$id}", [
+            'append_to_response' => 'release_dates,recommendations,videos',
+            'include_video_language' => 'fr,en',
+        ]);
     }
 
     /**

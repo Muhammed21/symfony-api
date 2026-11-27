@@ -51,6 +51,10 @@ class Movie
     #[Groups(['movie:list', 'movie:read'])]
     private ?string $backdropUrl;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['movie:list', 'movie:read'])]
+    private ?string $trailerKey = null;
+
     /**
      * @var Collection<int, Genre>
      */
@@ -153,6 +157,16 @@ class Movie
     public function linkToTmdb(int $tmdbId): void
     {
         $this->tmdbId = $tmdbId;
+    }
+
+    public function showTrailer(?string $trailerKey): void
+    {
+        $this->trailerKey = $trailerKey;
+    }
+
+    public function getTrailerKey(): ?string
+    {
+        return $this->trailerKey;
     }
 
     public function getTmdbId(): ?int

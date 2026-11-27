@@ -72,6 +72,7 @@ final readonly class TmdbImporter
                 ++$updated;
             }
 
+            $movie->showTrailer(self::trailerKeyOf($detail['videos']['results']));
             $imported[] = [$movie, $detail['recommendations']['results']];
         }
 
@@ -136,6 +137,21 @@ final readonly class TmdbImporter
             posterUrl: null === $detail['poster_path'] ? null : self::POSTER_BASE_URL.$detail['poster_path'],
             backdropUrl: null === $detail['backdrop_path'] ? null : self::BACKDROP_BASE_URL.$detail['backdrop_path'],
         );
+    }
+
+    /**
+     * @param list<array{iso_639_1: string, site: string, type: string, official: bool, key: string}> $videos
+     */
+    private static function trailerKeyOf(array $videos): ?string
+    {
+        $trailers = array_values(array_filter(
+            $videos,
+            static fn (array $video): bool => 'YouTube' === $video['site'] && 'Trailer' === $video['type'],
+        ));
+        $rank = static fn (array $video): array => ['fr' === $video['iso_639_1'] ? 0 : 1, $video['official'] ? 0 : 1];
+        usort($trailers, static fn (array $a, array $b): int => $rank($a) <=> $rank($b));
+
+        return $trailers[0]['key'] ?? null;
     }
 
     /**

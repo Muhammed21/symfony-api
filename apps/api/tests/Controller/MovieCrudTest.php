@@ -168,6 +168,7 @@ final class MovieCrudTest extends ApiTestCase
             'ageRating' => '18+',
             'posterUrl' => null,
             'backdropUrl' => null,
+            'trailerKey' => null,
             'genres' => [],
             'similarMovies' => [],
             'averageRating' => null,

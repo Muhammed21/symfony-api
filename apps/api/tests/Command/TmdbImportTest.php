@@ -89,7 +89,7 @@ final class TmdbImportTest extends ApiTestCase
             $tmdb->requests[1]['query'],
         );
         self::assertSame(
-            ['api_key' => 'cle-de-test', 'language' => 'fr-FR', 'append_to_response' => 'release_dates,recommendations'],
+            ['api_key' => 'cle-de-test', 'language' => 'fr-FR', 'append_to_response' => 'release_dates,recommendations,videos', 'include_video_language' => 'fr,en'],
             $tmdb->requests[2]['query'],
         );
     }
@@ -216,6 +216,36 @@ final class TmdbImportTest extends ApiTestCase
         ])]));
 
         self::assertSame($ageRating, $this->movieTitled('Film 550')['ageRating']);
+    }
+
+    /**
+     * @return iterable<string, array{list<array<string, mixed>>, ?string}>
+     */
+    public static function trailers(): iterable
+    {
+        yield 'la bande-annonce française d\'abord, même non officielle' => [[FakeTmdb::video('en-officielle', 'en'), FakeTmdb::video('fr-vost', 'fr', official: false)], 'fr-vost'];
+        yield 'sinon l\'officielle' => [[FakeTmdb::video('en-fan', 'en', official: false), FakeTmdb::video('en-officielle', 'en')], 'en-officielle'];
+        yield 'sinon la première' => [[FakeTmdb::video('en-1', 'en', official: false), FakeTmdb::video('en-2', 'en', official: false)], 'en-1'];
+        yield 'jamais un extrait ni un teaser' => [[FakeTmdb::video('extrait', type: 'Clip'), FakeTmdb::video('teaser', type: 'Teaser')], null];
+        yield 'seulement YouTube' => [[FakeTmdb::video('vimeo', site: 'Vimeo')], null];
+        yield 'sans vidéo' => [[], null];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $videos
+     */
+    #[DataProvider('trailers')]
+    public function testGardeLaBandeAnnonceYoutubeLaPlusAdaptee(array $videos, ?string $trailerKey): void
+    {
+        $this->import(new FakeTmdb(self::GENRES, [1 => [550]], [550 => FakeTmdb::movie(550, ['videos' => ['results' => $videos]])]));
+
+        $movie = $this->movieTitled('Film 550');
+        $listed = $this->moviesByTitle()['Film 550'];
+
+        self::assertArrayHasKey('trailerKey', $movie);
+        self::assertArrayHasKey('trailerKey', $listed);
+        self::assertSame($trailerKey, $movie['trailerKey']);
+        self::assertSame($trailerKey, $listed['trailerKey']);
     }
 
     public function testRelieLesFilmsRecommandesDejaImportes(): void

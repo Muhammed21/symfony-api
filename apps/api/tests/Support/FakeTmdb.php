@@ -43,6 +43,7 @@ final class FakeTmdb
             'backdrop_path' => "/banniere-{$id}.jpg",
             'release_dates' => ['results' => []],
             'recommendations' => ['results' => []],
+            'videos' => ['results' => []],
             ...$overrides,
         ];
     }
@@ -62,6 +63,14 @@ final class FakeTmdb
                 array_values($certificationsByType),
             ),
         ]]];
+    }
+
+    /**
+     * @return array{iso_639_1: string, site: string, type: string, official: bool, key: string}
+     */
+    public static function video(string $key, string $language = 'fr', string $type = 'Trailer', bool $official = true, string $site = 'YouTube'): array
+    {
+        return ['iso_639_1' => $language, 'site' => $site, 'type' => $type, 'official' => $official, 'key' => $key];
     }
 
     /**
