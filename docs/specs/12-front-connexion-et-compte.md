@@ -54,7 +54,7 @@ Vérifiées à l'envoi, avant tout appel à l'API ; chaque erreur s'affiche sous
 
 ## Barre de navigation
 
-- Déconnecté : seul à droite de la barre, une icône de profil dans un rond blanc de 44 px (`LinkSymbol` `prominent`, nommé « Se connecter »), à la taille de l'avatar, vers `/compte?redirect=<page courante>`.
+- Déconnecté : seul à droite de la barre, une icône de profil dans une pastille de verre liquide de 40 px, comme la barre d'onglets (`LinkSymbol` `glass` en taille `medium`, nommé « Se connecter »), vers `/compte?redirect=<page courante>`.
 - Connecté : un avatar rond de 44 px avec l'initiale de l'e-mail en capitale. C'est un bouton (`Compte de <e-mail>`, `aria-expanded`) qui ouvre un menu de verre sous lui : l'e-mail, puis `Se déconnecter`.
 - Le menu se ferme avec Échap (le focus revient à l'avatar), un clic en dehors ou un second clic sur l'avatar.
 - Se déconnecter oublie la session ; la page courante reste affichée et le lien `Se connecter` revient.

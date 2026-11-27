@@ -99,19 +99,25 @@ describe("bouton de compte de la barre (spec 12)", () => {
     expect(router.state.location.pathname).toBe("/compte");
   });
 
-  it("déconnecté, montre une icône de profil ronde de 44 px, sans texte, à la taille de l'avatar", async () => {
+  it("déconnecté, montre une icône de profil dans une pastille de verre de 40 px, comme la barre d'onglets", async () => {
     const { screen } = await renderButton();
     const link = screen.getByRole("link", { name: "Se connecter" });
+    await userEvent.unhover(link);
 
     await expect.element(link).toHaveStyle({
-      width: "44px",
-      height: "44px",
+      width: "40px",
+      height: "40px",
       borderTopLeftRadius: "9999px",
-      backgroundColor: "rgba(255, 255, 255, 0.96)",
-      color: "rgb(0, 0, 0)",
+      backgroundColor: "rgba(255, 255, 255, 0.08)",
+      backdropFilter: "blur(16px) saturate(1.8)",
+      color: "rgba(255, 255, 255, 0.96)",
     });
+    expect(getComputedStyle(link.element()).boxShadow).toContain(
+      "rgba(255, 255, 255, 0.4) 0px 1px 0px 0px inset",
+    );
     expect(link.element().textContent).toBe("");
-    expect(link.element().querySelector("svg")).not.toBeNull();
+    const symbol = link.element().querySelector("svg");
+    expect(symbol === null ? "aucun symbole" : getComputedStyle(symbol).width).toBe("16px");
   });
 
   it("connecté, montre l'avatar à l'initiale de l'e-mail, menu fermé", async () => {

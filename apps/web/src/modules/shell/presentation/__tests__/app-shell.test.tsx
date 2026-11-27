@@ -40,6 +40,9 @@ const animationOf = (element: Element | null) =>
         duration: getComputedStyle(element).animationDuration,
       };
 
+const left = (element: Element | null | undefined) =>
+  Math.round(element?.getBoundingClientRect().left ?? -1);
+
 describe("coque de l'application (spec 11)", () => {
   it("place la page dans le contenu principal de la fenêtre", async () => {
     const { screen } = await renderShell("/");
@@ -123,6 +126,26 @@ describe("coque de l'application (spec 11)", () => {
     await expect
       .element(tabs.getByRole("link", { name: "Accueil" }))
       .not.toHaveAttribute("aria-current");
+  });
+
+  it("fait glisser la pastille de l'onglet courant d'Accueil à Catalogue, et retour", async () => {
+    await page.viewport(1280, 800);
+    const { screen, router } = await renderShell("/");
+    const tabs = screen.getByRole("navigation", { name: "Navigation principale" });
+    const pill = tabs.element().querySelector<HTMLElement>("li[aria-hidden='true']");
+    const tabLeft = (name: string) => left(tabs.getByRole("link", { name }).element());
+    await expect.poll(() => left(pill)).toBe(tabLeft("Accueil"));
+
+    await tabs.getByRole("link", { name: "Catalogue" }).click();
+
+    await expect.poll(() => pill?.getAnimations().length ?? 0).toBeGreaterThan(0);
+    await expect.poll(() => left(pill)).toBe(tabLeft("Catalogue"));
+
+    await router.navigate({ to: "/" });
+
+    await expect.poll(() => pill?.getAnimations().length ?? 0).toBeGreaterThan(0);
+    await expect.poll(() => left(pill)).toBe(tabLeft("Accueil"));
+    expect(tabs.element().querySelector("li[aria-hidden='true']")).toBe(pill);
   });
 
   it("garde l'onglet Catalogue courant quelle que soit la recherche", async () => {

@@ -17,7 +17,8 @@ const LogInLink = () => {
     <LinkSymbol
       label="Se connecter"
       symbol={<CircleUserRound />}
-      appearance="prominent"
+      size="medium"
+      appearance="glass"
       render={(anchor) => <RouterLink {...anchor} to="/compte" search={{ redirect: here }} />}
     />
   );
